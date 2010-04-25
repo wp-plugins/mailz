@@ -98,14 +98,16 @@ $defaultfooter = '
 </body></html>
 ';
 
-if (is_file("../config/header.inc")) {
-	$fd = fopen("../config/header.inc", "r");
-	$defaultheader = fread($fd, filesize("../config/header.inc"));
+//zing added dirname(__FILE__)
+if (is_file(dirname(__FILE__)."/../config/header.inc")) {
+	$fd = fopen(dirname(__FILE__)."/../config/header.inc", "r");
+	$defaultheader = fread($fd, filesize(dirname(__FILE__)."/../config/header.inc"));
 	fclose($fd);
 }
-if (is_file("../config/footer.inc")) {
-	$fd = fopen("../config/footer.inc", "r");
-	$defaultfooter = fread($fd, filesize("../config/footer.inc"));
+//zing added dirname(__FILE__)
+if (is_file(dirname(__FILE__)."/../config/footer.inc")) {
+	$fd = fopen(dirname(__FILE__)."/../config/footer.inc", "r");
+	$defaultfooter = fread($fd, filesize(dirname(__FILE__)."/../config/footer.inc"));
 	fclose($fd);
 }
 

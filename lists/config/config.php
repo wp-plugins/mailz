@@ -42,6 +42,29 @@ $table_prefix = "phplist_";
 # read README.usertables for more information
 $usertable_prefix = "phplist_user_";
 
+/*
+
+=========================================================================
+
+Settings for Wordpress integration
+
+=========================================================================
+
+*/
+
+if ( isset($_GET['wpabspath']) ) {
+	//error_reporting(E_ALL & ~E_NOTICE);
+	//ini_set('display_errors', '1');
+	define('ABSPATH', dirname(__FILE__) . '/');
+	require($_GET['wpabspath'].'wp-config.php');
+	$database_host = DB_HOST;
+	$database_name = DB_NAME;
+	$database_user = DB_USER;
+	$database_password = DB_PASSWORD;
+	$table_prefix = $table_prefix . 'zing_phplist_'; //$table_prefix gets returned from WP config
+	$usertable_prefix = $table_prefix;
+}
+
 # if you change the path to the PHPlist system, make the change here as well
 # path should be relative to the root directory of your webserver (document root)
 # you cannot actually change the "admin", but you can change the "lists"
@@ -188,7 +211,7 @@ Debugging and informational
 
 # if test is true (not 0) it will not actually send ANY messages,
 # but display what it would have sent
-define ("TEST",1);
+define ("TEST",0);
 
 # if you set verbose to 1, it will show the messages that will be sent. Do not do this
 # if you have a lot of users, because it is likely to crash your browser
