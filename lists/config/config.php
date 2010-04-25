@@ -42,29 +42,6 @@ $table_prefix = "phplist_";
 # read README.usertables for more information
 $usertable_prefix = "phplist_user_";
 
-/*
-
-=========================================================================
-
-Settings for Wordpress integration
-
-=========================================================================
-
-*/
-
-if ( isset($_GET['wpabspath']) ) {
-	//error_reporting(E_ALL & ~E_NOTICE);
-	//ini_set('display_errors', '1');
-	define('ABSPATH', dirname(__FILE__) . '/');
-	require($_GET['wpabspath'].'wp-config.php');
-	$database_host = DB_HOST;
-	$database_name = DB_NAME;
-	$database_user = DB_USER;
-	$database_password = DB_PASSWORD;
-	$table_prefix = $table_prefix . 'zing_phplist_'; //$table_prefix gets returned from WP config
-	$usertable_prefix = $table_prefix;
-}
-
 # if you change the path to the PHPlist system, make the change here as well
 # path should be relative to the root directory of your webserver (document root)
 # you cannot actually change the "admin", but you can change the "lists"
@@ -710,5 +687,31 @@ $database_module = "mysql.inc";
 
 # if you want more trouble, make this 63 (very unlikely you will like the result)
 $error_level = error_reporting(0);
+
+/*
+
+=========================================================================
+
+Settings for Wordpress integration
+
+=========================================================================
+
+*/
+
+if ( isset($_GET['wpabspath']) ) {
+	//error_reporting(E_ALL & ~E_NOTICE);
+	//ini_set('display_errors', '1');
+	define('ABSPATH', dirname(__FILE__) . '/');
+	require($_GET['wpabspath'].'wp-config.php');
+	$database_host = DB_HOST;
+	$database_name = DB_NAME;
+	$database_user = DB_USER;
+	$database_password = DB_PASSWORD;
+	$table_prefix = $table_prefix . 'zing_phplist_'; //$table_prefix gets returned from WP config
+	$usertable_prefix = $table_prefix;
+	$pageroot = '';
+	$adminpages = '/wp-content/plugins/mailz/lists/admin';//$_GET['wpsiteurl'].'/wp-admin/options-general.php';
+	$wpindex='&zlist=index&page_id='.$_GET['wppageid'];
+}
 
 ?>

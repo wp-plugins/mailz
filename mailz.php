@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.2
+ Version: 0.3
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.2");
+define("ZING_MAILZ_VERSION","0.3");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -111,85 +111,6 @@ function zing_mailz_activate() {
 		update_option("zing_mailz_version",ZING_MAILZ_VERSION);
 	}
 
-	//create database tables
-	if (!$zing_mailz_version) {
-		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
-		$news = new HTTPRequest($http);
-		if ($news->live()) {
-			$output=$news->DownloadToString(true);
-		}
-	}
-
-	//set admin password
-	$password=md5(time().get_option('home'));
-	$query="update ".$prefix."phplist_admin set password='".$password."' where loginname='admin'";
-	$wpdb->query($query);
-	update_option("zing_mailz_password",$password);
-
-	//set configuration options
-	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',substr(ZING_MAILZ_URL,0,-1))."' where item='website'";
-	$wpdb->query($query);
-	
-/*	
-	if ($handle = opendir(dirname(__FILE__).'/db')) {
-		while (false !== ($file = readdir($handle))) {
-			if (strstr($file,".sql")) {
-				$f=explode("-",$file);
-					
-				$v=str_replace(".sql","",$f[1]);
-				if ($zing_mailz_version < $v) {
-					$file_content = file(dirname(__FILE__).'/db/'.$file);
-					$query = "";
-					foreach($file_content as $sql_line) {
-						$tsl = trim($sql_line);
-						if (($sql_line != "") && (substr($tsl, 0, 2) != "--") && (substr($tsl, 0, 1) != "#")) {
-							$sql_line = str_replace("CREATE TABLE `", "CREATE TABLE `".$prefix, $sql_line);
-							$sql_line = str_replace("INSERT INTO `", "INSERT INTO `".$prefix, $sql_line);
-							$sql_line = str_replace("ALTER TABLE `", "ALTER TABLE `".$prefix, $sql_line);
-							$sql_line = str_replace("UPDATE `", "UPDATE `".$prefix, $sql_line);
-							$sql_line = str_replace("TRUNCATE TABLE `", "TRUNCATE TABLE `".$prefix, $sql_line);
-							$query .= $sql_line;
-
-							if(preg_match("/;\s*$/", $sql_line)) {
-								echo '<br />'.$query;
-								$wpdb->query($query);
-								$query = "";
-							}
-						}
-
-					}
-				}
-			}
-		}
-		closedir($handle);
-	}
-
-*/
-	
-	//default settings
-	if ($zing_mailz_version <= '0.1') {
-		/*
-		 $query="update ".$prefix."config set admin_email='".get_option('admin_email')."'";
-		 $query.=",helpdesk_url='".get_option('home')."'";
-		 $wpdb->query($query);
-		 */
-	}
-
-	//default user
-	/*
-	 $query="INSERT INTO `".$prefix."staff` (`staff_id`, `group_id`, `dept_id`, `username`, `firstname`, `lastname`, `passwd`, `email`, `phone`, `phone_ext`, `mobile`, `signature`, `isactive`, `isadmin`, `isvisible`, `onvacation`, `daylight_saving`, `append_signature`, `change_passwd`, `timezone_offset`, `max_page_size`, `created`, `lastlogin`, `updated`) VALUES";
-	 $query.="('".$current_user->data->ID."', 1, 1, '".$current_user->data->user_login."', '".$current_user->first_name."', '".$current_user->last_name."', '".md5($current_user->data->user_pass)."', '".$current_user->data->user_email."', '', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0.0, 0, '".date("Y-m-d")."', NULL, '".date("Y-m-d")."')";
-	 $wpdb->query($query);
-	 $query=sprintf("UPDATE `".$prefix."staff` SET `passwd`='%s', `change_passwd`=0 WHERE `username`='%s'",md5($current_user->data->user_pass),$current_user->data->user_login);
-	 $wpdb->query($query);
-	 */
-
-	//default options
-	foreach ($zing_mailz_options as $value) {
-		delete_option( $value['id'] );
-		if ( !empty($value['id']) && !get_option($value['id']) ) update_option( $value['id'], $value['std'] );
-	}
-
 	//create standard pages
 	if ($zing_mailz_version <= '0.1') {
 		$pages=array();
@@ -218,6 +139,33 @@ function zing_mailz_activate() {
 			add_option("zing_mailz_pages",$ids);
 		}
 	}
+	
+	//create database tables
+	if (!$zing_mailz_version) {
+		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
+		$news = new HTTPRequest($http);
+		if ($news->live()) {
+			$output=$news->DownloadToString(true);
+		}
+	}
+
+	//set admin password
+	$password=md5(time().get_option('home'));
+	$query="update ".$prefix."phplist_admin set password='".$password."' where loginname='admin'";
+	$wpdb->query($query);
+	update_option("zing_mailz_password",$password);
+
+	//set configuration options
+	//$query="update ".$prefix."phplist_config set value='".str_replace('http://','',substr(ZING_MAILZ_URL,0,-1))."' where item='website'";
+	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('home'))."' where item='website'";
+	$wpdb->query($query);
+
+	//default options
+	foreach ($zing_mailz_options as $value) {
+		delete_option( $value['id'] );
+		if ( !empty($value['id']) && !get_option($value['id']) ) update_option( $value['id'], $value['std'] );
+	}
+
 }
 
 /**
@@ -335,8 +283,8 @@ function zing_mailz_output($process) {
 			return $content;
 			break;
 	}
-	error_reporting(E_ALL & ~E_NOTICE);
-	ini_set('display_errors', '1');
+	//error_reporting(E_ALL & ~E_NOTICE);
+	//ini_set('display_errors', '1');
 
 	/*
 	 if (get_option("zing_mailz_subscribers") == "Subscribers" && !is_user_logged_in()) {
@@ -377,8 +325,11 @@ function zing_mailz_mainpage() {
 }
 
 function zing_mailz_ob($buffer) {
-	global $current_user,$zing_mailz_mode;
-
+	global $current_user,$zing_mailz_mode,$wpdb;
+	
+	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
+	$query="select uniqid from ".$prefix."phplist_user where email='".$current_user->data->user_email."'";
+	$uid=$wpdb->get_var($query);
 	$home=get_option('home');
 	$admin=get_option('siteurl').'/wp-admin/';
 	$pid=zing_mailz_mainpage();
@@ -399,6 +350,14 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('./?','index?page_id='.$pid.'&zlist=index&',$buffer);
 		$buffer=str_replace(ZING_OST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		if ($_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
+			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
+			$buffer=str_replace('name=emailconfirm value=""','name=emailconfirm value="'.$current_user->data->user_email.'"',$buffer);
+		}
+		if ($_GET['p']=='unsubscribe' && isset($current_user->data->user_email)) {
+			$buffer=str_replace('name="unsubscribeemail" value=""','name="unsubscribeemail" value="'.$current_user->data->user_email.'"',$buffer);
+			$buffer=str_replace('uid="','uid='.$uid.'"',$buffer);
+		}
+		if ($_GET['p']=='preferences' && isset($current_user->data->user_email)) {
 			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
 			$buffer=str_replace('name=emailconfirm value=""','name=emailconfirm value="'.$current_user->data->user_email.'"',$buffer);
 		}
@@ -432,6 +391,8 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	}
 
 	$vars.=$and.'wpabspath='.urlencode(ABSPATH);
+	$vars.='&wppageid='.zing_mailz_mainpage();
+	$vars.='&wpsiteurl='.get_option('siteurl');
 	if ($vars) $http.='?'.$vars;
 	return $http;
 }

@@ -239,14 +239,14 @@ $default_config = array (
 
   # the location of your subscribe script
 "subscribeurl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=subscribe",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=subscribe$wpindex",
   "URL where users can subscribe",
   "text"
 ),
 
   # the location of your unsubscribe script:
 "unsubscribeurl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=unsubscribe",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=unsubscribe$wpindex",
   "URL where known users can unsubscribe",
   "text"
 ),
@@ -261,14 +261,14 @@ $default_config = array (
 
 # the location of your confirm script:
 "confirmationurl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=confirm",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=confirm$wpindex",
   "URL where users have to confirm their subscription",
   "text"
 ),
 
   # url to change their preferences
 "preferencesurl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=preferences",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=preferences$wpindex",
   "URL where users can update their details",
   "text"
 ),
