@@ -1,0 +1,30 @@
+#content tr td {
+	padding:0px;
+}
+
+#zing-mailz-cp-content {
+width:87%;
+float:left;
+position:relative;
+border:dashed 1px;
+padding:5px;
+min-height:500px;
+}
+
+#zing-mailz-cp-menu {
+width:10%;
+float:right;
+position:relative;
+border:dashed 1px;
+padding:5px;
+}
+
+.zing-left {
+position:relative;
+float:left;
+}
+
+.zing-right {
+position:relative;
+float:right;
+}

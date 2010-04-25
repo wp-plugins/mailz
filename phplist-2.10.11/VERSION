@@ -1,0 +1,8 @@
+# file that keeps track of the latest tag in cvs and the corresponding version
+# this automates publishing a new version, when it's tagged
+# if you don't understand this, don't worry. You don't need this file
+VERSION=2.10.10
+TAG=phplist-version2-10-10
+PREVTAG=phplist-version2-10-6RC2
+DEVVERSION=2.10.8
+
