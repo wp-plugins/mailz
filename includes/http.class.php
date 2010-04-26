@@ -70,7 +70,7 @@ if (!class_exists('HTTPRequest')) {
 			return $this->DownloadToString_curl($withHeaders);
 		}
 
-		private function DownloadToString_http()
+		function DownloadToString_http()
 		{
 			$crlf = "\r\n";
 			$response = "";
@@ -113,7 +113,7 @@ if (!class_exists('HTTPRequest')) {
 			}
 		}
 
-		private function DownloadToString_curl($withHeaders=false)
+		function DownloadToString_curl($withHeaders=false)
 		{
 			session_start();
 			if (!$_SESSION['tmpfile']) {
@@ -150,29 +150,66 @@ if (!class_exists('HTTPRequest')) {
 			}
 			curl_setopt($ch, CURLOPT_COOKIEJAR, $ckfile);
 			curl_setopt ($ch, CURLOPT_COOKIEFILE, $ckfile);
+				
+			if (count($_FILES) > 0) {
+				//print_r($_FILES);
+				//$this->post['z_FILES']=$_FILES;
+				foreach ($_FILES as $name => $file) {
+					if ($file['tmp_name']) {
+						$newfile=dirname(__FILE__).'/../cache/'.$file['name'];
+						$newfiles[]=$newfile;
+						//echo 'copy '.$file['tmp_name'].' to '.$newfile;
+						copy($file['tmp_name'],$newfile);
+						if ($file['tmp_name']) $this->post[$name]='@'.$newfile;
+					}
+				}
+				//print_r($_FILES);
+			}
 			if (count($this->post) > 0) {
 				curl_setopt($ch, CURLOPT_POST, 1); // set POST method
 				$post="";
+				$apost=array();
 				foreach ($this->post as $k => $v) {
 					if (is_array($v)) {
 						foreach ($v as $k2 => $v2) {
-							if ($post) $post.='&';
-							$post.=$k.'['.$k2.']'.'='.urlencode(stripslashes($v2));
+							if (is_array($v2)) {
+								foreach ($v2 as $k3 => $v3) {
+									if ($post) $post.='&';
+									$post.=$k.'['.$k2.']'.'['.$k3.']'.'='.urlencode(stripslashes($v3));
+									$apost[$k.'['.$k2.']'.'['.$k3.']']=$v3;
+								}
+							} else {
+								if ($post) $post.='&';
+								$post.=$k.'['.$k2.']'.'='.urlencode(stripslashes($v2));
+								$key='['.$k.']['.$k2.']';
+								$apost[$k.'['.$k2.']']=$v2;
+							}
 						}
 
 					} else {
 						if ($post) $post.='&';
 						$post.=$k.'='.urlencode(stripslashes($v));
+						$apost[$k]=$v;
 					}
 				}
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $post); // add POST fields
 			}
+				
+			if (count($post) > 0) curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
+				
 			$data = curl_exec($ch); // run the whole process
 			if (curl_errno($ch)) {
 				$this->errno=curl_errno($ch);
 				$this->error=curl_error($ch);
 			}
 			$info=curl_getinfo($ch);
+			
+			//remove temporary upload files
+			if (count($newfiles) > 0) {
+				foreach ($newfiles as $file) {
+					unlink($file);
+				}
+			}
+			
 			if ($withHeaders) {
 				curl_close($ch);
 				list($header,$result)=explode("<", $data, 2);
