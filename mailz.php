@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.5
+ Version: 0.6
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.5");
+define("ZING_MAILZ_VERSION","0.6");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -139,7 +139,7 @@ function zing_mailz_activate() {
 			add_option("zing_mailz_pages",$ids);
 		}
 	}
-	
+
 	//create database tables
 	if (!$zing_mailz_version) {
 		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
@@ -172,6 +172,7 @@ function zing_mailz_activate() {
  * @return void
  */
 function zing_mailz_deactivate() {
+	wp_clear_scheduled_hook('zing_mailz_cron_hook');
 }
 
 /**
@@ -208,7 +209,7 @@ function zing_mailz_uninstall() {
  */
 function zing_mailz_main($process,$content="") {
 	global $zing_mailz_content;
-	
+
 	if ($zing_mailz_content) $content=$zing_mailz_content;
 	return $content;
 }
@@ -325,7 +326,7 @@ function zing_mailz_mainpage() {
 
 function zing_mailz_ob($buffer) {
 	global $current_user,$zing_mailz_mode,$wpdb;
-	
+
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 	$query="select uniqid from ".$prefix."phplist_user where email='".$current_user->data->user_email."'";
 	$uid=$wpdb->get_var($query);
@@ -419,7 +420,7 @@ function zing_mailz_header()
 	if (isset($_POST) && isset($zing_mailz_post)) {
 		$_POST=array_merge($_POST,$zing_mailz_post);
 	}
-	
+
 	$output=zing_mailz_output("content");
 	/*
 	 echo '<script type="text/javascript" language="javascript">';
@@ -471,28 +472,28 @@ function zing_mailz_header()
  * @return unknown_type
  */
 /*
-function widget_zingiri_mailz_menu($args) {
-	global $nav, $thisuser;
-	global $zing_mailz_menu;
+ function widget_zingiri_mailz_menu($args) {
+ global $nav, $thisuser;
+ global $zing_mailz_menu;
 
-	extract($args);
-	echo $before_widget;
-	echo $before_title;
-	echo "Tickets";
-	echo $after_title;
-	if ($zing_mailz_menu!='') {
-		echo $zing_mailz_menu;
-		echo '<ul>';
-		echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=index">User panel</a></li>';
-		echo '</ul>';
-	} else {
-		echo '<ul>';
-		if (current_user_can('edit_plugins')) echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=admin/index">Admin Panel</a></li>';
-		echo '</ul>';
-	}
-	echo $after_widget;
-}
-*/
+ extract($args);
+ echo $before_widget;
+ echo $before_title;
+ echo "Tickets";
+ echo $after_title;
+ if ($zing_mailz_menu!='') {
+ echo $zing_mailz_menu;
+ echo '<ul>';
+ echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=index">User panel</a></li>';
+ echo '</ul>';
+ } else {
+ echo '<ul>';
+ if (current_user_can('edit_plugins')) echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=admin/index">Admin Panel</a></li>';
+ echo '</ul>';
+ }
+ echo $after_widget;
+ }
+ */
 /**
  * Register sidebar widgets
  * @return unknown_type
@@ -535,7 +536,7 @@ function zing_mailz_login() {
 	}
 	elseif (is_admin() && current_user_can('edit_plugins') && !isset($_SESSION['zing']['mailz']['loggedin'])) {
 		$post['do']='scplogin';
-		$post['login']=$current_user->data->user_login;
+		$post['login']='admin';//$current_user->data->user_login;
 		$post['password']=get_option('zing_mailz_password');
 		$post['submit']='Enter';
 		//print_r($post);
@@ -579,4 +580,43 @@ function zing_mailz_footer() {
 	zing_footers();
 }
 
+/*
+function zing_mailz_more_reccurences() {
+	return array(
+'minute' => array('interval' => 60, 'display' => 'Every minute'),
+'weekly' => array('interval' => 604800, 'display' => 'Once Weekly'),
+'fortnightly' => array('interval' => 1209600, 'display' => 'Once Fortnightly'),
+	);
+}
+add_filter('cron_schedules', 'zing_mailz_more_reccurences');
+*/
+
+function zing_mailz_cron() {
+
+	$msg=time();
+	
+	$post['login']='admin';
+	$post['password']=get_option('zing_mailz_password');
+	
+	$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
+
+	$news = new HTTPRequest($http);
+	$news->post=$post;
+	
+	if ($news->live()) {
+		$output=$news->DownloadToString(true);
+		$msg.='ok';
+	} else {
+		$msg.='failed';
+	}
+	update_option('zing_mailz_cron',$msg);
+}
+if (!wp_next_scheduled('zing_mailz_cron_hook')) {
+	wp_schedule_event( time(), 'hourly', 'zing_mailz_cron_hook' );
+}
+add_action('zing_mailz_cron_hook','zing_mailz_cron');
+//echo wp_next_scheduled('zing_mailz_cron_hook')-time();
+//echo '<br />'.wp_get_schedule('zing_mailz_cron_hook');
+//print_r(wp_get_schedules());
+//echo '<br />last run='.get_option('zing_mailz_cron');
 ?>
