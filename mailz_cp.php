@@ -1,6 +1,7 @@
 <?php
 $zing_mailz_name = "Zingiri Mailing List";
 $zing_mailz_shortname = "zing_mailz";
+$zing_mailz_options=array();
 
 function zing_mailz_add_admin() {
 

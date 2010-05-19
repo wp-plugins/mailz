@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
 Tested up to: 2.9.1
-Stable tag: 0.6
+Stable tag: 0.7
 
 Zingiri Mailing List is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
@@ -38,6 +38,9 @@ Simply upload the new version and go to the control panel to ugprade your versio
 Don't forget to take a database backup before you upgrade!
 
 == Changelog ==
+
+= 0.7 =
+* Fixed issue with options array not being initialized properly causing an installation problem
 
 = 0.6 = 
 * Forced admin user as default user that connects to PHPmail

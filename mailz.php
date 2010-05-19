@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.6
+ Version: 0.7
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.6");
+define("ZING_MAILZ_VERSION","0.7");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
