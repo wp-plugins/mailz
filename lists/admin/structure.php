@@ -69,7 +69,7 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
         "name" => array("varchar(100) not null","Name of Dataitem"),
         "data" => array("text",""),
         "index_1" => array("emailidx (email)",""),
-        "index_2" => array("emailnameidx (email,name)",""),
+        "index_2" => array("emailnameidx (email(233),name)",""),
     ),
     "list" => array ( # a list in the system
         "id" => array("integer not null primary key auto_increment","ID"),

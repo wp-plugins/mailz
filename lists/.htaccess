@@ -9,5 +9,3 @@ deny from all
 Order allow,deny
 allow from all
 </FilesMatch>
-php_flag magic_quotes_gpc on
-
