@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.8
+ Version: 0.9.1
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.8");
+define("ZING_MAILZ_VERSION","0.9.1");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -210,7 +210,9 @@ function zing_mailz_uninstall() {
 function zing_mailz_main($process,$content="") {
 	global $zing_mailz_content;
 
-	if ($zing_mailz_content) $content=$zing_mailz_content;
+	if ($zing_mailz_content) {
+		$content='<div id="phplist">'.$zing_mailz_content.'</div>';
+	}
 	return $content;
 }
 
@@ -271,14 +273,6 @@ function zing_mailz_output($process) {
 				$_GET['cat']=$cf['cat'][0];
 			}
 			break;
-			/*
-			 case "footer":
-			 $to_include="footer.php";
-			 break;
-			 case "sidebar":
-			 $to_include="menu_".$content.".php";
-			 break;
-			 */
 		default:
 			return $content;
 			break;
@@ -286,33 +280,17 @@ function zing_mailz_output($process) {
 	//error_reporting(E_ALL & ~E_NOTICE);
 	//ini_set('display_errors', '1');
 
-	/*
-	 if (get_option("zing_mailz_subscribers") == "Subscribers" && !is_user_logged_in()) {
-		$content="Access not allowed, please register or login first";
-		return $content;
-		}
-		*/
-
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
-		//echo $http;
-		//print_r($_POST);
 		$news = new HTTPRequest($http);
 		if ($news->live()) {
 			$output=$news->DownloadToString(true);
 			if ($news->redirect) {
 				$redirect=str_replace(ZING_OST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage=',$output);
-				//echo $redirectPage;
-				//$redirect=get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'];
-				//echo $output;
 				header($redirect);
-				//echo 'should redirect to '.$output;
-				//print_r($_GET);
-				//print_r($_POST);
 				die();
 			}
 			$content.=zing_mailz_ob($output);
-			//$content.=$output;
 			return $content;
 		}
 	}
@@ -422,47 +400,21 @@ function zing_mailz_header()
 	}
 
 	$output=zing_mailz_output("content");
-	/*
-	 echo '<script type="text/javascript" language="javascript">';
-	 echo "var ajaxurl='".ZING_MAILZ_URL."osticket/upload/scp/';";
-	 echo '</script>';
-	 */
 
 	$menu1=zing_integrator_cut($output,'<div class="menutableright">','</div>');
 	if ($menu1) {
-		//$menu1=strchr($menu1,'<span');
 		$menu1=str_replace('<span','<li><span',$menu1);
 		$menu1=str_replace('</span>','</span></li>',$menu1);
 		$menu1='<ul>'.$menu1.'</ul>';
 		$menu1=str_replace('menulinkleft','xmenulinkleft',$menu1);
-		//$menu1=str_replace('<br />','',$menu1);
 		$menu1=str_replace('<hr>','',$menu1);
-		//$menu1=str_replace('|','',$menu1).'<br />';
 	}
 	$zing_mailz_menu=$menu1;
 
 	$body=zing_integrator_cut($output,'<body','</body>',true);
 	$body=strchr($body,'>');
-	$zing_mailz_content='<div id="phplist">'.substr($body,1).'</div>';
-	/*
-	 zing_integrator_cut($output,'<div id="footer">','</div>');
-	 $head=zing_integrator_cut($output,'<div id="osthead">','</div>',true);
-	 */
-	/*
-	 $menu=zing_integrator_cut($output,'<div id="nav">','</div>');
-	 zing_integrator_cut($output,'<div id="header"','</div>');
-
-	 $menu=str_replace('<ul id="main_nav" >','<ul>',$menu);
-	 $menu=str_replace('<ul id="sub_nav">','<br /><ul>',$menu);
-	 $zing_mailz_menu=$menu1.$menu;
-	 $zing_mailz_content=$output;
-
-	 //stylesheets and javascripts
-	 echo $head;
-	 */
+	$zing_mailz_content=trim(substr($body,1));
 	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
-	//echo '<script language="javascript" type="text/javascript" src="' . ZING_MAILZ_URL . 'lists/admin/js/select_style.js">';
-	//echo '<script language="javascript" type="text/javascript" src="' . ZING_MAILZ_URL . 'lists/admin/js/jslib.js">';
 	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
 }
 
@@ -511,13 +463,6 @@ function zing_mailz_sidebar_init()
  */
 function zing_mailz_init()
 {
-	/*
-	 global $zing_mailz_post;
-	 if (isset($_POST['name']) && (isset($_POST['submit_x']) || isset($_POST['submit']))) {
-		$zing_mailz_post['name']=$_POST['name'];
-		unset($_POST['name']);
-		}
-		*/
 	ob_start();
 	session_start();
 }
@@ -530,7 +475,6 @@ function zing_mailz_login() {
 	if (!current_user_can('edit_plugins') && isset($_SESSION['zing']['mailz']['loggedin'])) {
 		zing_mailz_logout();
 	}
-	//unset($_SESSION['zing']['mailz']['loggedin']);
 	if (!is_admin()) {
 		$loggedin=true;
 	}
@@ -539,14 +483,11 @@ function zing_mailz_login() {
 		$post['login']='admin';//$current_user->data->user_login;
 		$post['password']=get_option('zing_mailz_password');
 		$post['submit']='Enter';
-		//print_r($post);
 		$http=zing_mailz_http('osticket','admin/index.php');
-		//echo '<br />'.$http;
 		$news = new HTTPRequest($http);
 		$news->post=$post;
 		if ($news->live()) {
 			$output=$news->DownloadToString(true);
-			//echo '<br />'.$output;
 			if (strpos($output,"invalid password")===false && strpos($output,"Default login is admin")===false) {
 				$loggedin=true;
 				$_SESSION['zing']['mailz']['loggedin']=1;
@@ -615,8 +556,4 @@ if (!wp_next_scheduled('zing_mailz_cron_hook')) {
 	wp_schedule_event( time(), 'hourly', 'zing_mailz_cron_hook' );
 }
 add_action('zing_mailz_cron_hook','zing_mailz_cron');
-//echo wp_next_scheduled('zing_mailz_cron_hook')-time();
-//echo '<br />'.wp_get_schedule('zing_mailz_cron_hook');
-//print_r(wp_get_schedules());
-//echo '<br />last run='.get_option('zing_mailz_cron');
 ?>

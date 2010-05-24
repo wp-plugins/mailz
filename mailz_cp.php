@@ -67,46 +67,6 @@ function zing_mailz_admin() {
 <p>The following Wordpress users are active osTicket users</p>
  -->
 <?php if ($zing_mailz_version) {
-	//$wpdb->show_errors();
-	/*
-	$prefix=$wpdb->prefix."zing_ost_";
-	
-	$query="select * from `##users`,`##usermeta` where `##users`.`ID`=`##usermeta`.`user_id` and `##usermeta`.`meta_key`='wp_user_level'";
-	$query=str_replace("##",$wpdb->base_prefix,$query);
-	$sql = mysql_query($query) or die(mysql_error());
-	while ($row = mysql_fetch_array($sql)) {
-		if ($row['meta_value'] >= 8) { //administrator role
-			if (!isset($row['first_name'])) $row['first_name']=$row['display_name'];
-			$query2="INSERT INTO `".$prefix."staff` (`staff_id`, `group_id`, `dept_id`, `username`, `firstname`, `lastname`, `passwd`, `email`, `phone`, `phone_ext`, `mobile`, `signature`, `isactive`, `isadmin`, `isvisible`, `onvacation`, `daylight_saving`, `append_signature`, `change_passwd`, `timezone_offset`, `max_page_size`, `created`, `lastlogin`, `updated`) VALUES";
-			$query2.="('".$row['ID']."', 1, 1, '".$row['user_login']."', '".$row['first_name']."', '".$row['last_name']."', '".md5($row['user_pass'])."', '".$row['user_email']."', '', '', '', '', 1, 1, 1, 0, 0, 0, 0, 0.0, 0, '".date("Y-m-d")."', NULL, '".date("Y-m-d")."')";
-			$wpdb->query($query2);
-			$query2=sprintf("UPDATE `".$prefix."staff` SET `passwd`='%s', `isadmin`=1, `change_passwd`=0 WHERE `username`='%s'",md5($row['user_pass']),$row['user_login']);
-			$wpdb->query($query2);
-		} elseif ($row['meta_value'] >= 5) { //editor role
-			if (!isset($row['first_name'])) $row['first_name']=$row['display_name'];
-			$query2="INSERT INTO `".$prefix."staff` (`staff_id`, `group_id`, `dept_id`, `username`, `firstname`, `lastname`, `passwd`, `email`, `phone`, `phone_ext`, `mobile`, `signature`, `isactive`, `isadmin`, `isvisible`, `onvacation`, `daylight_saving`, `append_signature`, `change_passwd`, `timezone_offset`, `max_page_size`, `created`, `lastlogin`, `updated`) VALUES";
-			$query2.="('".$row['ID']."', 1, 1, '".$row['user_login']."', '".$row['first_name']."', '".$row['last_name']."', '".md5($row['user_pass'])."', '".$row['user_email']."', '', '', '', '', 1, 0, 1, 0, 0, 0, 0, 0.0, 0, '".date("Y-m-d")."', NULL, '".date("Y-m-d")."')";
-			$wpdb->query($query2);
-			$query2=sprintf("UPDATE `".$prefix."staff` SET `passwd`='%s', `isadmin`=0, `change_passwd`=0 WHERE `username`='%s'",md5($row['user_pass']),$row['user_login']);
-			$wpdb->query($query2);
-		} else {
-			$query2=sprintf("DELETE FROM `".$prefix."staff` WHERE `username`='%s'",$row['user_login']);
-			$wpdb->query($query2);
-		}
-		$level[$row['user_login']]=$row['meta_value'];
-	}
-	$query="select * from `##users`,`##zing_ost_staff` where `##users`.`user_login`=`##zing_ost_staff`.`username`";
-	$query=str_replace("##",$wpdb->base_prefix,$query);
-	$sql = mysql_query($query) or die(mysql_error());
-	while ($row = mysql_fetch_array($sql)) {
-		echo $row['user_login'].' - '.$row['firstname'].' - '.$row['user_email'];
-		if ($level[$row['user_login']] >= 8) echo ' - admin';
-		elseif ($level[$row['user_login']] >= 5) echo ' - staff';
-		
-		if (md5($row['user_pass']) != $row['passwd']) echo '!Password not synchronised';
-		echo '<br />';
-	}
-	*/
 		zing_mailz_cp();
 }
 	?>
@@ -170,7 +130,7 @@ function zing_mailz_cp() {
 	if ($_GET['zlistpage']=='admin') {
 		echo 'Please use the <a href="users.php">Wordpress Users menu</a> to change <strong>admin</strong> user details';
 	} else {
-		echo $zing_mailz_content;
+		echo '<div id="phplist">'.$zing_mailz_content.'</div>';
 	}
 	echo '</div>';
 	echo '<div id="zing-mailz-cp-menu">';

@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
 Tested up to: 2.9.1
-Stable tag: 0.8
+Stable tag: 0.9.1
 
 Zingiri Mailing List is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
@@ -42,6 +42,10 @@ Fixes applied in PHPlists:
 * admin/structure.php: changed length of index of user_blacklist_data (limited to 1000, i.e. 333 bytes in UTF-8)
 
 == Changelog ==
+
+= 0.9.1 = 
+* Fixed issue with pages and posts being shown as blank after activation of plugin
+* Code clean up
 
 = 0.8 =
 * Fixed issue with max key length exceeded on table user_blacklist_data
