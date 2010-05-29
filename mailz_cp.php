@@ -7,6 +7,8 @@ function zing_mailz_add_admin() {
 
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
 
+	//echo 'mc='.get_magic_quotes_gpc().'/'.get_magic_quotes_runtime();
+	
 	if ( $_GET['page'] == basename(__FILE__) ) {
 
 		if ( 'update' == $_REQUEST['action'] ) {

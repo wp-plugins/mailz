@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.9.1
+ Version: 0.9.2
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.9.1");
+define("ZING_MAILZ_VERSION","0.9.2");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -72,7 +72,7 @@ if (!defined("ZING_MAILZ_LOGIN")) {
 
 define("ZING_OST_URL",ZING_MAILZ_URL.'lists');
 
-$zing_footers[]=array('http://www.osticket.com/','osTicket');
+$zing_footers[]=array('http://www.phplist.com/','PHPlist');
 $zing_mailz_version=get_option("zing_mailz_version");
 if ($zing_mailz_version) {
 	add_action("init","zing_mailz_init");
@@ -284,7 +284,7 @@ function zing_mailz_output($process) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
 		$news = new HTTPRequest($http);
 		if ($news->live()) {
-			$output=$news->DownloadToString(true);
+			$output=stripslashes($news->DownloadToString(true));
 			if ($news->redirect) {
 				$redirect=str_replace(ZING_OST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage=',$output);
 				header($redirect);
@@ -487,7 +487,7 @@ function zing_mailz_login() {
 		$news = new HTTPRequest($http);
 		$news->post=$post;
 		if ($news->live()) {
-			$output=$news->DownloadToString(true);
+			$output=stripslashes($news->DownloadToString(true));
 			if (strpos($output,"invalid password")===false && strpos($output,"Default login is admin")===false) {
 				$loggedin=true;
 				$_SESSION['zing']['mailz']['loggedin']=1;
