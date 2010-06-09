@@ -1,4 +1,4 @@
-body {
+#phplist {
 scrollbar-base-color: #DEDEB6; 
 
 scrollbar-face-color: #CCCC99;; 
@@ -6,7 +6,7 @@ scrollbar-track-color: #DEDEB6;
 scrollbar-arrow-color: #000000;
 }
 
-a:link {
+#phplist a:link {
 	font-size: 11px; color: #ff6600; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;
 div#menutable div#menuheader {
   position:absolute;
@@ -24,120 +24,120 @@ div#menutable div#menuheader {
 
 
 }
-a:active {
+#phplist a:active {
 	font-size: 11px; color: #ff6600; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;
 }
-a:visited {
+#phplist a:visited {
 	font-size: 11px; color: #ff6600; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;
 }
-a:hover {
+#phplist a:hover {
    min-height:400px;
 	text-decoration: underline;
 }
-p {
+#phplist p {
 	font-weight: normal; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;
 }
-td {
+#phplist td {
 	font-weight: normal; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;
 }
 
-ol {font-weight: normal; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
+#phplist ol {font-weight: normal; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
 
-.disclist li {list-style-type : circle; padding: 5px;}
+#phplist .disclist li {list-style-type : circle; padding: 5px;}
 
-h1 {font-weight: bold; font-size: 12px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
+#phplist h1 {font-weight: bold; font-size: 12px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
 
-h2 {font-weight: bold; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
+#phplist h2 {font-weight: bold; font-size: 11px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
 
-h3 {font-weight: bold; font-size: 12px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; margin:0px; padding:0px;}
+#phplist h3 {font-weight: bold; font-size: 12px; color: #666666; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; margin:0px; padding:0px;}
 
    margin: 0px;
-hr {width : 100%; height : 1px; color: #ff9900; size:1px;}
+#phplist hr {width : 100%; height : 1px; color: #ff9900; size:1px;}
 
-.leaftitle {font-weight: bold; font-size: 16px; color: #ff9900; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
+#phplist .leaftitle {font-weight: bold; font-size: 16px; color: #ff9900; font-style: normal; font-family: verdana, sans-serif; text-decoration: none;}
 
-.title {font-weight: bold; font-size: 11px; color: #999966; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; padding-left:5px;}
+#phplist .title {font-weight: bold; font-size: 11px; color: #999966; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; padding-left:5px;}
 
-.phphead,
-a:active.phphead,
-a:link.phphead,
-a:hover.phphead,
-a:visited.phphead {font-size: 14px; color: #000000; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; padding-left:20px;}
+#phplist .phphead,
+#phplist a:active.phphead,
+#phplist a:link.phphead,
+#phplist a:hover.phphead,
+#phplist a:visited.phphead {font-size: 14px; color: #000000; font-style: normal; font-family: verdana, sans-serif; text-decoration: none; padding-left:20px;}
 
-.menulinkleft {margin : 0px; padding : 0px;}
-.menulinkleft a:link, 
-.menulinkleft a:active, 
-.menulinkleft a:visited {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #F9F9F9; font-weight: normal; display : block; text-align : left; text-decoration : none; padding-left: 5px;line-height : 15px;border-top: 2px white solid;}
-.menulinkleft a:hover {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #EBEBEB; font-weight: normal; display : block; text-align : left; text-decoration : none;}
-
-
-.menutable {background-color : white; border-left : 1px black solid; border-right : 1px black solid; display : block; width : 132px;}
+#phplist .menulinkleft {margin : 0px; padding : 0px;}
+#phplist .menulinkleft a:link, 
+#phplist .menulinkleft a:active, 
+#phplist .menulinkleft a:visited {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #F9F9F9; font-weight: normal; display : block; text-align : left; text-decoration : none; padding-left: 5px;line-height : 15px;border-top: 2px white solid;}
+#phplist .menulinkleft a:hover {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #EBEBEB; font-weight: normal; display : block; text-align : left; text-decoration : none;}
 
 
-.menuhd {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #CCCC99; font-weight: normal; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
+#phplist .menutable {background-color : white; border-left : 1px black solid; border-right : 1px black solid; display : block; width : 132px;}
 
-.bottom {font-family: verdana, sans-serif;font-size : 10px; font-weight : bold; padding: 2px; padding-left:20px;}
-.input {font-family: verdana, sans-serif;font-size : 10px; font-weight : normal;}
 
-.searchBoxinput {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; padding-left:2px; height:15px; width:110px;}
+#phplist .menuhd {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #CCCC99; font-weight: normal; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
 
-.dropdown {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; padding-left:5px; height:15px; width:250px;}
+#phplist .bottom {font-family: verdana, sans-serif;font-size : 10px; font-weight : bold; padding: 2px; padding-left:20px;}
+#phplist .input {font-family: verdana, sans-serif;font-size : 10px; font-weight : normal;}
 
-.addbutton {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; height:15px; width:120px;}
+#phplist .searchBoxinput {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; padding-left:2px; height:15px; width:110px;}
 
-.submitsearch {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;background-color: #DEDEB6;color : #000000; border:1px #CCCC99 solid; height:15px;}
+#phplist .dropdown {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; padding-left:5px; height:15px; width:250px;}
 
-.menufill {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : left; text-decoration : none; padding: 0px;border-top: 1px white solid; border-bottom: 1px white solid; padding-left: 5px;}
+#phplist .addbutton {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;color : #000000;border: 1px #999966 solid; height:15px; width:120px;}
 
-.rightmenufill {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : left; text-decoration : none; padding: 0px;border-top: 1px white solid; border-bottom: 1px white solid; padding-left: 5px;}
+#phplist .submitsearch {font-family: verdana, sans-serif;font-size : 11px; font-weight : normal; margin : 0px; padding : 0px;background-color: #DEDEB6;color : #000000; border:1px #CCCC99 solid; height:15px;}
 
-.branchhd {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
+#phplist .menufill {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : left; text-decoration : none; padding: 0px;border-top: 1px white solid; border-bottom: 1px white solid; padding-left: 5px;}
 
-.branchaction {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : right; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
+#phplist .rightmenufill {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : left; text-decoration : none; padding: 0px;border-top: 1px white solid; border-bottom: 1px white solid; padding-left: 5px;}
 
-.branchaction2 {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
+#phplist .branchhd {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
 
-.listorder {font-family: verdana, sans-serif;font-size : 10px; color : black; padding:0px; width:20px;}
+#phplist .branchaction {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : right; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
 
-.delete {font-family: verdana, sans-serif;font-size : 11px; color : red;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : right; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
+#phplist .branchaction2 {font-family: verdana, sans-serif;font-size : 11px; color : black;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : left; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
 
-a.deletelink,
-a:link.deletelink,
-a:active.deletelink,
-a:visited.deletelink  {font-family: verdana, sans-serif;font-size : 12px; color : red; font-weight: bold; text-align : right; text-decoration : none;}
-a:hover.deletelink {color: #666633;}
+#phplist .listorder {font-family: verdana, sans-serif;font-size : 10px; color : black; padding:0px; width:20px;}
 
-a.branches {padding :2px;}
-a:link.branches,
-a:active.branches,
-a:visited.branches  {font-family: verdana, sans-serif;font-size : 11px; color : #999966;background-color : #ffffff; font-weight: bold; text-align : middle; text-decoration : none; display:block;}
-a:hover.branches {color: #666633;}
+#phplist .delete {font-family: verdana, sans-serif;font-size : 11px; color : red;background-color : #DEDEB6; font-weight: bold; border-top: 1px black solid;  border-bottom: 1px black solid;display : block; text-align : right; text-decoration : none; padding: 2px;vertical-align : top; padding-left : 3px;}
 
-a.buttonpublish {border: 1px #999966 solid; padding :2px;}
-a:link.buttonpublish,
-a:active.buttonpublish,
-a:visited.buttonpublish  {font-family: verdana, sans-serif;font-size : 11px; color : #999966;background-color : #ffffff; font-weight: bold; text-align : middle; text-decoration : none;}
-a:hover.buttonpublish 
+#phplist a.deletelink,
+#phplist a:link.deletelink,
+#phplist a:active.deletelink,
+#phplist a:visited.deletelink  {font-family: verdana, sans-serif;font-size : 12px; color : red; font-weight: bold; text-align : right; text-decoration : none;}
+#phplist a:hover.deletelink {color: #666633;}
 
-a.menuhelp {color : #000000;}
-a:link.menuhelp,
-a:active.menuhelp,
-a:visited.menuhelp  {font-family: verdana, sans-serif;font-size : 11px; color : #999933;background-color : #CCCC99; font-weight: normal; text-align : right; text-decoration : none; padding: 0px;}
-a:hover.menuhelp {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : right; text-decoration : none; padding: 0px;}
+#phplist a.branches {padding :2px;}
+#phplist a:link.branches,
+#phplist a:active.branches,
+#phplist a:visited.branches  {font-family: verdana, sans-serif;font-size : 11px; color : #999966;background-color : #ffffff; font-weight: bold; text-align : middle; text-decoration : none; display:block;}
+#phplist a:hover.branches {color: #666633;}
 
-a:link.urhere,
-a:active.urhere,
-a:visited.urhere  {font-family: verdana, sans-serif; font-size : 10px; color : black; font-weight: normal; text-align : left; text-decoration : none;}
-a:hover.urhere  {font-family: verdana, sans-serif; font-size : 10px; color : #666666; font-weight: normal; text-align : left; text-decoration : none;}
+#phplist a.buttonpublish {border: 1px #999966 solid; padding :2px;}
+#phplist a:link.buttonpublish,
+#phplist a:active.buttonpublish,
+#phplist a:visited.buttonpublish  {font-family: verdana, sans-serif;font-size : 11px; color : #999966;background-color : #ffffff; font-weight: bold; text-align : middle; text-decoration : none;}
+#phplist a:hover.buttonpublish 
 
-.webblermenu {font-family: verdana, sans-serif; font-size : 11px; color : white; font-weight: normal; text-align : left; text-decoration : none; padding :5px; background-color : #ff9900; border: 1px solid black;}
+#phplist a.menuhelp {color : #000000;}
+#phplist a:link.menuhelp,
+#phplist a:active.menuhelp,
+#phplist a:visited.menuhelp  {font-family: verdana, sans-serif;font-size : 11px; color : #999933;background-color : #CCCC99; font-weight: normal; text-align : right; text-decoration : none; padding: 0px;}
+#phplist a:hover.menuhelp {font-family: verdana, sans-serif;font-size : 11px; color : #000000;background-color : #CCCC99; font-weight: normal; text-align : right; text-decoration : none; padding: 0px;}
 
-a:link.powered,
-a:active.powered,
-a:visited.powered  {font-family: verdana, sans-serif; font-size : 10px; color : #666666;font-weight: bold; text-align : left; text-decoration : none; padding: 2px;}
-a:hover.powered {color : #7D7B7B;}
+#phplist a:link.urhere,
+#phplist a:active.urhere,
+#phplist a:visited.urhere  {font-family: verdana, sans-serif; font-size : 10px; color : black; font-weight: normal; text-align : left; text-decoration : none;}
+#phplist a:hover.urhere  {font-family: verdana, sans-serif; font-size : 10px; color : #666666; font-weight: normal; text-align : left; text-decoration : none;}
 
- .email  {
+#phplist .webblermenu {font-family: verdana, sans-serif; font-size : 11px; color : white; font-weight: normal; text-align : left; text-decoration : none; padding :5px; background-color : #ff9900; border: 1px solid black;}
+
+#phplist a:link.powered,
+#phplist a:active.powered,
+#phplist a:visited.powered  {font-family: verdana, sans-serif; font-size : 10px; color : #666666;font-weight: bold; text-align : left; text-decoration : none; padding: 2px;}
+#phplist a:hover.powered {color : #7D7B7B;}
+
+ #phplist .email  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : bold;
@@ -146,7 +146,7 @@ a:hover.powered {color : #7D7B7B;}
 	text-decoration : none;
 }
 
-.address  {
+#phplist .address  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -155,7 +155,7 @@ a:hover.powered {color : #7D7B7B;}
 	text-decoration : none;
 }
 
-a.url  {
+#phplist a.url  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : bold;
@@ -164,7 +164,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.listitem  {
+#phplist .listitem  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -173,7 +173,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.attributename  {
+#phplist .attributename  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -182,7 +182,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.attributeinput  {
+#phplist .attributeinput  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -191,7 +191,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.required {
+#phplist .required {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -200,7 +200,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.missing {
+#phplist .missing {
 	font-size : 14px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : bold;
@@ -208,7 +208,7 @@ a.url  {
 	color : red;
 }
 
-.error  {
+#phplist .error  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -217,7 +217,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.info  {
+#phplist .info  {
 	font-size : 12px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : normal;
@@ -226,7 +226,7 @@ a.url  {
 	text-decoration : none;
 }
 
-.botbar  {
+#phplist .botbar  {
 	font-size : 11px;
 	font-family : Arial, Helvetica, sans-serif;
 	font-weight : bold;

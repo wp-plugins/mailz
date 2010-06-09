@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.9.2
+ Version: 0.9.3
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.9.2");
+define("ZING_MAILZ_VERSION","0.9.3");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -77,7 +77,6 @@ $zing_mailz_version=get_option("zing_mailz_version");
 if ($zing_mailz_version) {
 	add_action("init","zing_mailz_init");
 	add_filter('wp_footer','zing_mailz_footer');
-	add_action("plugins_loaded", "zing_mailz_sidebar_init");
 	add_filter('the_content', 'zing_mailz_content', 10, 3);
 	add_action('wp_head','zing_mailz_header');
 }
@@ -202,7 +201,7 @@ function zing_mailz_uninstall() {
 }
 
 /**
- * Main function handling content, footer and sidebars
+ * Main function handling content
  * @param $process
  * @param $content
  * @return unknown_type
@@ -325,7 +324,7 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('src="js/jslib.js"','src="'.ZING_OST_URL.'/js/jslib.js"',$buffer);
 	} else {
 		$buffer=str_replace('/lists/admin',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer); //go to admin page
-		$buffer=str_replace('./?','index?page_id='.$pid.'&zlist=index&',$buffer);
+		$buffer=str_replace('./?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		$buffer=str_replace(ZING_OST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		if ($_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
 			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
@@ -414,47 +413,12 @@ function zing_mailz_header()
 	$body=zing_integrator_cut($output,'<body','</body>',true);
 	$body=strchr($body,'>');
 	$zing_mailz_content=trim(substr($body,1));
-	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
-	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
-}
-
-/**
- * Sidebar menu widget
- * @param $args
- * @return unknown_type
- */
-/*
- function widget_zingiri_mailz_menu($args) {
- global $nav, $thisuser;
- global $zing_mailz_menu;
-
- extract($args);
- echo $before_widget;
- echo $before_title;
- echo "Tickets";
- echo $after_title;
- if ($zing_mailz_menu!='') {
- echo $zing_mailz_menu;
- echo '<ul>';
- echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=index">User panel</a></li>';
- echo '</ul>';
- } else {
- echo '<ul>';
- if (current_user_can('edit_plugins')) echo '<li><a href="?page_id='.zing_mailz_mainpage().'&zlist=admin/index">Admin Panel</a></li>';
- echo '</ul>';
- }
- echo $after_widget;
- }
- */
-/**
- * Register sidebar widgets
- * @return unknown_type
- */
-function zing_mailz_sidebar_init()
-{
-	if (current_user_can('edit_plugins') || current_user_can('edit_pages')) {
-		//	register_sidebar_widget(__('Zingiri Mailing List Menu'), 'widget_zingiri_mailz_menu');
+	if (is_admin()) {
+		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
+	} else {
+		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/styles/phplist.css" media="screen" />';
 	}
+	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
 }
 
 /**
