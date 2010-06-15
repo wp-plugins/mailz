@@ -176,25 +176,25 @@ if (!class_exists('HTTPRequest')) {
 								foreach ($v2 as $k3 => $v3) {
 									if ($post) $post.='&';
 									$post.=$k.'['.$k2.']'.'['.$k3.']'.'='.urlencode(stripslashes($v3));
-									$apost[$k.'['.$k2.']'.'['.$k3.']']=$v3;
+									$apost[$k.'['.$k2.']'.'['.$k3.']']=stripslashes($v3);
 								}
 							} else {
 								if ($post) $post.='&';
 								$post.=$k.'['.$k2.']'.'='.urlencode(stripslashes($v2));
 								$key='['.$k.']['.$k2.']';
-								$apost[$k.'['.$k2.']']=$v2;
+								$apost[$k.'['.$k2.']']=stripslashes($v2);
 							}
 						}
 
 					} else {
 						if ($post) $post.='&';
 						$post.=$k.'='.urlencode(stripslashes($v));
-						$apost[$k]=$v;
+						$apost[$k]=stripslashes($v);
 					}
 				}
 			}
 				
-			if (count($post) > 0) curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
+			if (count($apost) > 0) curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
 				
 			$data = curl_exec($ch); // run the whole process
 			if (curl_errno($ch)) {

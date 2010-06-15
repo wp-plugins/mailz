@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.9.3
+ Version: 0.9.4
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.9.3");
+define("ZING_MAILZ_VERSION","0.9.4");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -70,7 +70,7 @@ if (!defined("ZING_MAILZ_LOGIN")) {
 	define("ZING_MAILZ_LOGIN", get_option("zing_mailz_login"));
 }
 
-define("ZING_OST_URL",ZING_MAILZ_URL.'lists');
+define("ZING_PHPLIST_URL",ZING_MAILZ_URL.'lists');
 
 $zing_footers[]=array('http://www.phplist.com/','PHPlist');
 $zing_mailz_version=get_option("zing_mailz_version");
@@ -285,7 +285,7 @@ function zing_mailz_output($process) {
 		if ($news->live()) {
 			$output=stripslashes($news->DownloadToString(true));
 			if ($news->redirect) {
-				$redirect=str_replace(ZING_OST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage=',$output);
+				$redirect=str_replace(ZING_PHPLIST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage=',$output);
 				header($redirect);
 				die();
 			}
@@ -318,14 +318,14 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('./?','options-general.php?'.'page=mailz_cp.php&zlist=index&',$buffer);
 		$buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
-		$buffer=str_replace(ZING_OST_URL.'/?',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer);
-		$buffer=str_replace('./FCKeditor',ZING_OST_URL.'/admin/FCKeditor',$buffer);
-		$buffer=str_replace('src="images/','src="'.ZING_OST_URL.'/admin/images/',$buffer);
-		$buffer=str_replace('src="js/jslib.js"','src="'.ZING_OST_URL.'/js/jslib.js"',$buffer);
+		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer);
+		$buffer=str_replace('./FCKeditor',ZING_PHPLIST_URL.'/admin/FCKeditor',$buffer);
+		$buffer=str_replace('src="images/','src="'.ZING_PHPLIST_URL.'/admin/images/',$buffer);
+		$buffer=str_replace('src="js/jslib.js"','src="'.ZING_PHPLIST_URL.'/js/jslib.js"',$buffer);
 	} else {
 		$buffer=str_replace('/lists/admin',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer); //go to admin page
 		$buffer=str_replace('./?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
-		$buffer=str_replace(ZING_OST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
+		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		if ($_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
 			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
 			$buffer=str_replace('name=emailconfirm value=""','name=emailconfirm value="'.$current_user->data->user_email.'"',$buffer);
@@ -346,7 +346,7 @@ function zing_mailz_ob($buffer) {
 function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$vars="";
 	if (!$to_include || $to_include==".php") $to_include="index";
-	$http=ZING_OST_URL.'/';
+	$http=ZING_PHPLIST_URL.'/';
 	$http.= $to_include;
 	$and="";
 	if (count($_GET) > 0) {
