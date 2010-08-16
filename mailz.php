@@ -26,10 +26,10 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 0.9.4
+ Version: 1.0.0
  Author URI: http://www.zingiri.com/
  */
-define("ZING_MAILZ_VERSION","0.9.4");
+define("ZING_MAILZ_VERSION","1.0.0");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -156,7 +156,7 @@ function zing_mailz_activate() {
 
 	//set configuration options
 	//$query="update ".$prefix."phplist_config set value='".str_replace('http://','',substr(ZING_MAILZ_URL,0,-1))."' where item='website'";
-	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('home'))."' where item='website'";
+	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('siteurl'))."' where item='website'";
 	$wpdb->query($query);
 
 	//default options
@@ -317,6 +317,8 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('<a href="./?zlistpage=logout">logout</a>','',$buffer);
 		$buffer=str_replace('./?','options-general.php?'.'page=mailz_cp.php&zlist=index&',$buffer);
 		$buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
+		$buffer=str_replace('name="page"','name="zlistpage"',$buffer);
+		$buffer=str_replace('<form method=get>','<form method=get><input type="hidden" name="page" value="mailz_cp.php" /><input type="hidden" name="zlist" value="index" /><input type="hidden" name="zlistpage" value="'.$_GET['zlistpage'].'" />',$buffer);
 		$buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer);
 		$buffer=str_replace('./FCKeditor',ZING_PHPLIST_URL.'/admin/FCKeditor',$buffer);

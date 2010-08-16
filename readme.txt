@@ -3,8 +3,8 @@ Contributors: EBO
 Donate link: http://www.zingiri.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
-Tested up to: 2.9.1
-Stable tag: 0.9.4
+Tested up to: 3.0.1
+Stable tag: 1.0.0
 
 Zingiri Mailing List is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
@@ -40,8 +40,18 @@ Don't forget to take a database backup before you upgrade!
 == Other ==
 Fixes applied in PHPlists:
 * admin/structure.php: changed length of index of user_blacklist_data (limited to 1000, i.e. 333 bytes in UTF-8)
+* admin/editlist.php: replaced $_GET['id'] with $_REQUEST['id'];
+* admin/editattributes.php: replaced $id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0; with $id = sprintf('%d',$_REQUEST['id']);
 
 == Changelog ==
+
+= 1.0.0 = 
+* Updated to work with Wordpress 3.0.1
+* Fixed issue with editing of lists duplicating the list instead of simply updating it
+* Fixed issue with user reconciliation features being directed to an unaccessible page
+* Fixed issue with website url in PHPlist not being updated correctly. Should be siteurl rather than home url.
+* Fixed issue with "Error: No such attribute: 0" when trying to add an attribute.
+* Added display of version in control panel
 
 = 0.9.4 =
 * Fixed compatibility issue with Zingiri Tickets plugin

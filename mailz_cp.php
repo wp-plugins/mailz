@@ -82,7 +82,7 @@ function zing_mailz_admin() {
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION)
 	echo 'You downloaded version '.ZING_MAILZ_VERSION.' and need to upgrade your database (currently at version '.$zing_mailz_version.').';
 	elseif ($zing_mailz_version == ZING_MAILZ_VERSION)
-	echo 'Your version is up to date!';
+	echo 'Your version ('.$zing_mailz_version.') is up to date!';
 
 	?>
 	</p>
