@@ -1,16 +1,16 @@
-=== Zingiri Mailing List ===
+=== ccMails ===
 Contributors: EBO
-Donate link: http://www.zingiri.com/
+Donate link: http://www.choppedcode.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
 Tested up to: 3.0.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 
-Zingiri Mailing List is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
+ccMails is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
 == Description ==
 
-Zingiri Mailing List brings a state of the art mailing list system - PHPlist - to the Wordpress world.
+ccMails brings a state of the art mailing list system - PHPlist - to the Wordpress world.
 
 phplist is the world's most popular open source email campaign manager
 
@@ -19,14 +19,14 @@ phplist is the world's most popular open source email campaign manager
 1. Upload the `mailz` folder to the `/wp-content/plugins/` directory
 2. Change permissions on directory mailz/cache to world writable (777)
 3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Go to the Wordpress Settings page and find the link to Zingiri Mailing List, and start configuring ...
+4. Go to the Wordpress Settings page and find the link to ccMails, and start configuring ...
 
-Please visit the [Zingiri](http://forums.zingiri.com/ "Zingiri Support Forum") for more information and support.
+Please visit the [ChoppedCode](http://choppedcode.com/forums/ "ChoppedCode Support Forum") for more information and support.
 
 == Frequently Asked Questions ==
 
 = I have more questions! =
-Please visit the [Zingiri](http://forums.zingiri.com/ "Zingiri Support Forum") for more information and support.
+Please visit the [ChoppedCode](http://choppedcode.com/forums/ "ChoppedCode Support Forum") for more information and support.
 
 == Screenshots ==
 
@@ -42,8 +42,15 @@ Fixes applied in PHPlists:
 * admin/structure.php: changed length of index of user_blacklist_data (limited to 1000, i.e. 333 bytes in UTF-8)
 * admin/editlist.php: replaced $_GET['id'] with $_REQUEST['id'];
 * admin/editattributes.php: replaced $id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0; with $id = sprintf('%d',$_REQUEST['id']);
+* admin/spagedit.php: replaced $_GET['id'] by $_REQUEST['id']
 
 == Changelog ==
+
+= 1.1.0 =
+* Fixed issue with editing of subscribe pages duplicating the page instead of updating it
+* Added a check to see if CURL is installed
+* Renamed plugin to ccMails
+* Changed support site to http://choppedcode.com
 
 = 1.0.0 = 
 * Updated to work with Wordpress 3.0.1
@@ -54,7 +61,7 @@ Fixes applied in PHPlists:
 * Added display of version in control panel
 
 = 0.9.4 =
-* Fixed compatibility issue with Zingiri Tickets plugin
+* Fixed compatibility issue with ccTickets plugin
 * Fixed issue with backslashes in front of single and double quotes
 
 = 0.9.3 =

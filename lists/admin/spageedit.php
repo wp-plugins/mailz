@@ -16,8 +16,8 @@ switch ($access) {
   default:
     $subselect = " where id = 0";break;
 }
-if (isset($_GET['id'])) {
-  $id = sprintf('%d',$_GET['id']);
+if (isset($_REQUEST['id'])) {
+  $id = sprintf('%d',$_REQUEST['id']);
 } else {
   $id = 0;
 }

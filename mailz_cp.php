@@ -1,5 +1,5 @@
 <?php
-$zing_mailz_name = "Zingiri Mailing List";
+$zing_mailz_name = "ccMails";
 $zing_mailz_shortname = "zing_mailz";
 $zing_mailz_options=array();
 
@@ -77,13 +77,8 @@ function zing_mailz_admin() {
 <form method="post">
 <p>
 	<?php
-	if (empty($zing_mailz_version))
-	echo 'Please proceed with a clean install or deactivate your plugin';
-	elseif ($zing_mailz_version != ZING_MAILZ_VERSION)
-	echo 'You downloaded version '.ZING_MAILZ_VERSION.' and need to upgrade your database (currently at version '.$zing_mailz_version.').';
-	elseif ($zing_mailz_version == ZING_MAILZ_VERSION)
+	if ($zing_mailz_version == ZING_MAILZ_VERSION)
 	echo 'Your version ('.$zing_mailz_version.') is up to date!';
-
 	?>
 	</p>
 
@@ -113,8 +108,8 @@ function zing_mailz_admin() {
 </div>
 <div style="clear:both"></div>
 <hr />
-<p>For more info and support, contact us at <a href="http://www.zingiri.com/">Zingiri</a> or
-check out our <a href="http://forums.zingiri.com/">support forums</a>.</p>
+<p>For more info and support, contact us at <a href="http://www.choppedcode.com/">ChoppedCode</a> or
+check out our <a href="http://choppedcode.com/forums/">support forums</a>.</p>
 <hr />
 	<?php
 }

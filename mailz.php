@@ -1,35 +1,14 @@
 <?php
-/*  zingiri_mailz.php
- Copyright 2008,2009,2010 EBO
- Support site: http://www.zingiri.com
-
- This file is part of Zingiri Mailing List.
-
- Zingiri Mailing List is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- Zingiri Mailing List is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with Zingiri; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-?>
-<?php
 /*
- Plugin Name: Zingiri Mailing List
- Plugin URI: http://www.zingiri.com
+ Plugin Name: ccMails
+ Plugin URI: http://www.choppedcode.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.0.0
- Author URI: http://www.zingiri.com/
+ Version: 1.1.0
+ Author URI: http://www.choppedcode.com/
  */
-define("ZING_MAILZ_VERSION","1.0.0");
+define("ZING_MAILZ_VERSION","1.1.0");
+define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -80,6 +59,7 @@ if ($zing_mailz_version) {
 	add_filter('the_content', 'zing_mailz_content', 10, 3);
 	add_action('wp_head','zing_mailz_header');
 }
+add_action('admin_notices','zing_mailz_notices');
 
 register_activation_hook(__FILE__,'zing_mailz_activate');
 register_deactivation_hook(__FILE__,'zing_mailz_deactivate');
@@ -89,6 +69,24 @@ require_once(dirname(__FILE__) . '/includes/footer.inc.php');
 require_once(dirname(__FILE__) . '/includes/integrator.inc.php');
 require_once(dirname(__FILE__) . '/mailz_cp.php');
 
+function zing_mailz_notices() {
+	$zing_mailz_version=get_option("zing_mailz_version");
+	$warnings=array();
+
+	if (phpversion() < '5')	$errors[]="You are running PHP version ".phpversion().". You require PHP version 5 or higher to install the Web Shop.";
+	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
+	
+	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
+	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to upgrade your database (currently at version '.$zing_mailz_version.').';
+	
+	if (count($warnings)>0) {
+		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
+		foreach ($warnings as $message) {
+			echo "<p><strong>Mailing list: ".$message."</strong></p>";
+		}
+		echo "</div>";
+	}
+}
 /**
  * Activation: creation of database tables & set up of pages
  * @return unknown_type
@@ -479,7 +477,7 @@ function zing_mailz_logout() {
 	}
 }
 /**
- * Display common Zingiri footer
+ * Display common ChoppedCode footer
  * @param $page_id
  * @return unknown_type
  */
@@ -488,28 +486,28 @@ function zing_mailz_footer() {
 }
 
 /*
-function zing_mailz_more_reccurences() {
-	return array(
-'minute' => array('interval' => 60, 'display' => 'Every minute'),
-'weekly' => array('interval' => 604800, 'display' => 'Once Weekly'),
-'fortnightly' => array('interval' => 1209600, 'display' => 'Once Fortnightly'),
-	);
-}
-add_filter('cron_schedules', 'zing_mailz_more_reccurences');
-*/
+ function zing_mailz_more_reccurences() {
+ return array(
+ 'minute' => array('interval' => 60, 'display' => 'Every minute'),
+ 'weekly' => array('interval' => 604800, 'display' => 'Once Weekly'),
+ 'fortnightly' => array('interval' => 1209600, 'display' => 'Once Fortnightly'),
+ );
+ }
+ add_filter('cron_schedules', 'zing_mailz_more_reccurences');
+ */
 
 function zing_mailz_cron() {
 
 	$msg=time();
-	
+
 	$post['login']='admin';
 	$post['password']=get_option('zing_mailz_password');
-	
+
 	$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
 
 	$news = new HTTPRequest($http);
 	$news->post=$post;
-	
+
 	if ($news->live()) {
 		$output=$news->DownloadToString(true);
 		$msg.='ok';
