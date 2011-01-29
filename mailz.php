@@ -4,12 +4,14 @@
  Plugin URI: http://www.choppedcode.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.1.0
+ Version: 1.1.1
  Author URI: http://www.choppedcode.com/
  */
-define("ZING_MAILZ_VERSION","1.1.0");
+define("ZING_MAILZ_VERSION","1.1.1");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
+
+$dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -63,11 +65,10 @@ add_action('admin_notices','zing_mailz_notices');
 
 register_activation_hook(__FILE__,'zing_mailz_activate');
 register_deactivation_hook(__FILE__,'zing_mailz_deactivate');
-require_once(dirname(__FILE__) . '/includes/shared.inc.php');
-require_once(dirname(__FILE__) . '/includes/http.class.php');
-require_once(dirname(__FILE__) . '/includes/footer.inc.php');
-require_once(dirname(__FILE__) . '/includes/integrator.inc.php');
+require_once(dirname(__FILE__) . '/includes/index.php');
+require_once(dirname(__FILE__) . '/classes/index.php');
 require_once(dirname(__FILE__) . '/mailz_cp.php');
+require_once(dirname(__FILE__) . '/mailz_import.php');
 
 function zing_mailz_notices() {
 	$zing_mailz_version=get_option("zing_mailz_version");
@@ -75,6 +76,8 @@ function zing_mailz_notices() {
 
 	if (phpversion() < '5')	$errors[]="You are running PHP version ".phpversion().". You require PHP version 5 or higher to install the Web Shop.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
+	
+	if (!is_writable(dirname(__FILE__).'/cache')) $warnings[]='Cache path '.dirname(__FILE__).'/cache'.' not writable';
 	
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to upgrade your database (currently at version '.$zing_mailz_version.').';
@@ -140,7 +143,7 @@ function zing_mailz_activate() {
 	//create database tables
 	if (!$zing_mailz_version) {
 		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
-		$news = new HTTPRequest($http);
+		$news = new mailzHTTPRequest($http);
 		if ($news->live()) {
 			$output=$news->DownloadToString(true);
 		}
@@ -234,7 +237,7 @@ function zing_mailz_output($process) {
 			$cf=get_post_custom($post->ID);
 			if (isset($_GET['zlist']))
 			{
-				if ($_GET['page']=='mailz_cp.php') $to_include='admin/index';
+				if ($_GET['page']=='mailz_cp') $to_include='admin/index';
 				elseif (isset($_GET['page'])) $to_include='admin/index';
 				else $to_include=$_GET['zlist'];
 				$zing_mailz_mode="client";
@@ -279,11 +282,11 @@ function zing_mailz_output($process) {
 
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
-		$news = new HTTPRequest($http);
+		$news = new mailzHTTPRequest($http);
 		if ($news->live()) {
 			$output=stripslashes($news->DownloadToString(true));
 			if ($news->redirect) {
-				$redirect=str_replace(ZING_PHPLIST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage=',$output);
+				$redirect=str_replace(ZING_PHPLIST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'admin.php?page=mailz_cp&zlist=index&zlistpage=',$output);
 				header($redirect);
 				die();
 			}
@@ -313,17 +316,17 @@ function zing_mailz_ob($buffer) {
 	if (is_admin()) {
 		$buffer=str_replace('<span class="menulinkleft"><a href="./?zlistpage=logout">logout</a><br /></span>','',$buffer);
 		$buffer=str_replace('<a href="./?zlistpage=logout">logout</a>','',$buffer);
-		$buffer=str_replace('./?','options-general.php?'.'page=mailz_cp.php&zlist=index&',$buffer);
-		$buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
+		$buffer=str_replace('./?','admin.php?'.'page=mailz_cp&zlist=index&',$buffer);
+		$buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace('name="page"','name="zlistpage"',$buffer);
-		$buffer=str_replace('<form method=get>','<form method=get><input type="hidden" name="page" value="mailz_cp.php" /><input type="hidden" name="zlist" value="index" /><input type="hidden" name="zlistpage" value="'.$_GET['zlistpage'].'" />',$buffer);
-		$buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'options-general.php?page=mailz_cp.php&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
-		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer);
+		$buffer=str_replace('<form method=get>','<form method=get><input type="hidden" name="page" value="mailz_cp" /><input type="hidden" name="zlist" value="index" /><input type="hidden" name="zlistpage" value="'.$_GET['zlistpage'].'" />',$buffer);
+		$buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
+		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer);
 		$buffer=str_replace('./FCKeditor',ZING_PHPLIST_URL.'/admin/FCKeditor',$buffer);
 		$buffer=str_replace('src="images/','src="'.ZING_PHPLIST_URL.'/admin/images/',$buffer);
 		$buffer=str_replace('src="js/jslib.js"','src="'.ZING_PHPLIST_URL.'/js/jslib.js"',$buffer);
 	} else {
-		$buffer=str_replace('/lists/admin',$admin.'options-general.php?page=mailz_cp.php&zlist=index&',$buffer); //go to admin page
+		$buffer=str_replace('/lists/admin',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer); //go to admin page
 		$buffer=str_replace('./?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		if ($_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
@@ -448,7 +451,7 @@ function zing_mailz_login() {
 		$post['password']=get_option('zing_mailz_password');
 		$post['submit']='Enter';
 		$http=zing_mailz_http('osticket','admin/index.php');
-		$news = new HTTPRequest($http);
+		$news = new mailzHTTPRequest($http);
 		$news->post=$post;
 		if ($news->live()) {
 			$output=stripslashes($news->DownloadToString(true));
@@ -468,7 +471,7 @@ function zing_mailz_logout() {
 
 		$_GET['zlistpage']='logout';
 		$http=zing_mailz_http('osticket','admin/index.php');
-		$news = new HTTPRequest($http);
+		$news = new mailzHTTPRequest($http);
 		if ($news->live()) {
 			$output=$news->DownloadToString(true);
 			unset($_SESSION['zing']['mailz']['loggedin']);
@@ -505,7 +508,7 @@ function zing_mailz_cron() {
 
 	$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
 
-	$news = new HTTPRequest($http);
+	$news = new mailzHTTPRequest($http);
 	$news->post=$post;
 
 	if ($news->live()) {

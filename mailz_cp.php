@@ -6,8 +6,6 @@ $zing_mailz_options=array();
 function zing_mailz_add_admin() {
 
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
-
-	//echo 'mc='.get_magic_quotes_gpc().'/'.get_magic_quotes_runtime();
 	
 	if ( $_GET['page'] == basename(__FILE__) ) {
 
@@ -46,8 +44,11 @@ function zing_mailz_add_admin() {
 		}
 	}
 
-	add_options_page($zing_mailz_name." Options", "$zing_mailz_name", 8, basename(__FILE__), 'zing_mailz_admin');
-}
+	//add_options_page($zing_mailz_name." Options", "$zing_mailz_name", 8, basename(__FILE__), 'zing_mailz_admin');
+	add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
+	add_submenu_page('mailz_cp', $zing_mailz_name.'- Administration', 'Administration', 'administrator', 'mailz_cp', 'zing_mailz_admin');
+	if (get_option("zing_mailz_version")) add_submenu_page('mailz_cp', $zing_mailz_name.'- Import', 'Import', 'administrator', 'mailz-import', 'zing_mailz_import');
+	}
 
 function zing_mailz_admin() {
 
@@ -117,12 +118,10 @@ check out our <a href="http://choppedcode.com/forums/">support forums</a>.</p>
 function zing_mailz_cp() {
 	global $zing_mailz_content;
 	global $zing_mailz_menu;
-//	global $zing_mailz_post;
 	
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	
 	zing_mailz_header();
-//echo '<div width="100%">';
 	echo '<div id="zing-mailz-cp-content">';
 	if ($_GET['zlistpage']=='admin') {
 		echo 'Please use the <a href="users.php">Wordpress Users menu</a> to change <strong>admin</strong> user details';
@@ -133,8 +132,6 @@ function zing_mailz_cp() {
 	echo '<div id="zing-mailz-cp-menu">';
 	echo $zing_mailz_menu;
 	echo '</div>';
-//echo '</div>';
-	
 }
 
 add_action('admin_menu', 'zing_mailz_add_admin'); ?>

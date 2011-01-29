@@ -1,6 +1,6 @@
 <?php
-if (!class_exists('HTTPRequest')) {
-	class HTTPRequest
+if (!class_exists('mailzHTTPRequest')) {
+	class mailzHTTPRequest
 	{
 		var $_fp;        // HTTP socket
 		var $_url;        // full URL
@@ -43,7 +43,7 @@ if (!class_exists('HTTPRequest')) {
 		}
 
 		// constructor
-		function HTTPRequest($url="",$login=false)
+		function mailzHTTPRequest($url="",$login=false)
 		{
 			if (!$url) return;
 			$this->login=$login;
@@ -104,7 +104,7 @@ if (!class_exists('HTTPRequest')) {
 			// redirection?
 			if(isset($headers['location']))
 			{
-				$http = new HTTPRequest($headers['location']);
+				$http = new mailzHTTPRequest($headers['location']);
 				return($http->DownloadToString($http));
 			}
 			else

@@ -3,8 +3,8 @@ Contributors: EBO
 Donate link: http://www.choppedcode.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
-Tested up to: 3.0.1
-Stable tag: 1.1.0
+Tested up to: 3.0.4
+Stable tag: 1.1.1
 
 ccMails is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
@@ -45,6 +45,12 @@ Fixes applied in PHPlists:
 * admin/spagedit.php: replaced $_GET['id'] by $_REQUEST['id']
 
 == Changelog ==
+
+= 1.1.1 =
+* Added test on cache directory being writable
+* Added new option to import all Wordpress users in a default mailing list
+* Tested up to Wordpress version 3.0.4
+* Fixed potential compatibility issue with other ChoppedCode plugins
 
 = 1.1.0 =
 * Fixed issue with editing of subscribe pages duplicating the page instead of updating it
