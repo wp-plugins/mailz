@@ -4,10 +4,10 @@
  Plugin URI: http://www.choppedcode.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.1.1
+ Version: 1.1.2
  Author URI: http://www.choppedcode.com/
  */
-define("ZING_MAILZ_VERSION","1.1.1");
+define("ZING_MAILZ_VERSION","1.1.2");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 

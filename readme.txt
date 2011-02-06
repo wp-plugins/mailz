@@ -4,7 +4,7 @@ Donate link: http://www.choppedcode.com/
 Tags: mailing, mailing list
 Requires at least: 2.1.7
 Tested up to: 3.0.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 
 ccMails is a Wordpress plugin that brings together a great content management system with the fantastic PHPmail mailing list solution.
 
@@ -45,6 +45,9 @@ Fixes applied in PHPlists:
 * admin/spagedit.php: replaced $_GET['id'] by $_REQUEST['id']
 
 == Changelog ==
+
+= 1.1.2 =
+* Removed definition of GetUserIp function which is not used and causes a conflict with Nextgen Gallery Voting plugin
 
 = 1.1.1 =
 * Added test on cache directory being writable
