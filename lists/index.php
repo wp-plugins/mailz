@@ -487,16 +487,6 @@ function checkGroup(name,value) {
   $html .= formStart('name="subscribeform"');
   # @@@ update
   if (isset($_SESSION["adminloggedin"]) && $_SESSION["adminloggedin"]) {
-    $html .= '<style type="text/css">
-      div.adminmessage {
-        width: 100%;
-        border: 2px dashed #000000;
-        padding: 10px;
-        margin-bottom: 15px;
-        background-color: #E7BE8F;
-
-      }
-      </style>';
     $html .= '<div class="adminmessage"><p><b>You are logged in as administrator ('.$_SESSION["logindetails"]["adminname"].') of this phplist system</b></p>';
     $html .= '<p>You are therefore offered the following choice, which your users will not see when they load this page.</p>';
     $html .= '<p><a href="'.$GLOBALS['adminpages'].'">Go back to admin area</a></p>';

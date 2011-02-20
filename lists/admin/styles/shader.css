@@ -1,10 +1,10 @@
 .shader {
   margin-bottom: 0px;
-  border-color: #e7be8f;
+  border-color: #f1f1f1;
 }
 .shaderfooter {
   font-size : 11px;
-  background-color : #e7be8f;
+  background-color : #f1f1f1;
   font-weight: bold;
   text-align : left;
   text-decoration : none;
@@ -12,7 +12,7 @@
 .shaderheader {
   font-size : 11px; 
   color : black;
-  background-color : #e7be8f;
+  background-color : #f1f1f1;
   font-weight: bold; 
   border-top: 1px black solid;  
   border-bottom: 1px black solid;
@@ -25,9 +25,7 @@
   padding-left : 3px;
 }
 .shaderfootertexthidden {
-  font-size : 11px;
-  color : black;
-  background-color : #e7be8f;
+  background-color : #f1f1f1;
   font-weight: bold;
   text-align : left;
   text-decoration : none;
@@ -40,7 +38,7 @@
 .shaderfootertextvisible {
   font-size : 11px;
   color : black;
-  background-color : #e7be8f;
+  background-color : #f1f1f1;
   font-weight: bold;
   text-align : left;
   text-decoration : none;
@@ -51,25 +49,23 @@
 }
 
 .shaderfooterright {
-  background-color:#e7be8f;
+  background-color:#f1f1f1;
   text-align : right;
   text-decoration : none;
 }
 .shaderdivider {
-  //background-color:#e7be8f;
+  //background-color:#f1f1f1;
 }
 .shaderborder {
-  //background-color:#e7be8f;
+  //background-color:#f1f1f1;
 }
 .shaderborderright {
-  background-color:#e7be8f;
+  background-color:#f1f1f1;
   text-align : right;
   text-decoration : none;
 }
 .shadersmall {
-  font-family:"MS Sans Serif",Geneva,sans-serif;
   font-size:10px;
-  text-decoration:none;
 }
 
 .shadersmallnavtext {

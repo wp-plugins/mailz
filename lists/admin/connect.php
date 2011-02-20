@@ -141,9 +141,9 @@ if (ereg("dev", VERSION))
 else
 	$v = VERSION;
 if (REGISTER) {
-	$PoweredByImage = '<p align=left><a href="http://www.phplist.com"><img src="http://phplist.tincan.co.uk/images/' . $v . '/power-phplist.png" width=70 height=30 title="Powered by PHPlist version ' . $v . ', &copy; tincan ltd" alt="Powered by PHPlist' . $v . ', &copy tincan ltd" border="0"></a></p>';
+	$PoweredByImage = '<p class="phplist-powered-by" align=left><a href="http://www.phplist.com"><img src="http://phplist.tincan.co.uk/images/' . $v . '/power-phplist.png" width=70 height=30 title="Powered by PHPlist version ' . $v . ', &copy; tincan ltd" alt="Powered by PHPlist' . $v . ', &copy tincan ltd" border="0"></a></p>';
 } else {
-	$PoweredByImage = '<p align=left><a href="http://www.phplist.com"><img src="images/power-phplist.png" width=70 height=30 title="Powered by PHPlist version ' . $v . ', &copy; tincan ltd" alt="Powered by PHPlist' . $v . ', &copy tincan ltd" border="0"></a></p>';
+	$PoweredByImage = '<p class="phplist-powered-by" align=left><a href="http://www.phplist.com"><img src="images/power-phplist.png" width=70 height=30 title="Powered by PHPlist version ' . $v . ', &copy; tincan ltd" alt="Powered by PHPlist' . $v . ', &copy tincan ltd" border="0"></a></p>';
 }
 $PoweredByText = '
     <style type="text/css"><!--

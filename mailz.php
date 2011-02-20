@@ -1,15 +1,18 @@
 <?php
 /*
- Plugin Name: ccMails
+ Plugin Name: Mailing List
  Plugin URI: http://www.choppedcode.com
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.1.2
+ Version: 1.2.0
  Author URI: http://www.choppedcode.com/
  */
-define("ZING_MAILZ_VERSION","1.1.2");
+define("ZING_MAILZ_VERSION","1.2.0");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
+
+//error_reporting(E_ALL & ~E_NOTICE);
+//ini_set('display_errors', '1');
 
 $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 
@@ -59,6 +62,7 @@ if ($zing_mailz_version) {
 	add_action("init","zing_mailz_init");
 	add_filter('wp_footer','zing_mailz_footer');
 	add_filter('the_content', 'zing_mailz_content', 10, 3);
+	add_action('wp_head','zing_mailz_head');
 	add_action('wp_head','zing_mailz_header');
 }
 add_action('admin_notices','zing_mailz_notices');
@@ -69,6 +73,7 @@ require_once(dirname(__FILE__) . '/includes/index.php');
 require_once(dirname(__FILE__) . '/classes/index.php');
 require_once(dirname(__FILE__) . '/mailz_cp.php');
 require_once(dirname(__FILE__) . '/mailz_import.php');
+require_once(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 
 function zing_mailz_notices() {
 	$zing_mailz_version=get_option("zing_mailz_version");
@@ -80,7 +85,7 @@ function zing_mailz_notices() {
 	if (!is_writable(dirname(__FILE__).'/cache')) $warnings[]='Cache path '.dirname(__FILE__).'/cache'.' not writable';
 	
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
-	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to upgrade your database (currently at version '.$zing_mailz_version.').';
+	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz-upgrade">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
 	
 	if (count($warnings)>0) {
 		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
@@ -226,7 +231,7 @@ function zing_mailz_output($process) {
 	global $zing_mailz_loaded,$zing_mailz_mode;
 
 	$content="";
-
+	
 	switch ($process)
 	{
 		case "content":
@@ -244,7 +249,6 @@ function zing_mailz_output($process) {
 			}
 			elseif (isset($_GET['zscp']))
 			{
-				//$to_include="scp/".$_GET['zscp'];
 				$to_include="index";
 
 				$zing_mailz_mode="admin";
@@ -256,12 +260,10 @@ function zing_mailz_output($process) {
 			}
 			elseif (isset($cf['zing_mailz_page']) && ($cf['zing_mailz_page'][0]=='mailz'))
 			{
-				//$zing_mailz_mode="client";
 				$to_include="index";
 			}
 			elseif (isset($cf['zing_mailz_page']) && ($cf['zing_mailz_page'][0]=='admin'))
 			{
-				//$to_include="scp/".$_GET['zscp'];
 				$to_include="index.php";
 				$zing_mailz_mode="admin";
 			}
@@ -277,9 +279,6 @@ function zing_mailz_output($process) {
 			return $content;
 			break;
 	}
-	//error_reporting(E_ALL & ~E_NOTICE);
-	//ini_set('display_errors', '1');
-
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
 		$news = new mailzHTTPRequest($http);
@@ -402,7 +401,6 @@ function zing_mailz_header()
 	}
 
 	$output=zing_mailz_output("content");
-
 	$menu1=zing_integrator_cut($output,'<div class="menutableright">','</div>');
 	if ($menu1) {
 		$menu1=str_replace('<span','<li><span',$menu1);
@@ -416,6 +414,9 @@ function zing_mailz_header()
 	$body=zing_integrator_cut($output,'<body','</body>',true);
 	$body=strchr($body,'>');
 	$zing_mailz_content=trim(substr($body,1));
+}
+
+function zing_mailz_head() {
 	if (is_admin()) {
 		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
 	} else {

@@ -20,7 +20,7 @@
 
 </td></tr>
 
-
+<!-- 
 <tr>
 <td bgcolor="#000000" colspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
 </tr>
@@ -30,7 +30,7 @@
 <td bgcolor="#ff9900" class="bottom">&copy; <a href="http://tincan.co.uk" target="_tincan" class="urhere">tincan limited</a> | <a class="urhere" href="http://www.phplist.com" target="_blank">phplist</a> - version <?php echo VERSION?></td>
 <td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
 </tr>
-
+ 
 <tr>
 <td bgcolor="#000000" colspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
 </tr>
@@ -44,6 +44,7 @@
 &nbsp;
 </td>
 </tr>
+-->
 </tbody>
 </table>
 

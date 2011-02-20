@@ -697,7 +697,7 @@ Settings for Wordpress integration
 =========================================================================
 
 */
-
+define("NAME",'Mailing List');
 if ( isset($_GET['wpabspath']) ) {
 	//error_reporting(E_ALL & ~E_NOTICE);
 	//ini_set('display_errors', '1');

@@ -223,7 +223,7 @@ if ($page != '') {
   $include = "home.php";
 }
 
-print '<p class="leaftitle">'.NAME.' - '.strtolower($page_title).'</p>';
+print '<h2 class="leaftitle">'.NAME.' - '.strtolower($page_title).'</h2>';
 
 if ($GLOBALS["require_login"] && $page != "login") {
   if ($page == 'logout') {
