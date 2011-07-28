@@ -1,13 +1,13 @@
 === Mailing List ===
 Contributors: EBO
-Donate link: http://www.choppedcode.com/
+Donate link: http://www.zingiri.net/
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing
 Requires at least: 2.1.7
-Tested up to: 3.0.5
-Stable tag: 1.2.0
+Tested up to: 3.2.1
+Stable tag: 1.2.1
 
 Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
-It is easy to install and use, and is seamlessly integrated with Wordpress.
+
 == Description ==
 
 Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
@@ -42,16 +42,16 @@ The main features are:
 == Installation ==
 
 1. Upload the `mailz` folder to the `/wp-content/plugins/` directory
-2. Change permissions on directory mailz/cache to world writable (777)
-3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Go to the Wordpress Settings page and find the link to Mailing List, and start configuring ...
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Go to the Wordpress Settings page and find the Mailing List menu, click on install
+4. You're now ready to start configuring your mailing lists
 
-Please visit the [ChoppedCode](http://choppedcode.com/forums/ "ChoppedCode Support Forum") for more information and support.
+Please visit the [Zingiri](http://zingiri.net/forums/ "Zingiri Support Forum") for more information and support.
 
 == Frequently Asked Questions ==
 
 = I have more questions! =
-Please visit the [ChoppedCode](http://choppedcode.com/forums/ "ChoppedCode Support Forum") for more information and support.
+Please visit the [Zingiri](http://zingiri.net/forums/ "Zingiri Support Forum") for more information and support.
 
 == Screenshots ==
 
@@ -74,6 +74,12 @@ Fixes applied in PHPlists:
 
 == Changelog ==
 
+= 1.2.1 =
+* Update cURL class to avoid having to use the cache directory
+* Enhanced management of logins to phplist application
+* Rebranding
+* Shortened plugin title
+
 = 1.2.0 =
 * Revamped the front and back end interfaces to fit better with Wordpress themes
 * Added link to our Facebook fan page on the plugin control panel
@@ -91,7 +97,7 @@ Fixes applied in PHPlists:
 * Added test on cache directory being writable
 * Added new option to import all Wordpress users in a default mailing list
 * Tested up to Wordpress version 3.0.4
-* Fixed potential compatibility issue with other ChoppedCode plugins
+* Fixed potential compatibility issue with other Zingiri plugins
 
 = 1.1.0 =
 * Fixed issue with editing of subscribe pages duplicating the page instead of updating it

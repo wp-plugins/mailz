@@ -136,8 +136,8 @@ function zing_mailz_cp($message='') {
 	echo '</div>';
 ?><div style="clear: both"></div>
 <hr />
-<p>For more info and support, contact us at <a href="http://www.choppedcode.com/">ChoppedCode</a> or
-check out our <a href="http://choppedcode.com/forums/">support forums</a>.</p>
+<p>For more info and support, contact us at <a href="http://www.zingiri.net/">Zingiri</a> or
+check out our <a href="http://zingiri.net/forums/">support forums</a>.</p>
 <hr />
 <?php
 }

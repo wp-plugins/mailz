@@ -1,13 +1,13 @@
 <?php
 /*
  Plugin Name: Mailing List
- Plugin URI: http://www.choppedcode.com
+ Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.2.0
- Author URI: http://www.choppedcode.com/
+ Version: 1.2.1
+ Author URI: http://www.zingiri.net/
  */
-define("ZING_MAILZ_VERSION","1.2.0");
+define("ZING_MAILZ_VERSION","1.2.1");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 
@@ -54,6 +54,11 @@ if (!defined("ZING_MAILZ_LOGIN")) {
 	define("ZING_MAILZ_LOGIN", get_option("zing_mailz_login"));
 }
 
+if (!defined("BLOGUPLOADDIR")) {
+	$upload=wp_upload_dir();
+	define("BLOGUPLOADDIR",$upload['path']);
+}
+
 define("ZING_PHPLIST_URL",ZING_MAILZ_URL.'lists');
 
 $zing_footers[]=array('http://www.phplist.com/','PHPlist');
@@ -82,11 +87,12 @@ function zing_mailz_notices() {
 	if (phpversion() < '5')	$errors[]="You are running PHP version ".phpversion().". You require PHP version 5 or higher to install the Web Shop.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
 	
-	if (!is_writable(dirname(__FILE__).'/cache')) $warnings[]='Cache path '.dirname(__FILE__).'/cache'.' not writable';
+	$upload=wp_upload_dir();
+	if ($upload['error']) $warnings[]=$upload['error'];
 	
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz-upgrade">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
-	
+
 	if (count($warnings)>0) {
 		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
 		foreach ($warnings as $message) {
@@ -148,9 +154,9 @@ function zing_mailz_activate() {
 	//create database tables
 	if (!$zing_mailz_version) {
 		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
-		$news = new mailzHTTPRequest($http);
+		$news = new zHttpRequest($http,'mailz');
 		if ($news->live()) {
-			$output=$news->DownloadToString(true);
+			$output=$news->DownloadToString();
 		}
 	}
 
@@ -231,7 +237,7 @@ function zing_mailz_output($process) {
 	global $zing_mailz_loaded,$zing_mailz_mode;
 
 	$content="";
-	
+
 	switch ($process)
 	{
 		case "content":
@@ -281,14 +287,9 @@ function zing_mailz_output($process) {
 	}
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
-		$news = new mailzHTTPRequest($http);
+		$news = new zHttpRequest($http,'mailz');
 		if ($news->live()) {
-			$output=stripslashes($news->DownloadToString(true));
-			if ($news->redirect) {
-				$redirect=str_replace(ZING_PHPLIST_URL.'/admin/?page=',get_option('siteurl').'/wp-admin/'.'admin.php?page=mailz_cp&zlist=index&zlistpage=',$output);
-				header($redirect);
-				die();
-			}
+			$output=stripslashes($news->DownloadToString());
 			$content.=zing_mailz_ob($output);
 			return $content;
 		}
@@ -440,27 +441,27 @@ function zing_mailz_login() {
 
 	$loggedin=false;
 
-	if (!current_user_can('edit_plugins') && isset($_SESSION['zing']['mailz']['loggedin'])) {
+	if (!isset($_SESSION['zing']['mailz']['loggedin'])) $_SESSION['zing']['mailz']['loggedin']=0;
+	
+	if (!current_user_can('edit_plugins') && $_SESSION['zing']['mailz']['loggedin'] > 0) {
 		zing_mailz_logout();
 	}
 	if (!is_admin()) {
 		$loggedin=true;
-	}
-	elseif (is_admin() && current_user_can('edit_plugins') && !isset($_SESSION['zing']['mailz']['loggedin'])) {
+	} elseif (is_admin() && current_user_can('edit_plugins') && time()-$_SESSION['zing']['mailz']['loggedin'] > 60) { //We relogin every minute to avoid time outs
 		$post['do']='scplogin';
 		$post['login']='admin';//$current_user->data->user_login;
 		$post['password']=get_option('zing_mailz_password');
 		$post['submit']='Enter';
 		$http=zing_mailz_http('osticket','admin/index.php');
-		$news = new mailzHTTPRequest($http);
+		$news = new zHttpRequest($http,'mailz');
 		$news->post=$post;
 		if ($news->live()) {
-			$output=stripslashes($news->DownloadToString(true));
+			$output=stripslashes($news->DownloadToString());
 			if (strpos($output,"invalid password")===false && strpos($output,"Default login is admin")===false) {
 				$loggedin=true;
-				$_SESSION['zing']['mailz']['loggedin']=1;
-			}
-			else echo '<br /><strong style="color:red">Couldn\'t log in to PHPlist</strong><br />';
+				$_SESSION['zing']['mailz']['loggedin']=time();
+			} else echo '<br /><strong style="color:red">Couldn\'t log in to PHPlist</strong><br />';
 		}
 	}
 	elseif (isset($_SESSION['zing']['mailz']['loggedin'])) $loggedin=true;
@@ -468,20 +469,16 @@ function zing_mailz_login() {
 }
 
 function zing_mailz_logout() {
-	if (isset($_SESSION['zing']['mailz']['loggedin'])) {
-
-		$_GET['zlistpage']='logout';
-		$http=zing_mailz_http('osticket','admin/index.php');
-		$news = new mailzHTTPRequest($http);
-		if ($news->live()) {
-			$output=$news->DownloadToString(true);
-			unset($_SESSION['zing']['mailz']['loggedin']);
-		}
-
+	$_GET['zlistpage']='logout';
+	$http=zing_mailz_http('osticket','admin/index.php');
+	$news = new zHttpRequest($http);
+	if ($news->live()) {
+		$output=$news->DownloadToString(true);
+		unset($_SESSION['zing']['mailz']['loggedin']);
 	}
 }
 /**
- * Display common ChoppedCode footer
+ * Display common Zingiri footer
  * @param $page_id
  * @return unknown_type
  */
@@ -509,11 +506,11 @@ function zing_mailz_cron() {
 
 	$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
 
-	$news = new mailzHTTPRequest($http);
+	$news = new zHttpRequest($http,'mailz');
 	$news->post=$post;
 
 	if ($news->live()) {
-		$output=$news->DownloadToString(true);
+		$output=$news->DownloadToString();
 		$msg.='ok';
 	} else {
 		$msg.='failed';

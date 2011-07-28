@@ -1,6 +1,7 @@
 <?php
-if (!class_exists('mailzHTTPRequest')) {
-	class mailzHTTPRequest
+//v0.2
+if (!class_exists('zHttpRequest')) {
+	class zHttpRequest
 	{
 		var $_fp;        // HTTP socket
 		var $_url;        // full URL
@@ -12,9 +13,76 @@ if (!class_exists('mailzHTTPRequest')) {
 		var $errno=false;
 		var $post=array();	//post variables, defaults to $_POST
 		var $redirect=false;
+		var $errors=array();
+		var $countRedirects=0;
+		var $sid;
 
+		// constructor
+		function __construct($url="",$sid='')
+		{
+			if (!$url) return;
+			$this->sid=$sid;
+			$this->_url = $url;
+			$this->_scan_url();
+			$this->post=$_POST;
+		}
+
+		
+		private function processHeaders($headers) {
+			// split headers, one per array element
+			if ( is_string($headers) ) {
+				// tolerate line terminator: CRLF = LF (RFC 2616 19.3)
+				$headers = str_replace("\r\n", "\n", $headers);
+				// unfold folded header fields. LWS = [CRLF] 1*( SP | HT ) <US-ASCII SP, space (32)>, <US-ASCII HT, horizontal-tab (9)> (RFC 2616 2.2)
+				$headers = preg_replace('/\n[ \t]/', ' ', $headers);
+				// create the headers array
+				$headers = explode("\n", $headers);
+			}
+
+			$response = array('code' => 0, 'message' => '');
+
+			// If a redirection has taken place, The headers for each page request may have been passed.
+			// In this case, determine the final HTTP header and parse from there.
+			for ( $i = count($headers)-1; $i >= 0; $i-- ) {
+				if ( !empty($headers[$i]) && false === strpos($headers[$i], ':') ) {
+					$headers = array_splice($headers, $i);
+					break;
+				}
+			}
+
+			$cookies = '';
+			$newheaders = array();
+			foreach ( $headers as $tempheader ) {
+				if ( empty($tempheader) )
+				continue;
+
+				if ( false === strpos($tempheader, ':') ) {
+					list( , $response['code'], $response['message']) = explode(' ', $tempheader, 3);
+					continue;
+				}
+
+				list($key, $value) = explode(':', $tempheader, 2);
+
+				if ( !empty( $value ) ) {
+					$key = strtolower( $key );
+					if ( isset( $newheaders[$key] ) ) {
+						if ( !is_array($newheaders[$key]) )
+						$newheaders[$key] = array($newheaders[$key]);
+						$newheaders[$key][] = trim( $value );
+					} else {
+						$newheaders[$key] = trim( $value );
+					}
+					if ( 'set-cookie' == $key ) {
+						$cookies = $value;
+					}
+				}
+			}
+
+			return array('response' => $response, 'headers' => $newheaders, 'cookies' => $cookies);
+		}
+		
 		// scan url
-		function _scan_url()
+		private function _scan_url()
 		{
 			$req = $this->_url;
 
@@ -42,19 +110,10 @@ if (!class_exists('mailzHTTPRequest')) {
 			$this->_uri = '/';
 		}
 
-		// constructor
-		function mailzHTTPRequest($url="",$login=false)
-		{
-			if (!$url) return;
-			$this->login=$login;
-			$this->_url = $url;
-			$this->_scan_url();
-			$this->post=$_POST;
-		}
-
 		//check if server is live
 		function live() {
-			$url=($this->_protocol == 'https' ? 'ssl://' : '') . $this->_host;
+			if (ip2long($this->_host)) return true; //in case using an IP instead of a host name
+			$url=$this->_host;
 			if (gethostbyname($url) == $url) return false;
 			else return true;
 		}
@@ -65,105 +124,88 @@ if (!class_exists('mailzHTTPRequest')) {
 			else return true;
 		}
 
+		//check destination is reachable
+		function checkConnection() {
+			$output=$this->DownloadToString_curl();
+			if ($output=='zingiri') return true;
+			else return false;
+		}
+
+		//error logging
+		function error($msg) {
+			cc_whmcs_log('Error',$msg);
+		}
+
+		//notification logging
+		function notify($msg) {
+			cc_whmcs_log('Notification',$msg);
+		}
+
+		function getSid() {
+			return md5(__FILE__);
+		}
+		
 		// download URL to string
-		function DownloadToString($withHeaders=false) {
-			return $this->DownloadToString_curl($withHeaders);
-		}
-
-		function DownloadToString_http()
+		function DownloadToString($withHeaders=true,$withCookies=false)
 		{
-			$crlf = "\r\n";
-			$response = "";
+			$newfiles=array();
 
-			// generate request
-			$req = 'GET ' . $this->_uri . ' HTTP/1.0' . $crlf
-			.    'Host: ' . $this->_host . $crlf
-			.    $crlf;
-
-			// fetch
-			$this->_fp = fsockopen(($this->_protocol == 'https' ? 'ssl://' : '') . $this->_host, $this->_port);
-			fwrite($this->_fp, $req);
-			while(is_resource($this->_fp) && $this->_fp && !feof($this->_fp))
-			$response .= fread($this->_fp, 1024);
-			fclose($this->_fp);
-
-			// split header and body
-			$pos = strpos($response, $crlf . $crlf);
-			if($pos === false)
-			return($response);
-			$header = substr($response, 0, $pos);
-			$body = substr($response, $pos + 2 * strlen($crlf));
-
-			// parse headers
-			$headers = array();
-			$lines = explode($crlf, $header);
-			foreach($lines as $line)
-			if(($pos = strpos($line, ':')) !== false)
-			$headers[strtolower(trim(substr($line, 0, $pos)))] = trim(substr($line, $pos+1));
-
-			// redirection?
-			if(isset($headers['location']))
-			{
-				$http = new mailzHTTPRequest($headers['location']);
-				return($http->DownloadToString($http));
-			}
-			else
-			{
-				return($body);
-			}
-		}
-
-		function DownloadToString_curl($withHeaders=false)
-		{
-			session_start();
-			if (!$_SESSION['tmpfile']) {
-				$_SESSION['tmpfile']=create_sessionid(16,1);
-				$ckfile=dirname(__FILE__).'/../cache/'.$_SESSION['tmpfile'].md5($_SESSION['tmpfile']).'.tmp';
-				$fh = fopen($ckfile, 'w');
-				fclose($fh);
-			} else {
-				$ckfile=dirname(__FILE__).'/../cache/'.$_SESSION['tmpfile'].md5($_SESSION['tmpfile']).'.tmp';
-			}
-			$cainfo=dirname(__FILE__).'/../certs/'.$this->_host.'.crt';
+			@session_start();
 			$ch = curl_init();    // initialize curl handle
 			$url=$this->_protocol.'://'.$this->_host.$this->_uri;
+			//echo '<br />call:'.$url;
 			curl_setopt($ch, CURLOPT_URL,$url); // set url to post to
 			curl_setopt($ch, CURLOPT_FAILONERROR, 1);
 			if ($withHeaders) curl_setopt($ch, CURLOPT_HEADER, 1);
-			//curl_setopt($ch, CURLOPT_HEADERFUNCTION, readHeader);
 
-
-			if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
-				//	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);// allow redirects - not allowed if safe mode
-			}
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
 			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10); // times out after 10s
+			curl_setopt($ch, CURLOPT_TIMEOUT, 60); // times out after 10s
 			if ($this->_protocol == "https") {
 				if (file_exists($cainfo)) {
 					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-					curl_setopt($ch, CURLOPT_CAINFO, $cainfo);
+					//curl_setopt($ch, CURLOPT_CAINFO, $cainfo);
 					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 				} else {
 					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+					curl_setopt($ch, CURLOPT_CAINFO, NULL);
+					curl_setopt($ch, CURLOPT_CAPATH, NULL);
 				}
 			}
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $ckfile);
-			curl_setopt ($ch, CURLOPT_COOKIEFILE, $ckfile);
-				
+			if ($withCookies && isset($_COOKIE)) {
+				echo $cookies;die('with cookies');
+				$cookies="";
+				foreach ($_COOKIE as $i => $v) {
+					if ($i=='WHMCSUID' || $i=="WHMCSPW") {
+						if ($cookies) $cookies.=';';
+						$cookies.=$i.'='.$v;
+					}
+				}
+				curl_setopt($ch, CURLOPT_COOKIE, $cookies);
+			}
+			if (isset($_SESSION[$this->sid])) {
+				curl_setopt($ch, CURLOPT_COOKIE, $_SESSION[$this->sid]);
+			}
 			if (count($_FILES) > 0) {
-				//print_r($_FILES);
-				//$this->post['z_FILES']=$_FILES;
 				foreach ($_FILES as $name => $file) {
-					if ($file['tmp_name']) {
-						$newfile=dirname(__FILE__).'/../cache/'.$file['name'];
+					if (is_array($file['tmp_name']) && count($file['tmp_name']) > 0) {
+						$c=count($file['tmp_name']);
+						for ($i=0;$i<$c;$i++) {
+							if ($file['tmp_name'][$i]) {
+								$newfile=BLOGUPLOADDIR.$file['name'][$i];
+								$newfiles[]=$newfile;
+								copy($file['tmp_name'][$i],$newfile);
+								if ($file['tmp_name'][$i]) $this->post[$name][$i]='@'.$newfile;
+							}
+						}
+					} elseif ($file['tmp_name']) {
+						$newfile=BLOGUPLOADDIR.$file['name'];
 						$newfiles[]=$newfile;
-						//echo 'copy '.$file['tmp_name'].' to '.$newfile;
 						copy($file['tmp_name'],$newfile);
 						if ($file['tmp_name']) $this->post[$name]='@'.$newfile;
 					}
 				}
-				//print_r($_FILES);
 			}
 			if (count($this->post) > 0) {
 				curl_setopt($ch, CURLOPT_POST, 1); // set POST method
@@ -193,42 +235,67 @@ if (!class_exists('mailzHTTPRequest')) {
 					}
 				}
 			}
-				
-			if (count($apost) > 0) curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
-				
+
+			if (count($post) > 0) {
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
+			}
+
 			$data = curl_exec($ch); // run the whole process
 			if (curl_errno($ch)) {
 				$this->errno=curl_errno($ch);
 				$this->error=curl_error($ch);
+				$this->error('HTTP Error:'.$this->errno.'/'.$this->error.' at '.$this->_url);
+				return false;
 			}
 			$info=curl_getinfo($ch);
-			
+			if ( !empty($data) ) {
+				$headerLength = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+				$head = trim( substr($data, 0, $headerLength) );
+				if ( strlen($data) > $headerLength ) $body = substr( $data, $headerLength );
+				else $body = '';
+				if ( false !== strpos($head, "\r\n\r\n") ) {
+					$headerParts = explode("\r\n\r\n", $head);
+					$head = $headerParts[ count($headerParts) -1 ];
+				}
+				$head = $this->processHeaders($head);
+				$headers=$head['headers'];
+				$cookies=$head['cookies'];
+			} else {
+				if ( $curl_error = curl_error($ch) )
+				return new WP_Error('http_request_failed', $curl_error);
+				if ( in_array( curl_getinfo( $ch, CURLINFO_HTTP_CODE ), array(301, 302) ) )
+				return new WP_Error('http_request_failed', __('Too many redirects.'));
+
+				$headers=array();
+				$cookies='';
+				$body = '';
+			}
+
+			if ($cookies) $_SESSION[$this->sid]=$cookies;
+			curl_close($ch);
+
 			//remove temporary upload files
 			if (count($newfiles) > 0) {
 				foreach ($newfiles as $file) {
 					unlink($file);
 				}
 			}
-			
-			if ($withHeaders) {
-				curl_close($ch);
-				list($header,$result)=explode("<", $data, 2);
-				if ($result) $result='<'.$result;
-				$matches = array();
-				preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
-				if (count($matches) > 0) {
-					$this->redirect=true;
-					return $matches[0];
+
+			$this->$headers=$headers;
+			$this->data=$data;
+			$this->cookies=$cookies;
+			$this->body=$body;
+			if ($headers['location']) {
+				$this->_uri='/'.$headers['location'];
+				$this->post=array();
+				$this->countRedirects++;
+				if ($countRedirects < 10) {
+					return $this->DownloadToString($withHeaders,$withCookies);
+				} else {
+					return 'ERROR: Too many redirects';
 				}
-			} else {
-				$result=$data;
 			}
-			//die(print_r($result));
-			//if (empty($header)) return "";
-			//echo '<br />--'.$header;
-			//echo '<br />--'.$result;
-			//echo '<br />--';
-			return $result;
+			return $body;
 		}
 	}
 }
