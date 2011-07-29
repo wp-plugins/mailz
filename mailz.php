@@ -4,15 +4,15 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.2.1
+ Version: 1.2.2
  Author URI: http://www.zingiri.net/
  */
-define("ZING_MAILZ_VERSION","1.2.1");
+define("ZING_MAILZ_VERSION","1.2.2");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 
-//error_reporting(E_ALL & ~E_NOTICE);
-//ini_set('display_errors', '1');
+error_reporting(E_ALL & ~E_NOTICE);
+ini_set('display_errors', '1');
 
 $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 
@@ -372,7 +372,7 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 
 	$vars.=$and.'wpabspath='.urlencode(ABSPATH);
 	$vars.='&wppageid='.zing_mailz_mainpage();
-	$vars.='&wpsiteurl='.get_option('siteurl');
+	$vars.='&wpsiteurl='.urlencode(get_option('siteurl'));
 	if ($vars) $http.='?'.$vars;
 	return $http;
 }
@@ -442,7 +442,6 @@ function zing_mailz_login() {
 	$loggedin=false;
 
 	if (!isset($_SESSION['zing']['mailz']['loggedin'])) $_SESSION['zing']['mailz']['loggedin']=0;
-	
 	if (!current_user_can('edit_plugins') && $_SESSION['zing']['mailz']['loggedin'] > 0) {
 		zing_mailz_logout();
 	}

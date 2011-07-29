@@ -1,5 +1,8 @@
 <?php
-//v0.2
+//v0.5
+//removed cc_whmcs_log call
+//need wpabspath for mailz
+//mailz returns full URL in case of redirection!! 
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -27,7 +30,7 @@ if (!class_exists('zHttpRequest')) {
 			$this->post=$_POST;
 		}
 
-		
+
 		private function processHeaders($headers) {
 			// split headers, one per array element
 			if ( is_string($headers) ) {
@@ -80,7 +83,7 @@ if (!class_exists('zHttpRequest')) {
 
 			return array('response' => $response, 'headers' => $newheaders, 'cookies' => $cookies);
 		}
-		
+
 		// scan url
 		private function _scan_url()
 		{
@@ -106,8 +109,7 @@ if (!class_exists('zHttpRequest')) {
 			}
 
 			$this->_uri = substr($req, $pos);
-			if($this->_uri == '')
-			$this->_uri = '/';
+			if($this->_uri == '') $this->_uri = '/';
 		}
 
 		//check if server is live
@@ -133,26 +135,26 @@ if (!class_exists('zHttpRequest')) {
 
 		//error logging
 		function error($msg) {
-			cc_whmcs_log('Error',$msg);
+			echo 'Error: '.$msg;
 		}
 
 		//notification logging
 		function notify($msg) {
-			cc_whmcs_log('Notification',$msg);
+			echo 'Notification: '.$msg;
 		}
 
-		function getSid() {
-			return md5(__FILE__);
-		}
-		
 		// download URL to string
 		function DownloadToString($withHeaders=true,$withCookies=false)
+		{
+			return $this->connect($this->_protocol.'://'.$this->_host.$this->_uri,$withHeaders,$withCookies);
+		}
+
+		function connect($url,$withHeaders,$withCookies)
 		{
 			$newfiles=array();
 
 			@session_start();
 			$ch = curl_init();    // initialize curl handle
-			$url=$this->_protocol.'://'.$this->_host.$this->_uri;
 			//echo '<br />call:'.$url;
 			curl_setopt($ch, CURLOPT_URL,$url); // set url to post to
 			curl_setopt($ch, CURLOPT_FAILONERROR, 1);
@@ -184,8 +186,8 @@ if (!class_exists('zHttpRequest')) {
 				}
 				curl_setopt($ch, CURLOPT_COOKIE, $cookies);
 			}
-			if (isset($_SESSION[$this->sid])) {
-				curl_setopt($ch, CURLOPT_COOKIE, $_SESSION[$this->sid]);
+			if (isset($_SESSION[$this->sid]['cookies'])) {
+				curl_setopt($ch, CURLOPT_COOKIE, $_SESSION[$this->sid]['cookies']);
 			}
 			if (count($_FILES) > 0) {
 				foreach ($_FILES as $name => $file) {
@@ -271,7 +273,10 @@ if (!class_exists('zHttpRequest')) {
 				$body = '';
 			}
 
-			if ($cookies) $_SESSION[$this->sid]=$cookies;
+			if ($cookies) {
+				if (!isset($_SESSION[$this->sid])) $_SESSION[$this->sid]=array();
+				$_SESSION[$this->sid]['cookies']=$cookies;
+			}
 			curl_close($ch);
 
 			//remove temporary upload files
@@ -286,11 +291,12 @@ if (!class_exists('zHttpRequest')) {
 			$this->cookies=$cookies;
 			$this->body=$body;
 			if ($headers['location']) {
-				$this->_uri='/'.$headers['location'];
+				$redir=$headers['location'];
+				$redir.='&wpabspath='.urlencode(ABSPATH);
 				$this->post=array();
 				$this->countRedirects++;
 				if ($countRedirects < 10) {
-					return $this->DownloadToString($withHeaders,$withCookies);
+					return $this->connect($redir,$withHeaders,$withCookies);
 				} else {
 					return 'ERROR: Too many redirects';
 				}
