@@ -52,7 +52,6 @@ function zing_mailz_remove() {
 		}
 		header("Location: admin.php?page=mailz_cp&uninstalled=true");
 		exit();
-		//zing_mailz_cp();
 	}
 }
 
@@ -74,7 +73,6 @@ function zing_mailz_admin_menu() {
 
 	if (get_option("zing_mailz_version")) {
 		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
-		//add_submenu_page('mailz_cp', $zing_mailz_name.'- Administration', 'Administration', 'administrator', 'mailz_cp', 'zing_mailz_admin');
 		zing_mailz_header();
 		$html=str_get_html($zing_mailz_menu);
 		$first=true;
@@ -82,7 +80,9 @@ function zing_mailz_admin_menu() {
 			$link=str_replace("admin.php?page=mailz_cp&zlist=index&zlistpage=","",$e->href);
 			$label=ucfirst($e->innertext);
 			if ($first) add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz_cp', 'zing_mailz_admin');
-			elseif (substr($link,0,3)!='div') add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz-'.$link, 'zing_mailz_admin');
+			elseif (substr($link,0,3)!='div') {
+				add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz-'.$link, 'zing_mailz_admin');
+			}
 			$first=false;
 		}
 		add_submenu_page('mailz_cp', $zing_mailz_name.'- Import', 'Import', 'administrator', 'mailz-import', 'zing_mailz_import');
@@ -95,26 +95,19 @@ function zing_mailz_admin_menu() {
 }
 
 function zing_mailz_admin() {
-
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
 
 	if ( $_REQUEST['installed'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
 	if ( $_REQUEST['uninstalled'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' uninstalled.</strong></p></div>';
 
 	$zing_mailz_version=get_option("zing_mailz_version");
-	?>
-<?php
-//if ($zing_mailz_version) {
+
 	zing_mailz_cp();
-//}
-?>
-<?php
 }
 
 function zing_mailz_cp($message='') {
 	global $zing_mailz_content,$zing_mailz_name,$zing_mailz_menu;
 
-	//	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	$zing_mailz_version=get_option("zing_mailz_version");
 	
 	zing_mailz_head();
@@ -132,6 +125,7 @@ function zing_mailz_cp($message='') {
 		}
 	}
 	echo '</div>';
+	
 	require(dirname(__FILE__).'/support-us.inc.php');
 	echo '</div>';
 ?><div style="clear: both"></div>

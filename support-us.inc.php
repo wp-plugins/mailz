@@ -9,7 +9,7 @@
 		<fb:share-button href="http://www.zingiri.net/products/mailing-list/" type="button" >
 	</div>
 	<p>Rate our plugin on Wordpress</p>
-	<a href="http://wordpress.org/extend/plugins/mailz" alt="Rate our plugin"><img height="35px" src="http://www.zingiri.net/wp/wp-content/uploads/sc-mcstars2.png"><img height="35px" src="http://www.zingiri.net/wp/wp-content/uploads/sc-mcstars2.png"><img height="35px" src="http://www.zingiri.net/wp/wp-content/uploads/sc-mcstars2.png"><img height="35px" src="http://www.zingiri.net/wp/wp-content/uploads/sc-mcstars2.png"><img height="35px" src="http://www.zingiri.net/wp/wp-content/uploads/sc-mcstars2.png"></img></a>
+	<a href="http://wordpress.org/extend/plugins/mailz" alt="Rate our plugin"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"></img></a>
 	<p>Or help us out with a small token of appreciation</p>
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 		<input type="hidden" name="cmd" value="_s-xclick">

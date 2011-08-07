@@ -4,10 +4,10 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.2.2
+ Version: 1.2.3
  Author URI: http://www.zingiri.net/
  */
-define("ZING_MAILZ_VERSION","1.2.2");
+define("ZING_MAILZ_VERSION","1.2.3");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 
@@ -287,7 +287,7 @@ function zing_mailz_output($process) {
 	}
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
-		$news = new zHttpRequest($http,'mailz');
+		$news = new zHttpRequest($http,'mailz',true);
 		if ($news->live()) {
 			$output=stripslashes($news->DownloadToString());
 			$content.=zing_mailz_ob($output);
@@ -325,6 +325,7 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('./FCKeditor',ZING_PHPLIST_URL.'/admin/FCKeditor',$buffer);
 		$buffer=str_replace('src="images/','src="'.ZING_PHPLIST_URL.'/admin/images/',$buffer);
 		$buffer=str_replace('src="js/jslib.js"','src="'.ZING_PHPLIST_URL.'/js/jslib.js"',$buffer);
+		$buffer=str_replace('url( styles/tabs.css )','url( '.ZING_PHPLIST_URL.'/admin/styles/tabs.css )',$buffer);
 	} else {
 		$buffer=str_replace('/lists/admin',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer); //go to admin page
 		$buffer=str_replace('./?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
@@ -470,7 +471,7 @@ function zing_mailz_login() {
 function zing_mailz_logout() {
 	$_GET['zlistpage']='logout';
 	$http=zing_mailz_http('osticket','admin/index.php');
-	$news = new zHttpRequest($http);
+	$news = new zHttpRequest($http,'mailz');
 	if ($news->live()) {
 		$output=$news->DownloadToString(true);
 		unset($_SESSION['zing']['mailz']['loggedin']);

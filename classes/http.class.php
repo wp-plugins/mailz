@@ -1,8 +1,10 @@
 <?php
-//v0.5
+//v0.7
 //removed cc_whmcs_log call
 //need wpabspath for mailz
-//mailz returns full URL in case of redirection!! 
+//mailz returns full URL in case of redirection!!
+//made redirect generic, detect if location string contains protocol and server or not
+//added option to enable repost of $_POST variables 
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -12,6 +14,8 @@ if (!class_exists('zHttpRequest')) {
 		var $_protocol;    // protocol (HTTP/HTTPS)
 		var $_uri;        // request URI
 		var $_port;        // port
+		var $_path;
+		var $params;
 		var $error;
 		var $errno=false;
 		var $post=array();	//post variables, defaults to $_POST
@@ -19,15 +23,17 @@ if (!class_exists('zHttpRequest')) {
 		var $errors=array();
 		var $countRedirects=0;
 		var $sid;
+		var $repost=false;
 
 		// constructor
-		function __construct($url="",$sid='')
+		function __construct($url="",$sid='', $repost=false)
 		{
 			if (!$url) return;
 			$this->sid=$sid;
 			$this->_url = $url;
 			$this->_scan_url();
 			$this->post=$_POST;
+			$this->repost=$repost;
 		}
 
 
@@ -109,7 +115,12 @@ if (!class_exists('zHttpRequest')) {
 			}
 
 			$this->_uri = substr($req, $pos);
-			if($this->_uri == '') $this->_uri = '/';
+			if($this->_uri == '') {
+				$this->_uri = '/';
+			} else {
+				$this->_params=substr(strrchr($this->_uri,'/'),1);
+				$this->_path=str_replace($this->_params,'',$this->_uri);
+			}
 		}
 
 		//check if server is live
@@ -156,6 +167,7 @@ if (!class_exists('zHttpRequest')) {
 			@session_start();
 			$ch = curl_init();    // initialize curl handle
 			//echo '<br />call:'.$url;
+			//echo '<br />'.print_r($this->post);
 			curl_setopt($ch, CURLOPT_URL,$url); // set url to post to
 			curl_setopt($ch, CURLOPT_FAILONERROR, 1);
 			if ($withHeaders) curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -176,7 +188,7 @@ if (!class_exists('zHttpRequest')) {
 				}
 			}
 			if ($withCookies && isset($_COOKIE)) {
-				echo $cookies;die('with cookies');
+				//echo $cookies;die('with cookies');
 				$cookies="";
 				foreach ($_COOKIE as $i => $v) {
 					if ($i=='WHMCSUID' || $i=="WHMCSPW") {
@@ -290,10 +302,15 @@ if (!class_exists('zHttpRequest')) {
 			$this->data=$data;
 			$this->cookies=$cookies;
 			$this->body=$body;
+			//echo '<br />'.$body;
 			if ($headers['location']) {
+				//echo '<br />redirect to:'.print_r($headers,true);
 				$redir=$headers['location'];
-				$redir.='&wpabspath='.urlencode(ABSPATH);
-				$this->post=array();
+				if (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
+				if (strstr($redir,'&')) $redir.='&';
+				else $redir.='?';
+				$redir.='wpabspath='.urlencode(ABSPATH);
+				if (!$this->repost) $this->post=array();
 				$this->countRedirects++;
 				if ($countRedirects < 10) {
 					return $this->connect($redir,$withHeaders,$withCookies);
