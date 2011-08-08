@@ -1,10 +1,12 @@
 <?php
-//v0.7
+//v0.8
 //removed cc_whmcs_log call
 //need wpabspath for mailz
 //mailz returns full URL in case of redirection!!
 //made redirect generic, detect if location string contains protocol and server or not
-//added option to enable repost of $_POST variables 
+//added option to enable repost of $_POST variables
+//fixed issue with redirection location string 
+//added support for content-type
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -24,6 +26,7 @@ if (!class_exists('zHttpRequest')) {
 		var $countRedirects=0;
 		var $sid;
 		var $repost=false;
+		var $type; //content-type
 
 		// constructor
 		function __construct($url="",$sid='', $repost=false)
@@ -302,20 +305,25 @@ if (!class_exists('zHttpRequest')) {
 			$this->data=$data;
 			$this->cookies=$cookies;
 			$this->body=$body;
-			//echo '<br />'.$body;
+			if ($headers['content-type']) {
+				$this->type=$headers['content-type'];
+			}
 			if ($headers['location']) {
 				//echo '<br />redirect to:'.print_r($headers,true);
 				$redir=$headers['location'];
 				if (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
 				if (strstr($redir,'&')) $redir.='&';
+				elseif (strstr($redir,'?')) $redir.='&';
 				else $redir.='?';
 				$redir.='wpabspath='.urlencode(ABSPATH);
 				if (!$this->repost) $this->post=array();
 				$this->countRedirects++;
-				if ($countRedirects < 10) {
-					return $this->connect($redir,$withHeaders,$withCookies);
+				if ($this->countRedirects < 10) {
+					if ($redir != $url) {
+						return $this->connect($redir,$withHeaders,$withCookies);
+					}
 				} else {
-					return 'ERROR: Too many redirects';
+					die('ERROR: Too many redirects '.$url.' > '.$headers['location']);
 				}
 			}
 			return $body;

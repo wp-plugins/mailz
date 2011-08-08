@@ -4,10 +4,10 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: EBO
- Version: 1.2.3
+ Version: 1.2.4
  Author URI: http://www.zingiri.net/
  */
-define("ZING_MAILZ_VERSION","1.2.3");
+define("ZING_MAILZ_VERSION","1.2.4");
 define("ZING_PHPLIST_VERSION","2.10.11");
 define("ZING_MAILZ_PREFIX","zing_");
 
@@ -86,10 +86,10 @@ function zing_mailz_notices() {
 
 	if (phpversion() < '5')	$errors[]="You are running PHP version ".phpversion().". You require PHP version 5 or higher to install the Web Shop.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
-	
+
 	$upload=wp_upload_dir();
 	if ($upload['error']) $warnings[]=$upload['error'];
-	
+
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz-upgrade">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
 
@@ -289,8 +289,17 @@ function zing_mailz_output($process) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
 		$news = new zHttpRequest($http,'mailz',true);
 		if ($news->live()) {
-			$output=stripslashes($news->DownloadToString());
-			$content.=zing_mailz_ob($output);
+			$output=$news->DownloadToString();
+			if ($news->type=='application/csv') {
+				ob_end_clean();
+				header( "Content-type: ".$news->type );
+				header('Content-Disposition: attachment; filename="download.csv"');
+				echo $output;
+				die();
+			} else {
+				$output=stripslashes($output);
+				$content.=zing_mailz_ob($output);
+			}
 			return $content;
 		}
 	}
@@ -319,6 +328,7 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('./?','admin.php?'.'page=mailz_cp&zlist=index&',$buffer);
 		$buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace('name="page"','name="zlistpage"',$buffer);
+		$buffer=str_replace('<form method="get" name="listcontrol" action="">','<form method="get" name="listcontrol" action="admin.php"><input type="hidden" value="mailz-users" name="page"/>',$buffer);
 		$buffer=str_replace('<form method=get>','<form method=get><input type="hidden" name="page" value="mailz_cp" /><input type="hidden" name="zlist" value="index" /><input type="hidden" name="zlistpage" value="'.$_GET['zlistpage'].'" />',$buffer);
 		$buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer);
