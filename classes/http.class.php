@@ -1,5 +1,5 @@
 <?php
-//v0.8
+//v0.9
 //removed cc_whmcs_log call
 //need wpabspath for mailz
 //mailz returns full URL in case of redirection!!
@@ -7,6 +7,7 @@
 //added option to enable repost of $_POST variables
 //fixed issue with redirection location string 
 //added support for content-type
+//fixed issue with $this->$headers wrong, should be $this->headers
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -169,8 +170,7 @@ if (!class_exists('zHttpRequest')) {
 
 			@session_start();
 			$ch = curl_init();    // initialize curl handle
-			//echo '<br />call:'.$url;
-			//echo '<br />'.print_r($this->post);
+			//echo '<br />call:'.$url;echo '<br />'.print_r($this->post);
 			curl_setopt($ch, CURLOPT_URL,$url); // set url to post to
 			curl_setopt($ch, CURLOPT_FAILONERROR, 1);
 			if ($withHeaders) curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -254,6 +254,7 @@ if (!class_exists('zHttpRequest')) {
 			}
 
 			if (count($post) > 0) {
+				//echo '<br /><br />apost='.print_r($apost,true).'=<br /><br />';
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
 			}
 
@@ -301,7 +302,7 @@ if (!class_exists('zHttpRequest')) {
 				}
 			}
 
-			$this->$headers=$headers;
+			$this->headers=$headers;
 			$this->data=$data;
 			$this->cookies=$cookies;
 			$this->body=$body;

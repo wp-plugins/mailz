@@ -2,7 +2,7 @@
 </head>
 <body bgcolor="#ffffff" background="images/bg.png">
 <a name="top"></a>
-<div align=center>
+<div align=left>
 <table cellspacing=0 cellpadding=0 width=100% border=0>
 <tr>
 <td bgcolor="#000000" rowspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>

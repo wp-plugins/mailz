@@ -52,8 +52,9 @@ if (isset($_POST['prepare'])) {
 } else {
   $prepare = '';
 }
-if (isset($_GET['id'])) {
-  $id = sprintf('%d',$_GET["id"]);  // Only get this from the GET variable
+//zingiri
+if (isset($_REQUEST['id'])) {
+  $id = sprintf('%d',$_REQUEST["id"]);  // Only get this from the GET variable
 } else {
   $id = 0;
 }
@@ -94,7 +95,7 @@ ob_end_flush();
 #if (((!$send) && (!$save) && (!$sendtest)) && ($id)) {
 if ($id) {
   // Load message attributes / values
-
+	
   require $GLOBALS["coderoot"] . "structure.php";  // This gets the database structures into DBStruct
 
   $result = Sql_query("SELECT * FROM {$tables["message"]} where id = $id $ownership");
@@ -102,6 +103,11 @@ if ($id) {
     print $GLOBALS['I18N']->get("noaccess");
     $done = 1;
     return;
+  }
+  foreach (array('message', 'msgsubject') as $key) {
+    if (isset($_POST[$key])) {
+     $_POST[$key] = stripslashes($_POST[$key]);
+    }
   }
   while ($msg = Sql_fetch_array($result)) {
     foreach ($DBstruct["message"] as $field => $rec) {
@@ -163,13 +169,13 @@ if ($id) {
 // If we've got magic quotes on, then we need to get rid of the slashes - either
 // from the database or from the previous $_POST
 #if (get_magic_quotes_gpc()) {
-  $_POST["msgsubject"] = stripslashes($_POST["msgsubject"]);
-  #0013076: different content when forwarding 'to a friend'
+//  $_POST["msgsubject"] = stripslashes($_POST["msgsubject"]);
+    #0013076: different content when forwarding 'to a friend'
   $_POST["forwardsubject"] = stripslashes($_POST["forwardsubject"]);
   $_POST["from"] = stripslashes($_POST["from"]);
   $_POST["tofield"] = stripslashes($_POST["tofield"]);
   $_POST["replyto"] = stripslashes($_POST["replyto"]);
-  $_POST["message"] = stripslashes($_POST["message"]);
+//  $_POST["message"] = stripslashes($_POST["message"]);
   #0013076: different content when forwarding 'to a friend'
   $_POST["forwardmessage"] = stripslashes($_POST["forwardmessage"]);
   $_POST["textmessage"] = stripslashes($_POST["textmessage"]);
@@ -752,7 +758,8 @@ for ($i = 1; $i<=$num;$i++) {
       $attribute = '';
     }
     ## fix 6063
-    $crit_data["values"] = str_replace(" ", "",$crit_data["values"]);
+  #  $crit_data["values"] = str_replace(" ,", "",$crit_data["values"]);
+    $crit_data['values'] = cleanCommaList($crit_data["values"]);
 
     # hmm, rather get is some other way, this is a bit unnecessary
     $type = Sql_Fetch_Row_Query("select type from {$tables["attribute"]} where id = ".$crit_data["attribute"]);
@@ -783,7 +790,7 @@ for ($i = 1; $i<=$num;$i++) {
         }
         $where_clause .= $or_clause . ") ) ";
         $subqueries[$i]['query'] = sprintf('select userid from %s as table%d where attributeid = %d
-          and %s',$GLOBALS['tables']['user_attribute'],$tc,$crit_data['attribute'],$or_clause);
+          and ( %s )',$GLOBALS['tables']['user_attribute'],$tc,$crit_data['attribute'],$or_clause);
         break;
       case "checkbox":
         $value = $crit_data["values"][0];
@@ -808,7 +815,7 @@ for ($i = 1; $i<=$num;$i++) {
 
         $where_clause .= '( '.$valueselect . ') ) ';
         $subqueries[$i]['query'] = sprintf('select userid from %s as table%d where attributeid = %d
-          and %s',$GLOBALS['tables']['user_attribute'],$tc,$crit_data['attribute'],$valueselect);
+          and ( %s )',$GLOBALS['tables']['user_attribute'],$tc,$crit_data['attribute'],$valueselect);
 
         break;
       case "date":
@@ -1031,7 +1038,7 @@ if (!$done) {
 // custom code - start
   $utf8_subject = $subject;
   $utf8_from = $from;
-  if (strcasecmp($GLOBALS['strCharSet'], 'utf-8') <> 0) {
+  if (strcasecmp($GLOBALS['strCharSet'], 'utf-8') <> 0 && function_exists('iconv')) {
      $utf8_subject = iconv($GLOBALS['strCharSet'],'UTF-8',$utf8_subject);
      $utf8_from = iconv($GLOBALS['strCharSet'],'UTF-8',$utf8_from);
   }
@@ -1039,13 +1046,13 @@ if (!$done) {
   $maincontent .= '
   <tr><td>'.Help("subject").' '.$GLOBALS['I18N']->get("Subject").':</td>
     <td><input type=text name="msgsubject"
-    value="'.htmlentities($subject,ENT_QUOTES,'UTF-8').'" size=40></td></tr>
+    value="'.htmlentities($utf8_subject,ENT_QUOTES,'UTF-8').'" size=40></td></tr>
   <tr>
     <td colspan=2>
     </td></tr>
   <tr><td>'.Help("from").' '.$GLOBALS['I18N']->get("fromline").':</td>
     <td><input type=text name=from
-   value="'.htmlentities($from,ENT_QUOTES,'UTF-8').'" size=40></td></tr>
+   value="'.htmlentities($utf8_from,ENT_QUOTES,'UTF-8').'" size=40></td></tr>
   <tr><td colspan=2>
 
   </td></tr>';
@@ -1171,7 +1178,8 @@ if (!$done) {
     $oFCKeditor->BasePath = './FCKeditor/';
     //$oFCKeditor->ToolbarSet = 'Accessibility' ;
     $oFCKeditor->ToolbarSet = 'Default' ;
-    $oFCKeditor->Value = stripslashes($_POST["message"]);
+//    $oFCKeditor->Value = stripslashes($_POST["message"]);
+    $oFCKeditor->Value = $_POST["message"];
     $w = getConfig("fckeditor_width");
     $h = getConfig("fckeditor_height");
     if ($_SESSION["fckeditor_height"]) {

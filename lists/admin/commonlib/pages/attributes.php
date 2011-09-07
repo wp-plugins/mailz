@@ -1,12 +1,13 @@
 <?php
-$types = array('textline','checkbox','checkboxgroup','radio','select',"hidden","textarea","date",'avatar');
+$types = array('textline','checkbox','checkboxgroup','radio','select',"hidden","textarea","date");
 $formtable_exists = Sql_Table_exists("formfield");
 
-#ob_end_flush();
+ob_end_flush();
 #foreach ($_POST as $key => $val) {
 #  print "$key = ".print_r($val)."<br/>";
 #}
 #return;
+
 print '<script language="Javascript" src="js/progressbar.js" type="text/javascript"></script>';
 if (isset($_POST["action"])) {
   if (isset($_POST["name"])) {
@@ -18,23 +19,18 @@ if (isset($_POST["action"])) {
         if ($lc_name == "email") { print Warn($GLOBALS['I18N']->get('warnemailattribute')); }
 
         #print "New attribute: ".$_POST["name"][0]."<br/>";
-        if ( empty($_POST["required"][0]) ) {
-          $nRequired = 0;        
-        } else {
-          $nRequired = $_POST["required"][0];        
-        }
-        
         $query = sprintf('insert into %s (name,type,listorder,default_value,required,tablename) values("%s","%s",%d,"%s",%d,"%s")',
-        $tables["attribute"],addslashes($_POST["name"][0]),$_POST["type"][0],$_POST["listorder"][0],addslashes($_POST["default"][0]), $nRequired,$lc_name);
+        $tables["attribute"],addslashes($_POST["name"][0]),$_POST["type"][0],$_POST["listorder"][0],addslashes($_POST["default"][0]),$_POST["required"][0],$lc_name);
         Sql_Query($query);
         $insertid = Sql_Insert_id();
+
         # text boxes and hidden fields do not have their own table
-        if ($_POST["type"][$id] != "textline" && $_POST["type"][$id] != "hidden") {
+        if ($_POST["type"][$id] != "textline" && $_POST["type"]["id"] != "hidden") {
           $query = "create table $table_prefix"."listattr_$lc_name (id integer not null primary key auto_increment, name varchar(255) unique,listorder integer default 0)";
           Sql_Query($query);
         } else {
           # and they cannot currently be required, changed 29/08/01, insert javascript to require them, except for hidden ones :-)
-          if (isset($_POST["type"][$id]) && $_POST["type"][$id] == "hidden")
+          if ($_POST["type"]["id"] == "hidden")
             Sql_Query("update {$tables['attribute']} set required = 0 where id = $insertid");
         }
         if ($_POST["type"][$id] == "checkbox") {
@@ -60,6 +56,7 @@ if (isset($_POST["action"])) {
         $req = Sql_Fetch_Row_Query("select type,tablename from {$tables['attribute']} where id = $id");
         $existingtype = $req[0];
         #print "Existing attribute: ".$_POST["name"][$id]." new type:".$_POST["type"][$id]." existing type: ".$req[0]."<br/>";
+
         if ($_POST["type"][$id] != $existingtype)
         switch ($existingtype) {
           case "textline":case "hidden":case "date":
@@ -69,7 +66,6 @@ if (isset($_POST["action"])) {
               case "checkboxgroup":
               case "select":
                 $lc_name = getNewAttributeTablename($req[1]);
-                Sql_Query("update {$tables['attribute']} set tablename = \"$lc_name\" where id = $id");
                 Sql_Query("create table $table_prefix"."listattr_$lc_name (id integer not null primary key auto_increment, name varchar(255) unique,listorder integer default 0)");
                 $attreq = Sql_Query("select distinct value from {$tables['user_attribute']} where attributeid = $id");
                 while ($row = Sql_Fetch_Row($attreq)) {
@@ -126,26 +122,17 @@ if (isset($_POST["action"])) {
             }
             break;
         }
-        if ( empty($_POST["required"][$id]) ) {
-          $nRequired = 0;        
-        } else {
-          $nRequired = $_POST["required"][$id];        
-        }
         $query = sprintf('update %s set name = "%s" ,type = "%s" ,listorder = %d,default_value = "%s" ,required = %d where id = %d',
-          $tables["attribute"],addslashes($_POST["name"][$id]),$_POST["type"][$id],$_POST["listorder"][$id],$_POST["default"][$id],$nRequired,$id);
+        $tables["attribute"],addslashes($_POST["name"][$id]),$_POST["type"][$id],$_POST['listorder'][$id],sql_escape($_POST['default'][$id]),$_POST['required'][$id],$id);
         Sql_Query($query);
-        # save keywordlib seperately in case the DB hasn't been upgraded
-        if ((defined('IN_WEBBLER') && IN_WEBBLER)  || (defined('WEBBLER') && WEBBLER)){
-          Sql_Query(sprintf('update ignore %s set keywordlib = %d where id = %d',
-            $GLOBALS['tables']['attribute'],$_POST['keywordlib'][$id],$id));
-        }
       }
     }
     print '<script language="Javascript" type="text/javascript"> finish();</script>';flush();
   }
 } elseif (isset($_POST["tagaction"]) && is_array($_POST["tag"])) {
 	ksort($_POST["tag"]);
-  if (isset($_POST["tagaction"]['delete'])) {
+  $tagaction = htmlentities($_POST["tagaction"],ENT_QUOTES,'UTF-8');
+  if ($tagaction == $GLOBALS['I18N']->get('delete')) {
     while (list($k,$id) = each ($_POST["tag"])) {
       # check for dependencies
       if ($formtable_exists) {
@@ -164,11 +151,11 @@ if (isset($_POST["action"])) {
       } else {
         print Error($GLOBALS['I18N']->get('cannotdelete')."<br/>");
         while ($row = Sql_Fetch_Array($req)) {
-          print PageLink2("editelements&id=".$row["form"].'&option="edit_elements"&pi="formbuilder"',"form ".$row["form"]."")."<br/>\n";
+          print PageLink2("editelements&id=".$row["form"]."&option=edit_elements&pi=formbuilder","form ".$row["form"]."")."<br/>\n";
         }
       }
     }
- 	} elseif (isset($_POST["tagaction"]['merge'])) {
+ 	} elseif ($tagaction == $GLOBALS['I18N']->get('merge')) {
     $first = array_shift($_POST["tag"]);
     $firstdata = Sql_Fetch_Array_Query(sprintf('select * from %s where id = %d',$tables["attribute"],$first));
     if (!sizeof($_POST["tag"])) {
@@ -314,81 +301,69 @@ print $GLOBALS['I18N']->get('loadfrom')." ".PageLink2("defaults",$GLOBALS['I18N'
 
 $res = Sql_Query("select * from {$tables['attribute']} order by listorder");
 if (Sql_Affected_Rows()) 
-  print '<p class="information">'.$GLOBALS['I18N']->get('existing').':</p>';
+  print $GLOBALS['I18N']->get('existing').":<p>";
 else {
-  print '<p class="information">'.$GLOBALS['I18N']->get('noattributesdefined').'</p>';
+  print $GLOBALS['I18N']->get('noattributesdefined').'<br />';
 }
 $c= 0;
 while ($row = Sql_Fetch_array($res)) {
 	$c++;
-  print '<table class="attributesForms" border="1"><tr><td colspan="2">'.
+  print '<table border=1><tr><td colspan=2>'.
   $GLOBALS['I18N']->get('attribute').':'. $row["id"];
   if ($formtable_exists) {
     sql_query("select * from formfield where attribute = ".$row["id"]);
-    print "  (".$GLOBALS['I18N']->get('usedin').' '.Sql_affected_rows().' '.$GLOBALS['I18N']->get('forms').')';
+    print "  (".$GLOBALS['I18N']->get('usedin').' '.Sql_affected_rows().' '.$GLOBALS['I18N']->get('forms');
   }
     
-  print '</td><td colspan="2">'.$GLOBALS['I18N']->get('tag').' <input type="checkbox" name="tag['.$c.']" value="'.$row["id"].'" /></td></tr>';
+  print '</td><td colspan=2>'.$GLOBALS['I18N']->get('tag').' <input type="checkbox" name="tag['.$c.']" value="'.$row["id"].'"></td></tr>';
     
-  print '<tr><td colspan="2">'.$GLOBALS['I18N']->get('name').': </td><td colspan="2"><input type="text" name="name['.$row["id"].']" value="'.htmlspecialchars(stripslashes($row["name"])).'" size="40" /></td></tr>';
-  print '<tr><td colspan="2">'.$GLOBALS['I18N']->get('type').': </td><td colspan="2"><!--input type="hidden" name="type['.$row["id"].']" value="'.$row["type"].'">'.$row["type"].'-->';
+  print '<tr><td colspan=2>'.$GLOBALS['I18N']->get('name').': </td><td colspan=2><input type=text name="name['.$row["id"].']" value="'.htmlspecialchars(stripslashes($row["name"])).'" size=40></td></tr>';
+  print '<tr><td colspan=2>'.$GLOBALS['I18N']->get('type').': </td><td colspan=2><!--input type=hidden name="type['.$row["id"].']" value="'.$row["type"].'">'.$row["type"].'-->';
 
-  print '<select name="type['.$row["id"].']" onchange="warn();">';
+  print '<select name="type['.$row["id"].']" onChange="warn();">';
   foreach($types as $key => $val) {
-    printf('<option value="%s" %s>%s</option>',$val,$val == $row["type"] ? 'selected="selected"': '',$GLOBALS['I18N']->get($val));
+    printf('<option value="%s" %s>%s</option>',$val,$val == $row["type"] ? "selected": "",$GLOBALS['I18N']->get($val));
   }
   print ' 
    </select>';
 
-  if ((defined('IN_WEBBLER') && IN_WEBBLER) || (defined('WEBBLER') && WEBBLER) ) {
-    if ($row['type'] == 'select' || $row['type'] == 'radio' || $row['type'] == 'checkboxgroup') {
-      print ' '.$I18N->get('authoritative list') .'&nbsp;';
-      printf('<select name="keywordlib[%d]"><option value="">-- select</option>',$row['id']);
-      $req = Sql_Query(sprintf('select id,name from keywordlib order by listorder,name'));
-      while ($kwlib = Sql_Fetch_Array($req)) {
-        printf('<option value="%d" %s>%s</option>',$kwlib['id'],$row['keywordlib'] == $kwlib['id'] ? 'selected="selected"':'',htmlspecialchars($kwlib['name']));
-      }
-      print '</select>';
-    }
-  }
-
   print '</td></tr>';
-  print '<tr><td colspan="2">'.$GLOBALS['I18N']->get('defaultvalue').': </td><td colspan="2"><input type="text" name="default['.$row["id"].']" value="'.htmlspecialchars(stripslashes($row["default_value"])).'" size="40" /></td></tr>';
-  print '<tr><td>'.$GLOBALS['I18N']->get('orderoflisting').': </td><td><input type="text" name="listorder['.$row["id"].']" value="'.$row["listorder"].'" size="5" /></td>';
-  print '<td>'.$GLOBALS['I18N']->get('isrequired').': </td><td><input type="checkbox" name="required['.$row["id"].']" value="1" ';
-  print $row["required"] ? 'checked="checked"': '';
-  print  '/></td></tr>';
-  print '</table><hr/>';
+  print '<tr><td colspan=2>'.$GLOBALS['I18N']->get('defaultvalue').': </td><td colspan=2><input type=text name="default['.$row["id"].']" value="'.htmlspecialchars(stripslashes($row["default_value"])).'" size=40></td></tr>';
+  print '<tr><td>'.$GLOBALS['I18N']->get('orderoflisting').': </td><td><input type=text name="listorder['.$row["id"].']" value="'.$row["listorder"].'" size=5></td>';
+  print '<td>'.$GLOBALS['I18N']->get('isrequired').': </td><td><input type=checkbox name="required['.$row["id"].']" value="1" ';
+  print $row["required"] ? "checked": "";
+  print  '></td></tr>';
+  print '</table><hr>';
  } 
- printf('<input class ="submit" type="submit" name="action" value="%s" />',$GLOBALS['I18N']->get('savechanges'));
+ printf('<input type=submit name="action" value="%s">',$GLOBALS['I18N']->get('savechanges'));
 
 print '<br/><br/>
 <script language="Javascript" src="js/jslib.js" type="text/javascript"></script>';
 
 if ($c) {
   printf('<i>%s: </i><br/>',$GLOBALS['I18N']->get('withtagged'));
-  printf('<span class="buttonGroup"><input class="submit" type="submit" name="tagaction[delete]" value="%s" />&nbsp;
-  <input class="submit" type="submit" name="tagaction[merge]" value="%s" /> &nbsp;&nbsp;%s<br/>
-  </span><hr/>',$GLOBALS['I18N']->get('delete'),$GLOBALS['I18N']->get('merge'),Help("mergeattributes"));
+  printf('<input type=submit name="tagaction" value="%s">&nbsp;
+  <input type=submit name="tagaction" value="%s"> &nbsp;&nbsp;%s<br/>
+  <p><hr/></p>',$GLOBALS['I18N']->get('delete'),$GLOBALS['I18N']->get('merge'),Help("mergeattributes"));
 }
 
 print '
 <a name="new"></a>
 <h3>'.$GLOBALS['I18N']->get('addnew').':</h3>
-<table class="attributesNew" border="1">
-<tr><td colspan="2">'.$GLOBALS['I18N']->get('name').': </td><td colspan="2"><input type="text" name="name[0]" value="" size="40" /></td></tr>
-<tr><td colspan="2">'.$GLOBALS['I18N']->get('type').': </td><td colspan="2"><select name="type[0]">';
+<table border=1>
+<tr><td colspan=2>'.$GLOBALS['I18N']->get('name').': </td><td colspan=2><input type=text name="name[0]" value="" size=40></td></tr>
+<tr><td colspan=2>'.$GLOBALS['I18N']->get('type').': </td><td colspan=2><select name="type[0]">';
 foreach($types as $key => $val) {
-  printf('     <option value="%s" %s>%s</option>',$val,"",$GLOBALS['I18N']->get($val));
+  printf('<option value="%s" %s>%s</option>',$val,"",$GLOBALS['I18N']->get($val));
 }
 print'
 </select></td></tr>
-<tr><td colspan="2">'.$GLOBALS['I18N']->get('defaultvalue').': </td><td colspan="2"><input type="text" name="default[0]" value="" size="40" /></td></tr>
-<tr><td>'.$GLOBALS['I18N']->get('orderoflisting').': </td><td><input type="text" name="listorder[0]" value="" size="5" /></td>
-<td>'.$GLOBALS['I18N']->get('isrequired').': </td><td><input type="checkbox" name="required[0]" value="1" checked="checked" /></td></tr>
-</table><hr/>
+<tr><td colspan=2>'.$GLOBALS['I18N']->get('defaultvalue').': </td><td colspan=2><input type=text name="default[0]" value="" size=40></td></tr>
+<tr><td>'.$GLOBALS['I18N']->get('orderoflisting').': </td><td><input type=text name="listorder[0]" value="" size=5></td>
+<td>'.$GLOBALS['I18N']->get('isrequired').': </td><td><input type=checkbox name="required[0]" value="1" checked></td></tr>
+</table><hr>
 
-<input class="submit" type="submit" name="action" value="'.$GLOBALS['I18N']->get('savechanges').'" />
+<input type=submit name="action" value="'.$GLOBALS['I18N']->get('savechanges').'">
 </form>
 
 ';

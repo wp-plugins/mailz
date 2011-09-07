@@ -10,6 +10,8 @@ print PageLink2("admins",$GLOBALS['I18N']->get('listofadministrators'),"start=$s
 require dirname(__FILE__) . "/structure.php";
 $struct = $DBstruct["admin"];
 $id = !empty($_REQUEST["id"]) ? sprintf('%d',$_REQUEST["id"]) : 0;
+$find = isset($_REQUEST['find']) ? $_REQUEST['find'] : '';
+$start = isset($_GET['start']) ? sprintf('%d',$_GET['start']):0;
 
 echo "<hr /><br />";
 $noaccess = 0;
@@ -29,6 +31,11 @@ if ($noaccess) {
 }
 
 if (!empty($_POST["change"])) {
+  if (!verifyToken()) {
+    print Error($GLOBALS['I18N']->get('No Access'));
+    return;
+  }
+  
   if (empty($_POST["id"])) {
     # new one
     $result = Sql_query(sprintf('SELECT count(*) FROM %s WHERE namelc="%s"',
@@ -107,8 +114,8 @@ if ($id) {
   $result = Sql_query("SELECT * FROM {$tables["admin"]} where id = $id");
   $data = sql_fetch_array($result);
   print $data["loginname"];
-  if ($data["loginname"] != "admin" && $accesslevel == "all")
-    printf( "<br /><li><a href=\"javascript:deleteRec('%s');\">Delete</a> %s\n",PageURL2("admin","","delete=$id"),$admin["loginname"]);
+  if ($data["id"] != $_SESSION["logindetails"]["id"] && $accesslevel == "all")
+    printf( "<br /><li><a href=\"javascript:deleteRec('%s');\">Delete</a> %s\n",PageURL2("admin","","delete=$id"),$data["loginname"]);
 } else {
   $data = array();
   print $GLOBALS['I18N']->get('Add a new Administrator');

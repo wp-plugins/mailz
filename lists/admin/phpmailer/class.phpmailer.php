@@ -434,7 +434,7 @@ class PHPMailer
             $to .= $this->to[$i][0];
         }
 
-        if ($this->Sender != "" && strlen(ini_get("safe_mode"))< 1)
+        if ($this->Sender != "" && (bool) ini_get("safe_mode") === FALSE)
         {
             $old_from = ini_get("sendmail_from");
             ini_set("sendmail_from", $this->Sender);
@@ -773,7 +773,9 @@ class PHPMailer
         $this->boundary[1] = "b1_" . $uniq_id;
         $this->boundary[2] = "b2_" . $uniq_id;
 
-        $result .= $this->HeaderLine("Recieved", $this->sTimeStamp);
+        if (!empty($this->sTimeStamp)) {
+          $result .= $this->HeaderLine("Received", $this->sTimeStamp);
+        }
         $result .= $this->HeaderLine("Date", $this->RFCDate());
         if($this->Sender == "")
             $result .= $this->HeaderLine("Return-Path", trim($this->From));

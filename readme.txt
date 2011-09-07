@@ -1,10 +1,10 @@
 === Mailing List ===
-Contributors: EBO
-Donate link: http://www.zingiri.net/
+Contributors: zingiri
+Donate link: http://www.zingiri.net/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.2.4
+Stable tag: 1.3.0
 
 Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
 
@@ -64,7 +64,6 @@ Don't forget to take a database backup before you upgrade!
 
 == Other ==
 Fixes applied in PHPlists:
-* admin/structure.php: changed length of index of user_blacklist_data (limited to 1000, i.e. 333 bytes in UTF-8)
 * admin/editlist.php: replaced $_GET['id'] with $_REQUEST['id'];
 * admin/editattributes.php: replaced $id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0; with $id = sprintf('%d',$_REQUEST['id']);
 * admin/spagedit.php: replaced $_GET['id'] by $_REQUEST['id']
@@ -73,6 +72,14 @@ Fixes applied in PHPlists:
 * config/config.php: defined NAME as "Mailing List"
 
 == Changelog ==
+
+= 1.3.0 =
+* Upgraded phplists to version 2.10.15
+* Removed fix in admin/structure.php: changed length of index of user_blacklist_data (limited to 1000, i.e. 333 bytes in UTF-8)
+* Updated donations link
+* Uninstall plugin when deactivating
+* Fixed issue with empty messages being created when adding new messages or editing existing ones
+* First release to support Mailing List Pro extension
 
 = 1.2.4 =
 * Fixed issue with sort users not working

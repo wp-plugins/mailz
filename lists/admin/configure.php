@@ -23,6 +23,10 @@ reset($default_config);
 if (!empty($_REQUEST['save']) && $id) {
   $info = $default_config[$id];
   if (is_array($_POST)) {
+    if (!verifyToken()) {
+      print Error($GLOBALS['I18N']->get('No Access'));
+      return;
+    }
     if ($id == "website" || $id == "domain") {
       $_POST["values"][$id] = str_replace("[DOMAIN]","",$_POST["values"][$id]);
       $_POST["values"][$id] = str_replace("[WEBSITE]","",$_POST["values"][$id]);
@@ -61,8 +65,8 @@ if (!$id) {
     $value = $val[0];
 #  print $value . " ".$website . " ".$domain.'<br/>';
   if ($id != "website" && $id != "domain") {
-    $value = preg_replace('/'.$domain.'/i','[DOMAIN]', $value);
-    $value = preg_replace('/'.$website.'/i','[WEBSITE]', $value);
+    $value = preg_replace('/'.preg_quote($domain, '/').'/i','[DOMAIN]', $value);
+    $value = preg_replace('/'.preg_quote($website, '/').'/i','[WEBSITE]', $value);
   }
 #  print $value . '<br/>';
   if ($val[2] == "textarea")

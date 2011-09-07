@@ -32,7 +32,12 @@ require('./commands.php') ;
 require('./phpcompat.php') ;
 
 if ( !$Config['Enabled'] )
-	SendError( 1, 'This connector is disabled. Please check the "editor/filemanager/connectors/php/config.php" file' ) ;
+	SendError( 1, 'This connector is disabled. Please check the "editor/filemanager/connectors/phplist/config.php" file' ) ;
+
+@session_start();
+if (empty($_SESSION['logindetails'])) {
+   SendError( 1, 'Access Denied' ) ;
+}
 
 DoResponse() ;
 

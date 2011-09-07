@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__).'/accesscheck.php';
 
-define("STRUCTUREVERSION","2.10.11");
+define("STRUCTUREVERSION","2.10.15");
 
 $DBstruct = array( # order of tables is essential for smooth upgrade
     "attribute" => array ( # attributes of a user or a message
@@ -18,7 +18,7 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
     "user_attribute" => array(
         "attributeid" => array("integer not null","attribute"),
         "userid" => array("integer not null","user"),
-        "value" => array("varchar(255)","Value of this attribute for this user"),
+        "value" => array("text","Value of this attribute for this user"),
         "primary key" => array("(attributeid,userid)","PKey"),
         "index_1" => array("userindex (userid)",""),
         "index_2" => array("attindex (attributeid)",""),
@@ -60,16 +60,16 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
         "index_2" => array("dateidx (date)","sys:index"),
     ),
     "user_blacklist" => array(
-        "email" => array("varchar(255) not null unique","Email"),
+        "email" => array("varchar(100) not null unique","Email"),
         "added" => array("datetime","When added to blacklist"),
         "index_1" => array("emailidx (email)",""),
     ),
     "user_blacklist_data" => array(
-        "email" => array("varchar(255) not null unique","Email"),
-        "name" => array("varchar(100) not null","Name of Dataitem"),
+        "email" => array("varchar(100) not null unique","Email"),
+        "name" => array("varchar(50) not null","Name of Dataitem"),
         "data" => array("text",""),
         "index_1" => array("emailidx (email)",""),
-        "index_2" => array("emailnameidx (email(233),name)",""),
+        "index_2" => array("emailnameidx (email,name)",""),
     ),
     "list" => array ( # a list in the system
         "id" => array("integer not null primary key auto_increment","ID"),
@@ -108,8 +108,8 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
         "fromfield" => array("varchar(255) not null default ''","from"),
         "tofield" => array("varchar(255) not null default ''","tofield"),
         "replyto" => array("varchar(255) not null default ''","reply-to"),
-        "message" => array("Text","Message"),
-        "textmessage" => array("Text","Text version of Message"),
+        "message" => array("longtext","Message"),
+        "textmessage" => array("longtext","Text version of Message"),
         "footer" => array("text","Footer for a message"),
         "entered" => array("datetime","Entered"),
         "modified" => array("timestamp", "Modified"),
@@ -239,7 +239,8 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
         "data" => array("blob","The bounce"),
         "status" => array("varchar(255)","Status of this bounce"),
         "comment" => array("text","System Comment"),
-        "index_1" => array("dateindex (date)","")
+        "index_1" => array("dateindex (date)",""),
+        "index_2" => array("statusindex (status(10))",""),
     ),
     "user_message_bounce" => array( # bounce. We can have one usermessage bounce multiple times
         "id" => array("integer not null primary key auto_increment","ID"),
@@ -403,6 +404,13 @@ $DBstruct = array( # order of tables is essential for smooth upgrade
         "regex" => array("integer not null","Related regex"),
         "bounce" => array("integer not null","Related bounce"),
         "primary key" => array("(regex,bounce)",""),
+      ),
+      "admintoken" => array(
+        "id" => array("integer not null primary key auto_increment","ID"),
+        "adminid" => array("integer not null","adminid"),
+        "value" => array('varchar(255)',''),
+        "entered" => array('integer not null',''),
+        "expires" => array('datetime not null',''),
       ),
 /*    "translation" => array(
       "id" => array("integer not null primary key auto_increment",""),

@@ -45,6 +45,8 @@ $usertable_prefix = "phplist_user_";
 # if you change the path to the PHPlist system, make the change here as well
 # path should be relative to the root directory of your webserver (document root)
 # you cannot actually change the "admin", but you can change the "lists"
+# DO NOT include the file eg "index.php" because that is added when required. If you do
+# it is likely to break the tracking, see http://mantis.phplist.com/view.php?id=15542
 $pageroot = '/lists';
 $adminpages = '/lists/admin';
 
@@ -206,6 +208,10 @@ define ("WARN_ABOUT_PHP_SETTINGS",1);
 # check README.commandline how to do this
 define ("MANUALLY_PROCESS_QUEUE",1);
 
+# after every run of the queue to send out messages, phpList will send a summary to the
+# admin address. If you want to stop this, set this to false or 0
+define('SEND_QUEUE_PROCESSING_REPORT',true);
+
 # if you want to use \r\n for formatting messages set the 0 to 1
 # see also http://www.securityfocus.com/archive/1/255910
 # this is likely to break things for other mailreaders, so you should
@@ -307,17 +313,40 @@ define("ALLOW_NON_LIST_SUBSCRIBE",0);
 # a server wide configuration. So if you notice these values to be different
 # in reality, that may be the case
 
+## if you send the queue using your browser, you may want to consider settings like this
+## which will send 10 messages and then reload the browser to send the next 10. However, this
+## will not restrict the sending to any limits, so there's a good chance you will
+## go over the limits of your ISP
+# define("MAILQUEUE_BATCH_SIZE",10);
+# define("MAILQUEUE_BATCH_PERIOD",1);
+
+## if you send the queue using commandline, you can set it to something that complies with the
+## limits of your ISP, eg 300 messages an hour would be 
+# define("MAILQUEUE_BATCH_SIZE",300);
+# define("MAILQUEUE_BATCH_PERIOD",3600);
+# and then you need to set the cron to run every 5 minutes
+
 # define the amount of emails you want to send per period. If 0, batch processing
 # is disabled and messages are sent out as fast as possible
 define("MAILQUEUE_BATCH_SIZE",0);
 
 # define the length of one batch processing period, in seconds (3600 is an hour)
-define("MAILQUEUE_BATCH_PERIOD",3600);
+# Please note: this setting has two consequences:
+# 1. it will enforce that the amount of emails sent in the period identified here does not exceed the amount
+#  set in MAILQUEUE_BATCH_SIZE
+# 2. there will be a delay of MAILQUEUE_BATCH_PERIOD when running the queue.
+#
+# number 1 is mostly when using commandline queue processing (strongly recommended)
+# number 2 is when using browser queue processing. The browser will reload to send the next
+# batch after the amount of seconds set here
+
+define("MAILQUEUE_BATCH_PERIOD",100);
 
 # to avoid overloading the server that sends your email, you can add a little delay
 # between messages that will spread the load of sending
 # you will need to find a good value for your own server
-# value is in seconds (or you can play with the autothrottle below)
+# value is in seconds, and you can use fractions, eg "0.5" is half a second
+# (or you can play with the autothrottle below)
 define('MAILQUEUE_THROTTLE',0);
 
 # year ranges. If you use dates, by default the drop down for year will be from
@@ -466,6 +495,26 @@ define('LANGUAGE_SWITCH',1);
 # if you use this, you will need to teach your system regularly about patterns in new bounces
 define('USE_ADVANCED_BOUNCEHANDLING',0);
 
+/* 
+=========================================================================
+
+Security
+
+=========================================================================
+
+*/ 
+
+# CHECK REFERRER. Set this to "true" to activate a check on each request to make sure that
+# the "referrer" in the request is from ourselves. This is not failsafe, as the referrer may
+# not exist, or can be spoofed, but it will help a little
+# it is also possible that it doesn't work with Webservers that are not Apache, we haven't tested that.
+define('CHECK_REFERRER',false);
+
+# if you activate the check above, you can add domain names in this array for those domains
+# that you trust and that can be allowed as well
+# only mention the domain for each.
+# for example: $allowed_referrers = array('mydomain.com','msn.com','yahoo.com','google.com');
+$allowed_referrers = array();
 
 /*
 
@@ -699,6 +748,7 @@ Settings for Wordpress integration
 */
 define("NAME",'Mailing List');
 if ( isset($_GET['wpabspath']) ) {
+	//zingiri
 	//error_reporting(E_ALL & ~E_NOTICE);
 	//ini_set('display_errors', '1');
 	define('ABSPATH', dirname(__FILE__) . '/');

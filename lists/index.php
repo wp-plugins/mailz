@@ -77,6 +77,9 @@ if (isset($_GET['id'])) {
 // What is uid
 // What is userid
 // Why is there GET(id) and REQUEST(id)?
+$userid = "";
+$userpassword = "";
+$emailcheck = "";
 
 if (isset($_GET['uid']) && $_GET["uid"]) {
   $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where uniqid = "%s"',
@@ -85,20 +88,21 @@ if (isset($_GET['uid']) && $_GET["uid"]) {
   $userid = $req[1];
   $userpassword = $req[2];
   $emailcheck = $req[3];
-} elseif (isset($_GET["email"])) {
-  $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where email = "%s"',
-    $tables["user"],$_GET["email"]));
-  $id = $req[0];
-  $userid = $req[1];
-  $userpassword = $req[2];
-  $emailcheck = $req[3];
-} elseif (isset($_REQUEST["unsubscribeemail"])) {
-  $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where email = "%s"',
-    $tables["user"],$_REQUEST["unsubscribeemail"]));
-  $id = $req[0];
-  $userid = $req[1];
-  $userpassword = $req[2];
-  $emailcheck = $req[3];
+} elseif ($_GET['p'] == 'unsubscribe' || $_GET['p'] == 'blacklist' || $_GET['p'] == 'subscribe') {
+  if (isset($_GET["email"]) && validateEmail($_GET['email'])) {
+    $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where email = "%s"',
+      $tables["user"],$_GET["email"]));
+    $id = $req[0];
+    $userid = $req[1];
+    $userpassword = $req[2];
+    $emailcheck = $req[3];
+  } elseif (isset($_REQUEST["unsubscribeemail"]) && validateEmail($_REQUEST['unsubscribeemail'])) {
+    $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where email = "%s"',
+      $tables["user"],$_REQUEST["unsubscribeemail"]));
+    $id = $req[0];
+    $userid = $req[1];
+    $userpassword = $req[2];
+    $emailcheck = $req[3];
 /*
 } elseif ($_SESSION["userloggedin"] && $_SESSION["userid"]) {
   $req = Sql_Fetch_Row_Query(sprintf('select subscribepage,id,password,email from %s where id = %d',
@@ -108,11 +112,8 @@ if (isset($_GET['uid']) && $_GET["uid"]) {
   $userpassword = $req[2];
   $emailcheck = $req[3];
 */
-} else {
-  $userid = "";
-  $userpassword = "";
-  $emailcheck = "";
-}
+  }
+} 
 
 if (isset($_REQUEST['id']) && $_REQUEST["id"]){
   $id = sprintf('%d',$_REQUEST["id"]);
@@ -487,6 +488,7 @@ function checkGroup(name,value) {
   $html .= formStart('name="subscribeform"');
   # @@@ update
   if (isset($_SESSION["adminloggedin"]) && $_SESSION["adminloggedin"]) {
+//zingiri
     $html .= '<div class="adminmessage"><p><b>You are logged in as administrator ('.$_SESSION["logindetails"]["adminname"].') of this phplist system</b></p>';
     $html .= '<p>You are therefore offered the following choice, which your users will not see when they load this page.</p>';
     $html .= '<p><a href="'.$GLOBALS['adminpages'].'">Go back to admin area</a></p>';
@@ -793,12 +795,26 @@ function forwardPage($id) {
       $subtitle = $GLOBALS['strForwardSubtitle'].' '.stripslashes($messagedata['subject']);
     }
   } #mid set
+  if (empty($mid)) {
+#    print 'Mid empty'; exit;
+    FileNotFound();
+  }
 
   ## get userdata
-  $req = Sql_Query("select * from {$tables["user"]} where uniqid = \"".$_REQUEST["uid"]."\"");
+  $req = Sql_Query("select * from {$tables["user"]} where uniqid = \"".sql_escape($_REQUEST["uid"])."\"");
   $userdata = Sql_Fetch_Array($req);
   $req = Sql_Query(sprintf('select * from %s where email = "%s"',$tables["user"],$forwardemail));
   $forwarduserdata = Sql_Fetch_Array($req);
+
+  ## verify that this subscriber actually received this message to forward, otherwise they're not allowed
+  $allowed = Sql_Fetch_Row_Query(sprintf('select userid from %s where userid = %d and messageid = %d',
+    $GLOBALS['tables']['usermessage'],$userdata['id'],$mid));
+  if ($allowed[0] != $userdata['id']) {
+    ## when sending a test email from an admin, the entry isn't there yet
+    if (empty($_SESSION['adminloggedin']) || $_SESSION['adminloggedin'] != $_SERVER['REMOTE_ADDR']) {
+      FileNotFound();
+    }
+  }
   
   #0011996: forward to friend - personal message
   # text cannot be longer than max, to prevent very long text with only linefeeds total cannot be longer than twice max

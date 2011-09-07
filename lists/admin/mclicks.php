@@ -46,7 +46,7 @@ if (!$id) {
     $ls->addColumn($row['messageid'].' '.substr($row['subject'],0,50),$GLOBALS['I18N']->get('clicks'),$row['totalclicks']);
     $ls->addColumn($row['messageid'].' '.substr($row['subject'],0,50),$GLOBALS['I18N']->get('users'),$row['users']);
     $ls->addColumn($row['messageid'].' '.substr($row['subject'],0,50),$GLOBALS['I18N']->get('links'),$row['linkcount']);
-    $perc = sprintf('%0.2f',($row['numclicks'] / $row['total'] * 100));
+    $perc = sprintf('%0.2f',($row['totalclicks'] / $row['linkcount'] * 100));
     $ls->addColumn($row['messageid'].' '.substr($row['subject'],0,50),$GLOBALS['I18N']->get('rate'),$perc.' %');
   }
   print $ls->display();

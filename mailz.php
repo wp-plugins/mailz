@@ -3,16 +3,16 @@
  Plugin Name: Mailing List
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
- Author: EBO
- Version: 1.2.4
+ Author: Zingiri
+ Version: 1.3.0
  Author URI: http://www.zingiri.net/
  */
-define("ZING_MAILZ_VERSION","1.2.4");
-define("ZING_PHPLIST_VERSION","2.10.11");
-define("ZING_MAILZ_PREFIX","zing_");
 
-error_reporting(E_ALL & ~E_NOTICE);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL & ~E_NOTICE);
+//ini_set('display_errors', '1');
+
+define("ZING_MAILZ_VERSION","1.3.0");
+define("ZING_MAILZ_PREFIX","zing_");
 
 $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 
@@ -68,6 +68,7 @@ if ($zing_mailz_version) {
 	add_filter('wp_footer','zing_mailz_footer');
 	add_filter('the_content', 'zing_mailz_content', 10, 3);
 	add_action('wp_head','zing_mailz_head');
+	add_action('admin_head','zing_mailz_admin_head');
 	add_action('wp_head','zing_mailz_header');
 }
 add_action('admin_notices','zing_mailz_notices');
@@ -77,7 +78,6 @@ register_deactivation_hook(__FILE__,'zing_mailz_deactivate');
 require_once(dirname(__FILE__) . '/includes/index.php');
 require_once(dirname(__FILE__) . '/classes/index.php');
 require_once(dirname(__FILE__) . '/mailz_cp.php');
-require_once(dirname(__FILE__) . '/mailz_import.php');
 require_once(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 
 function zing_mailz_notices() {
@@ -113,14 +113,7 @@ function zing_mailz_activate() {
 	$wpdb->show_errors();
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 	$zing_mailz_version=get_option("zing_mailz_version");
-	if (!$zing_mailz_version)
-	{
-		add_option("zing_mailz_version",ZING_MAILZ_VERSION);
-	}
-	else
-	{
-		update_option("zing_mailz_version",ZING_MAILZ_VERSION);
-	}
+	update_option("zing_mailz_version",ZING_MAILZ_VERSION);
 
 	//create standard pages
 	if ($zing_mailz_version <= '0.1') {
@@ -158,6 +151,12 @@ function zing_mailz_activate() {
 		if ($news->live()) {
 			$output=$news->DownloadToString();
 		}
+	} else {
+		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'upgrade','doit'=>'yes'));
+		$news = new zHttpRequest($http,'mailz');
+		if ($news->live()) {
+			$output=$news->DownloadToString();
+		}
 	}
 
 	//set admin password
@@ -167,7 +166,6 @@ function zing_mailz_activate() {
 	update_option("zing_mailz_password",$password);
 
 	//set configuration options
-	//$query="update ".$prefix."phplist_config set value='".str_replace('http://','',substr(ZING_MAILZ_URL,0,-1))."' where item='website'";
 	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('siteurl'))."' where item='website'";
 	$wpdb->query($query);
 
@@ -183,6 +181,7 @@ function zing_mailz_activate() {
  * @return void
  */
 function zing_mailz_deactivate() {
+	zing_mailz_uninstall();
 	wp_clear_scheduled_hook('zing_mailz_cron_hook');
 }
 
@@ -363,23 +362,27 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$http=ZING_PHPLIST_URL.'/';
 	$http.= $to_include;
 	$and="";
-	if (count($_GET) > 0) {
-		foreach ($_GET as $n => $v) {
-			if ($n!="zpage" && $n!="page_id" && $n!="zscp" && $n!="zlistpage" && $n!="page") {
+	
+	$get=array_merge($_GET,$get);
+	if (count($get) > 0) {
+		foreach ($get as $n => $v) {
+			if ($n!="zlist" && $n!="zpage" && $n!="page_id" && $n!="zscp" && $n!="zlistpage" && $n!="page") {
 				$vars.= $and.$n.'='.zing_urlencode($v);
 				$and="&";
-			} elseif ($n=="zlistpage") {
+			} elseif ($n=="zlistpage" && $v !== null) {
 				$vars.= $and.'page'.'='.zing_urlencode($v);
 				$and="&";
 			}
 		}
 	}
+	/*
 	if (count($get) > 0) {
 		foreach ($get as $n => $v) {
 			$vars.= $and.$n.'='.zing_urlencode($v);
 			$and="&";
 		}
 	}
+	*/
 
 	$vars.=$and.'wpabspath='.urlencode(ABSPATH);
 	$vars.='&wppageid='.zing_mailz_mainpage();
@@ -428,12 +431,13 @@ function zing_mailz_header()
 	$zing_mailz_content=trim(substr($body,1));
 }
 
+function zing_mailz_admin_head() {
+	//echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
+	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
+}
+
 function zing_mailz_head() {
-	if (is_admin()) {
-		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
-	} else {
-		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/styles/phplist.css" media="screen" />';
-	}
+	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/styles/phplist.css" media="screen" />';
 	echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
 }
 
@@ -463,7 +467,7 @@ function zing_mailz_login() {
 		$post['login']='admin';//$current_user->data->user_login;
 		$post['password']=get_option('zing_mailz_password');
 		$post['submit']='Enter';
-		$http=zing_mailz_http('osticket','admin/index.php');
+		$http=zing_mailz_http('osticket','admin/index.php',array('zlistpage' => null));
 		$news = new zHttpRequest($http,'mailz');
 		$news->post=$post;
 		if ($news->live()) {
@@ -481,7 +485,7 @@ function zing_mailz_login() {
 function zing_mailz_logout() {
 	$_GET['zlistpage']='logout';
 	$http=zing_mailz_http('osticket','admin/index.php');
-	$news = new zHttpRequest($http,'mailz');
+	$news = new zHttpRequest($http,'mailz',array('zlistpage' => null));
 	if ($news->live()) {
 		$output=$news->DownloadToString(true);
 		unset($_SESSION['zing']['mailz']['loggedin']);
@@ -496,6 +500,15 @@ function zing_mailz_footer() {
 	zing_footers();
 }
 
+function mailz_log($type=0,$msg='',$filename="",$linenum=0) {
+	if (get_option('mailz_debug')) {
+		if (is_array($msg)) $msg=print_r($msg,true);
+		$v=get_option('mailz_debug_log');
+		if (!is_array($v)) $v=array();
+		array_unshift($v,array(time(),$type,$msg));
+		update_option('mailz_debug_log',$v);
+	}
+}
 /*
  function zing_mailz_more_reccurences() {
  return array(

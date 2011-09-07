@@ -16,6 +16,7 @@ switch ($access) {
   default:
     $subselect = " where id = 0";break;
 }
+//zingiri
 if (isset($_REQUEST['id'])) {
   $id = sprintf('%d',$_REQUEST['id']);
 } else {

@@ -21,10 +21,10 @@ switch ($access) {
 # handle commandline
 if ($GLOBALS["commandline"]) {
 #  error_reporting(63);
-  $cline = parseCline();
+	$cline = parseCline();
   reset($cline);
   if (!$cline || !is_array($cline) || !$cline["s"] || !$cline["l"]) {
-    clineUsage("-s subject -l list [-f from] < message");
+  	clineUsage("-s subject -l list [-f from] < message");
     exit;
   }
 
@@ -45,7 +45,7 @@ if ($GLOBALS["commandline"]) {
       }
     }
   }
-
+  
   $_POST["targetlist"] = array();
   foreach ($listids as $key => $val) {
     $_POST["targetlist"][$key] = "signup";

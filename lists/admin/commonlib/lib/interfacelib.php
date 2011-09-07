@@ -10,16 +10,14 @@ class WebblerListing {
   var $columns = array();
   var $sortby = array();
   var $sort = 0;
-  var $sortcolumn = '';
   var $buttons = array();
-  var $submitbuttons = array();
   var $initialstate = "block";
   var $duplicatebuttons = array();
   var $buttonduplicate = 0;
 
   function WebblerListing($title,$help = "") {
-    $this->title = strip_tags($title);
-    $this->help = strip_tags($help);
+    $this->title = $title;
+    $this->help = $help;
   }
 
   function addElement($name,$url = "",$colsize="") {
@@ -30,25 +28,15 @@ class WebblerListing {
         "colsize" => $colsize,
         "columns" => array(),
         "rows" => array(),
-        "class" => "",
       );
     }
-  }
-
-  function setClass($name,$class) {
-    $this->elements[$name]['class'] = $class;
   }
 
   function deleteElement($name) {
     unset($this->elements[$name]);
   }
-
   function addSort() {
     $this->sort = 1;
-  }
-
-  function sortBy($colname,$direction = 'desc') {
-    $this->sortcolumn = $colname;
   }
 
   function addColumn($name,$column_name,$value,$url="",$align="") {
@@ -92,16 +80,12 @@ class WebblerListing {
   function addInput ($name,$value) {
     $this->addElement($name);
     $this->addColumn($name,"value",
-      sprintf('<input type="text" name="%s" value="%s" size="40" class="listinginput" />',
+      sprintf('<input type=text name="%s" value="%s" size=40 class="listinginput">',
       strtolower($name),$value));
   }
 
   function addButton($name,$url) {
     $this->buttons[$name] = $url;
-  }
-  
-  function addSubmitButton($name,$label) {
-    $this->submitbuttons[$name] = $label;
   }
 
   function duplicateButton($name,$rows) {
@@ -123,7 +107,7 @@ class WebblerListing {
       $tophelp = $this->help;
     }
     $html = '<tr valign="top">';
-    $html .= sprintf('<td><a name="%s"></a><div class="listinghdname">%s%s</div></td>',str_replace(" ","_",htmlspecialchars(strtolower($this->title))),$tophelp,$this->title);
+    $html .= sprintf('<td><a name="%s"></a><div class="listinghdname">%s%s</div></td>',strtolower($this->title),$tophelp,$this->title);
     $c = 1;
     foreach ($this->columns as $column => $columnname) {
       if ($c == sizeof($this->columns)) {
@@ -149,12 +133,7 @@ class WebblerListing {
       $width = 'width='.$element["colsize"];
     else
       $width = "";
-    if (isset($element['class'])) {
-      $html = '<tr valign="middle" class="'.$element['class'].'">';
-    } else {
-      $html = '<tr valign="middle">';
-    }
-
+    $html = '<tr valign="middle">';
     if ($element["url"]) {
       $html .= sprintf('<td valign="top" %s class="listingname"><span class="listingname"><a href="%s" class="listingname">%s</a></span></td>',$width,$element["url"],$element["name"]);
     } else {
@@ -171,7 +150,7 @@ class WebblerListing {
       } else {
         $align = '';
       }
-      if (!empty($element["columns"][$column]["url"])) {
+      if (isset($element["columns"][$column]) && $element["columns"][$column]["url"]) {
         $html .= sprintf('<td valign="top" class="listingelement%s"><span class="listingelement%s"><a href="%s" class="listingelement">%s</a></span></td>',$align,$align,$element["columns"][$column]["url"],$value);
       } elseif (isset($element["columns"][$column])) {
         $html .= sprintf('<td valign="top" class="listingelement%s"><span class="listingelement%s">%s</span></td>',$align,$align,$element["columns"][$column]["value"]);
@@ -186,28 +165,28 @@ class WebblerListing {
       } else {
         $value = "";
       }
-      if (isset($row["align"])) {
-        $align = $row["align"];
+      if ($element["rows"][$row]["align"]) {
+        $align = $element["rows"][$row]["align"];
       } else {
         $align = 'left';
       }
-      if (!empty($row["url"])) {
+      if ($element["rows"][$row]["url"]) {
         $html .= sprintf('<tr><td valign="top" class="listingrowname">
           <span class="listingrowname"><a href="%s" class="listinghdname">%s</a></span>
-          </td><td valign="top" class="listingelement%s" colspan="%d">
+          </td><td valign="top" class="listingelement%s" colspan=%d>
           <span class="listingelement%s">%s</span>
           </td></tr>',$row["url"],$row["name"],$align,sizeof($this->columns),$align,$value);
       } else {
         $html .= sprintf('<tr><td valign="top" class="listingrowname">
           <span class="listingrowname">%s</span>
-          </td><td valign="top" class="listingelement%s" colspan="%d">
+          </td><td valign="top" class="listingelement%s" colspan=%d>
           <span class="listingelement%s">%s</span>
           </td></tr>',$row["name"],$align,sizeof($this->columns),$align,$value);
       }
     }
     $html .= sprintf('<!--greenline start-->
       <tr valign="middle">
-      <td colspan="%d" bgcolor="#CCCC99"><img height="1" alt="" src="images/transparent.png" width="1" border="0" /></td>
+      <td colspan="%d" bgcolor="#CCCC99"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td></td>
       </tr>
       <!--greenline end-->
     ',sizeof($this->columns)+2);
@@ -252,31 +231,16 @@ class WebblerListing {
     <tr><td colspan="2">&nbsp;</td></tr>
     ',sizeof($this->columns)+2,$buttons);
     }
-    $buttons = '';
-    if (sizeof($this->submitbuttons)) {
-      foreach ($this->submitbuttons as $name => $label) {
-        $buttons .= sprintf('<button type="submit" name="%s">%s</button>',$name,strtoupper($label));
-      }
-      $html .= sprintf('
-    <tr><td colspan="2">&nbsp;</td></tr>
-    <tr><td colspan="%d" align="right">%s</td></tr>
-    <tr><td colspan="2">&nbsp;</td></tr>
-    ',sizeof($this->columns)+2,$buttons);
-    }
     $html .= '</table>';
     return $html;
   }
 
   function index() {
-    return '<a name="top">Index:</a><br />';
+    return "<a name=top>Index:</a><br />";
   }
 
   function cmp($a,$b) {
-    if (isset($_GET["sortby"])) {
-      $sortcol = urldecode($_GET["sortby"]);
-    } elseif (!empty($this->sortcolumn)) {
-      $sortcol = $this->sortcolumn;
-    }
+    $sortcol = urldecode($_GET["sortby"]);
     if (!is_array($a) || !is_array($b)) return 0;
     $val1 = strip_tags($a["columns"][$sortcol]["value"]);
     $val2 = strip_tags($b["columns"][$sortcol]["value"]);
@@ -302,10 +266,6 @@ class WebblerListing {
     if ($this->sort) {
       usort($this->elements,array("WebblerListing","cmp"));
     }
-    if ($this->sortcolumn) {
-      usort($this->elements,array("WebblerListing","cmp"));
-    }
-
     foreach ($this->elements as $element) {
       $html .= $this->listingElement($element);
     }
@@ -322,52 +282,6 @@ class WebblerListing {
     return $html;
   }
 }
-
-
-class DomTab {
-
-  var $tabs = array();
-  var $domtabcluster = '';
-
-  function DomTab($name = '') {
-    $this->domtabcluster = $name;
-  }
-
-  function addTab($title,$content) {
-    $this->tabs[strip_tags($title)] = $content;
-  }
-
-  function header() {
-    return '
-	<script type="text/javascript">
-		document.write(\'<style type="text/css">\');    
-		document.write(\'div.domtab div{display:visible;}<\');
-		document.write(\'/s\'+\'tyle>\');    
-    </script>
-  ';
-  }  
-
-  function display() {
-    $html = '
-      <div class="domtab">
-        <ul class="domtabs">
-        ';
-    foreach ($this->tabs as $title => $content) {
-      $html .= sprintf('<li><a href="#%s">%s</a></li>',$this->domtabcluster.urlencode(strtolower($title)),$title);
-    }
-    $html .= '</ul>';
-
-    foreach ($this->tabs as $title => $content) {
-      $html .= '<div style="display: none;">';
-      $html .= sprintf('<h4><a name="%s" id="%s"><span class="hide">%s</span></a></h4>',$this->domtabcluster.strtolower($title),$this->domtabcluster.urlencode(strtolower($title)),$title);
-      $html .= $content;
-      $html .= '</div>';
-    }
-    $html .= '</div>';
-    return $this->header().$html;
-  }
-}
-
 
 class topBar {
   var $type = '';
@@ -399,8 +313,9 @@ class topBar {
     }
     return '
 <STYLE TYPE="text/css">
+body {margin: 0; padding: 0 0 0 0}
 
-#adminnavcontainer {margin: 0 0 0 0; padding: 0; background-color: #DEDEB6; position: absolute; top: 0px; left:0px; z-index: 2000;}
+#adminnavcontainer {margin: 0 0 0 0; padding: 0; background-color: #DEDEB6; position: absolute; top: 0px; left:0px}
 
 div.adminwebblerid { float: right; margin: 3px 5px 0 0;
 padding: 0;
@@ -410,7 +325,7 @@ color: #C2C283
 }
 
 #adminnavcontainer div {padding: 15px 0 0 0;}
-#adminnavcontainer ul {margin: 0 0 0 0; padding: 10px 0 0 0 ;}
+ul {margin: 0 0 0 0; padding: 10px 0 0 0 ;}
 #adminnavlist
 {
 padding: 3px 0 3px 0;
@@ -445,11 +360,7 @@ color: #000;
 background: #CCCC99;
 border-color: #CCCC99;
 }
-#unhideadminbar {
-  text-align: right;
-  display: block;
-  text-decoration: none;
-}
+
 </style>
 
 <script language="Javascript" type="text/javascript" src="/codelib/js/cookielib.js"></script>
@@ -466,15 +377,6 @@ function hideadminbar() {
     alert("To hide the bar, you need to logout");
   }
 }
-
-function unhideadminbar() {
-  if (document.getElementById) {
-    var el = document.getElementById(\'adminnavcontainer\');
-    el.style.visibility="visible";
-  }
-  SetCookie("webbleradminbar","",exp);
-}
-
 function closeadminbar() {
   if (document.getElementById) {
     var el = document.getElementById(\'adminnavcontainer\');
@@ -491,12 +393,12 @@ function closeadminbar() {
 <div></div>
 <ul id="adminnavlist">
 <li>&nbsp;</li>
-<li><a href="/'.$config["uploader_dir"]."/?page=edit&b=$bid&id=$lid".'" title="use this link to edit this page">edit page</a></li>
-<li><a href="/'.$config["uploader_dir"].'/?page=list&id='.$bid.'" title="use this link to edit this branch">branch</a></li>
-<li><a href="/'.$config["uploader_dir"].'/?page=sitemap" title="use this link to view the sitemap">sitemap</a></li>
-<li><a href="/'.$config["uploader_dir"].'/" title="use this link to go to the webbler admin homepage">webbler home</a></li>
+<li><a href="'.$config["uploader_dir"]."/?page=edit&b=$bid&id=$lid".'" title="use this link to edit this page">edit page</a></li>
+<li><a href="'.$config["uploader_dir"].'/?page=list&id='.$bid.'" title="use this link to edit this branch">branch</a></li>
+<li><a href="'.$config["uploader_dir"].'/?page=sitemap" title="use this link to view the sitemap">sitemap</a></li>
+<li><a href="'.$config["uploader_dir"].'/" title="use this link to go to the webbler admin homepage">webbler home</a></li>
 '.$validate.'
-<li><a href="/'.$config["uploader_dir"]."/?page=logout&return=".urlencode("lid=$lid").'" title="use this link to logout of the webbler">logout</a></li>
+<li><a href="'.$config["uploader_dir"]."/?page=logout&return=".urlencode("lid=$lid").'" title="use this link to logout of the webbler">logout</a></li>
 <li><a href="javascript:hideadminbar();" title="use this link to hide this admin bar on this page">hide bar</a></li>
 <li><a href="javascript:closeadminbar();" title="use this link to hide the admin bar for this session">close bar</a></li>
 <li>&nbsp;TEMPLATE:&nbsp; <b>'.getLeafTemplate($lid).'</b></li>
@@ -507,7 +409,6 @@ function closeadminbar() {
 var state = GetCookie("webbleradminbar");
 if (state == "closed") {
   hideadminbar();
-  document.write(\'<div id="unhideadminbar"><a href="#" onclick="unhideadminbar()">&sect;</a></div>\');
 }
 
 </script>
@@ -533,15 +434,13 @@ class WebblerTabs {
   }
 
   function display() {
-    if (empty($GLOBALS['design'])) {
-      $html = '<style type=text/css media=screen>@import url( styles/tabs.css );</style>';
-    }
+    $html = '<style type=text/css media=screen>@import url( styles/tabs.css );</style>';
     $html .= '<div id="webblertabs">';
     $html .= '<ul>';
     reset($this->tabs);
     foreach ($this->tabs as $tab => $url) {
       if (strtolower($tab) == $this->current) {
-        $html .= '<li id="current">';
+        $html .= '<li id=current>';
       } else {
         $html .= '<li>';
       }
@@ -633,7 +532,6 @@ class WebblerShader {
   var view;
 
   function getItem (id) {
-    var view;
     if (is_ie4) {
       view = eval(id);
     }
@@ -648,13 +546,12 @@ class WebblerShader {
 
       var shaderDiv = getItem(\'shader\'+id);
       var shaderSpan = getItem(\'shaderspan\'+id);
-  //    var shaderImg = getItem(\'shaderimg\'+id);
-      var shaderImg = false;
+      var shaderImg = getItem(\'shaderimg\'+id);
       var footerTitle = getItem(\'title\'+id);
       if(shaderDiv.style.display == \'block\') {
         states[id] = "closed";
         shaderDiv.style.display = \'none\';
-        shaderSpan.innerHTML = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('open').'&nbsp;</span><img alt="" src="images/shaderdown.gif" height="9" width="9" border="0" />\';
+        shaderSpan.innerHTML = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('open').'&nbsp;</span><img src="images/shaderdown.gif" height="9" width="9" border="0">\';
         footerTitle.style.visibility = \'visible\';
         if (shaderImg)
           shaderImg.src = \'images/expand.gif\';
@@ -662,7 +559,7 @@ class WebblerShader {
         states[id] = "open";
         shaderDiv.style.display = \'block\';
         footerTitle.style.visibility = \'hidden\';
-        shaderSpan.innerHTML = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('close').'&nbsp;</span><img alt="" src="images/shaderup.gif" height="9" width="9" border="0" />\';
+        shaderSpan.innerHTML = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('close').'&nbsp;</span><img src="images/shaderup.gif" height="9" width="9" border="0">\';
         if (shaderImg)
           shaderImg.src = \'images/collapse.gif\';
       }
@@ -707,9 +604,9 @@ class WebblerShader {
         default_status = pref;
       }
       if(default_status == \'block\') {
-        span_text = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('close').'&nbsp;</span><img src="images/shaderup.gif" alt="" height="9" width="9" border="0" />\';
+        span_text = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('close').'&nbsp;</span><img src="images/shaderup.gif" height="9" width="9" border="0">\';
       } else {
-        span_text = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('open').'&nbsp;</span><img src="images/shaderdown.gif" alt="" height="9" width="9" border="0" />\';
+        span_text = \'<span class="shadersmall">'.$GLOBALS['I18N']->get('open').'&nbsp;</span><img src="images/shaderdown.gif" height="9" width="9" border="0">\';
       }
       document.writeln("<a href=\'javascript: shade(" + number + ");\'><span id=\'shaderspan" + number + "\' class=\'shadersmalltext\'>" + span_text + "</span></a>");
     }
@@ -722,10 +619,10 @@ class WebblerShader {
         default_status = pref;
       }
       if(default_status == \'none\') {
-        title_text = \'<img src="images/expand.gif" alt="" height="9" width="9" border="0" />  \'+title;
+        title_text = \'<img src="images/expand.gif" height="9" width="9" border="0">  \'+title;
         title_class = "shaderfootertextvisible";
       } else {
-        title_text = \'<img src="images/collapse.gif" alt="" height="9" width="9" border="0" />   \'+title;
+        title_text = \'<img src="images/collapse.gif" height="9" width="9" border="0">   \'+title;
         title_class = "shaderfootertexthidden";
       }
       document.writeln("<a href=\'javascript: shade(" + number + ");\'><span id=\'title" + number + "\' class=\'"+title_class+"\'>" + title_text + "</span></a>");
@@ -738,14 +635,13 @@ class WebblerShader {
 
   function header() {
     $html = sprintf('
-<div class="tablewrapper">
 <table width="98%%" align="center" cellpadding="0" cellspacing="0" border="0">');
     return $html;
   }
 
   function shadeIcon() {
     return sprintf('
-<a href="javascript:shade(%d);" style="text-decoration:none;">&nbsp;<img id="shaderimg%d" src="images/collapse.gif" alt="" height="9" width="9" border="0" />
+<a href="javascript:shade(%d);" style="text-decoration:none;">&nbsp;<img id="shaderimg%d" src="images/collapse.gif" height="9" width="9" border="0">
     ',$this->num,$this->num);
   }
 
@@ -762,7 +658,7 @@ class WebblerShader {
   function dividerRow() {
     return '
   <tr>
-      <td colspan="4" class="shaderdivider"><img src="images/transparent.png" height="1" alt="" border="0" width="1" /></td>
+      <td colspan="4" class="shaderdivider"><img src="images/transparent.png" height="1" border="0" width="1"></td>
   </tr>
     ';
   }
@@ -771,14 +667,13 @@ class WebblerShader {
     $html = sprintf('
 
   <tr>
-    <td class="shaderborder"><img src="images/transparent.png" alt="" height="1" border="0" width="1" /></td>
-    <td class="shaderfooter"><script language="javascript"  type="text/javascript">title_span(%d,\'%s\',\'%s\');</script>&nbsp;</td>
-    <td class="shaderfooterright"><script language="javascript" type="text/javascript">open_span(%d,\'%s\');</script>&nbsp;</td>
-    <td class="shaderborder"><img src="images/transparent.png" alt="" height="1" border="0" width="1" /></td>
+    <td class="shaderborder"><img src="images/transparent.png" height="1" border="0" width="1"></td>
+    <td class="shaderfooter"><script language="javascript">title_span(%d,\'%s\',\'%s\');</script>&nbsp;</td>
+    <td class="shaderfooterright"><script language="javascript">open_span(%d,\'%s\');</script>&nbsp;</td>
+    <td class="shaderborder"><img src="images/transparent.png" height="1" border="0" width="1"></td>
   </tr>
 '.$this->dividerRow().'
-</table><!-- End table from header -->
-</div><!-- End tablewrapper -->
+</table><br/><br/>
     ',$this->num,$this->display,addslashes($this->name),$this->num,$this->display);
     return $html;
   }
@@ -786,16 +681,16 @@ class WebblerShader {
   function contentDiv() {
     $html = sprintf('
   <tr>
-      <td class="shaderdivider"><img src="images/transparent.png" alt="" height="1" border="0" width="1" /></td>
-      <td colspan="2">
-      <script language="javascript" type="text/javascript">start_div(%d,\'%s\')</script>',$this->num,$this->display);
+      <td class="shaderdivider"><img src="images/transparent.png" height="1" border="0" width="1"></td>
+      <td colspan=2>
+      <script language="javascript">start_div(%d,\'%s\')</script>',$this->num,$this->display);
     $html .= $this->content;
 
     $html .= '
-    <script language="javascript" type="text/javascript">end_div();</script>
+    <script language="javascript">end_div();</script>
     </td>
 
-    <td class="shaderdivider"><img src="images/transparent.png" alt="" height="1" border="0" width="1" /></td>
+    <td class="shaderdivider"><img src="images/transparent.png" height="1" border="0" width="1"></td>
   </tr>';
     return $html;
   }

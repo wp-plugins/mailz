@@ -29,7 +29,9 @@ $GLOBALS['database_module'] = $database_module;
 $GLOBALS['show_dev_errors'] = $show_dev_errors;
 
 ## @@ would be nice to move this to the config file at some point
-$GLOBALS['scheme'] = 'http';
+# http://mantis.phplist.com/view.php?id=15521
+## set it on the fly, although that will probably only work with Apache
+$GLOBALS['scheme'] = (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
 
 ## spelling mistake in earlier version, make sure to set it correctly
 if (!isset($bounce_unsubscribe_threshold) && isset($bounce_unsubscribe_treshold)) {

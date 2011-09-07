@@ -6,13 +6,24 @@
 
 require_once dirname(__FILE__).'/accesscheck.php';
 
-if( !$GLOBALS["require_login"] || $_SESSION["logindetails"]['superuser'] ){
-  $ownerselect_and = '';
-  $ownerselect_where = '';
-} else {
-  $ownerselect_where = ' WHERE owner = ' . $_SESSION["logindetails"]['id'];
-  $ownerselect_and = ' and owner = ' . $_SESSION["logindetails"]['id'];
+$access = accessLevel('messages');
+#print "Access: $access";
+switch ($access) {
+  case 'owner':
+    $ownerselect_where = ' where owner = ' . $_SESSION["logindetails"]["id"];
+    $owner_select_and = ' and owner = ' . $_SESSION["logindetails"]["id"];
+    break;
+  case 'all':
+    $ownerselect_where = '';
+    $owner_select_and = '';
+    break;
+  case 'none':
+  default:
+    $ownerselect_where = ' where id = 0';
+    $owner_select_and = ' and owner = 0';
+    break;
 }
+
 if (isset($_GET['start'])) {
   $start = sprintf('%d',$_GET['start']);
 } else {
@@ -89,11 +100,11 @@ if (isset($_GET['resend'])) {
   $resend = sprintf('%d',$_GET['resend']);
   # requeue the message in $resend
   print $GLOBALS['I18N']->get("Requeuing")." $resend ..";
-  $result = Sql_query("update ".$tables["message"]." set status = \"submitted\",sendstart = now() where id = $resend");
+  $result = Sql_query("update ".$tables["message"]." set status = \"submitted\",sendstart = now() where id = $resend $ownerselect_and");
   $suc6 = Sql_Affected_Rows();
   # only send it again to users, if we are testing, otherwise only to new users
   if (TEST)
-    $result = Sql_query("delete from ".$tables["usermessage"]." where messageid = $resend");
+    $result = Sql_query("delete from ".$tables["usermessage"]." where messageid = $resend $ownerselect_and");
   if ($suc6)
     print "... ".$GLOBALS['I18N']->get("Done");
   else
@@ -104,7 +115,7 @@ if (isset($_GET['resend'])) {
 if (isset($_GET['suspend'])) {
   $suspend = sprintf('%d',$_GET['suspend']);
   print $GLOBALS['I18N']->get('Suspending')." $suspend ..";
-  $result = Sql_query(sprintf('update %s set status = "suspended" where id = %d and (status = "inprocess" or status = "submitted")',$tables["message"],$suspend));
+  $result = Sql_query(sprintf('update %s set status = "suspended" where id = %d and (status = "inprocess" or status = "submitted") %s',$tables["message"],$suspend,$ownerselect_and));
   $suc6 = Sql_Affected_Rows();
   if ($suc6)
     print "... ".$GLOBALS['I18N']->get("Done");
@@ -113,6 +124,7 @@ if (isset($_GET['suspend'])) {
   print"<br /><hr /><br /><p>\n";
 }
 
+$subselect = '';
 ### Switch tab
 switch ($_GET["type"]) {
   case "queued":
@@ -140,12 +152,12 @@ switch ($_GET["type"]) {
 }
 
 ### Query messages from db
-if( !$GLOBALS["require_login"] || $_SESSION["logindetails"]['superuser'] ){
-  $subselect= ' where '.$subselect;
+if(empty($ownerselect_where)){
+  $subselect = ' where '.$subselect;
 } else {
-  $subselect = 'WHERE owner = ' . $_SESSION["logindetails"]['id'] .' and '.$subselect;
+  $subselect =  $ownerselect_where. ' and '.$subselect;
 }
-$req = Sql_query("SELECT count(*) FROM " . $tables["message"].' '.$subselect);
+$req = Sql_query("SELECT count(*) FROM " . $tables["message"].' '. $subselect);
 
 $total_req = Sql_Fetch_Row($req);
 $total = $total_req[0];
@@ -248,7 +260,8 @@ if ($total) {
         %s
         %s
         </table>',
-        $msg["processed"],
+      #  $msg["processed"],
+        $msg['astext'] + $msg['ashtml'] + $msg['astextandhtml'] + $msg['aspdf'] + $msg['astextandpdf'],
         $msg["astext"],
         $msg["ashtml"] + $msg["astextandhtml"], //bug 0009687
         $msg["aspdf"],

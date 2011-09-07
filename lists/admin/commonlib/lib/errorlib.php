@@ -160,9 +160,6 @@ function sendError($msg, $email = "") {
   }
 }
 
-
-//
-
 function Warn($msg) {
 	logError("Warning: $msg");
   return "<table border=1><tr><td><font color=red>Warning: $msg</font></td></tr></table>";
@@ -180,7 +177,7 @@ function LogError($error) {
     getenv("REQUEST_URI"),$error."\nReferred from: ".$ref,getenv("REMOTE_ADDR")),1);
 }
 
-function Debug($msg) {
+function Debug($variable, $description = 'Value', $nestingLevel = 0) {
 	global $config;
  # if (!$config["debug"])
 #		$er = error_reporting(0);
@@ -189,7 +186,8 @@ function Debug($msg) {
   if (!$config["debug"])
     return;
   if ($config["verbose"])
-     print "\n".'<font class="debug">DBG: '.$msg.'</font><br>'."\n";
+    smartDebug($variable, $description, $nestingLevel);
+  //     print "\n".'<font class="debug">DBG: '.$msg.'</font><br>'."\n";
   elseif ($config["debug_log"]) {
     $fp = @fopen($config["debug_log"],"a");
     $line = "[".date("d M Y, H:i:s")."] ".getenv("REQUEST_URI").'('.$config["stats"]["number_of_queries"].") $msg \n";
@@ -199,17 +197,63 @@ function Debug($msg) {
   #  fwrite($fp,"$line");
   #  fclose($fp);
   } else {
-  #  Fatal_Error("Debugging not configured properly");
+    Fatal_Error("Debugging not configured properly");
   }
 #  error_reporting($er);
 }
 
-if(!function_exists('dbg')) {
-//  $_GLOBALS['head']['dbginfo'] = '<!--Using dbg from uploader/codelib/commonlib/lib/errorlib-->'; 
-	function dbg($msg, $description, $nestingLevel) {
-	  # bit of shorthand
-	  Debug($msg);
-	}
+#TODO make an object!
+#TODO dump to floating  frame
+#TODO dump to logfile if not in devmode
+#TODO colapsable output
+
+static $sDebugResult;
+
+function addDebug($msg) {
+  global $sDebugResult;
+  $sDebugResult = $sDebugResult . "\n" . $msg;
+}
+
+function smartDebug($variable, $description = 'Value', $nestingLevel = 0) {
+  # WARNING recursive
+  $nestingLevelMax = 1;
+
+  if ( $debug_delay && $nestingLevel == -1 ) {
+    global $sDebugResult;
+    echo $sDebugResult;
+  } else {
+
+    if (!$nestingLevel)
+      addDebug("<ul type='circle' style='background:white; font-color:black; text-align:left; border:1px solid #a0a0a0;padding-bottom:4px;padding-right:4px'>\n<li>{" . getenv("REQUEST_URI") . "} ");
+    addDebug("<i>$description</i>: ");
+    if (is_array($variable) || is_object($variable)) {
+      if (is_array($variable)) {
+        addDebug("(array)[" . count($variable) . "]");
+      } else {
+        addDebug("<B>(object)</B>[" . count($variable) . "]");
+      }
+      addDebug("<ul type='circle' style='border:1px solid #a0a0a0;padding-bottom:4px;padding-right:4px'>\n");
+      foreach ($variable as $key => $value) {
+        if ($nestingLevel > $nestingLevelMax) {
+          addDebug("<li>\"{$key}\"");
+          //        output ( "Nesting level $nestingLevel reached.\n" );
+        } else {
+          addDebug("<li>\"{$key}\" => ");
+          smartDebug($value, '', $nestingLevel +1);
+        }
+        addDebug("</li>\n");
+      }
+      addDebug("</ul>\n");
+    } else
+      addDebug("(" . gettype($variable) . ") '{$variable}'\n");
+    if (!$nestingLevel)
+      addDebug("</li></ul>\n");
+  }
+}
+
+function dbg($msg) {
+  # bit of shorthand
+  Debug($msg);
 }
 
 #if (!$config["debug"])

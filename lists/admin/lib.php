@@ -69,14 +69,18 @@ if (!defined('FORWARD_EMAIL_COUNT') ) define('FORWARD_EMAIL_COUNT',1);
 if (FORWARD_EMAIL_COUNT < 1) {Error('FORWARD_EMAIL_COUNT must be > (int) 0');}
 # allows FORWARD_EMAIL_COUNT forwards per user per period in mysql interval terms default one day  
 if (!defined('FORWARD_EMAIL_PERIOD') ) define('FORWARD_EMAIL_PERIOD', '1 day');
+if (!defined('SEND_QUEUE_PROCESSING_REPORT')) define('SEND_QUEUE_PROCESSING_REPORT',true);
 if (!defined('FORWARD_PERSONAL_NOTE_SIZE')) define('FORWARD_PERSONAL_NOTE_SIZE',0);
 if (!defined('FORWARD_FRIEND_COUNT_ATTRIBUTE')) define('FORWARD_FRIEND_COUNT_ATTRIBUTE','');
 if (!defined('EMBEDUPLOADIMAGES')) define('EMBEDUPLOADIMAGES',0);
 if (!defined('IMPORT_FILESIZE'))  define('IMPORT_FILESIZE',1);
-if (!defined("EMAIL_ADDRESS_VALIDATION_LEVEL")) define("EMAIL_ADDRESS_VALIDATION_LEVEL",3); 
+if (!defined('CHECK_REFERRER')) define('CHECK_REFERRER',false);
+if (!defined("EMAIL_ADDRESS_VALIDATION_LEVEL")) define("EMAIL_ADDRESS_VALIDATION_LEVEL",1); 
 if (!isset($GLOBALS["export_mimetype"])) $GLOBALS["export_mimetype"] = 'application/csv';
 if (!isset($GLOBALS["admin_auth_module"])) $GLOBALS["admin_auth_module"] = 'phplist_auth.inc';
 if (!isset($GLOBALS["require_login"])) $GLOBALS["require_login"] = 0;
+
+if (!isset($allowed_referrers)) $allowed_referrers = array();
 
 if (!defined("WORKAROUND_OUTLOOK_BUG") && defined("USE_CARRIAGE_RETURNS")) {
   define("WORKAROUND_OUTLOOK_BUG",USE_CARRIAGE_RETURNS);
@@ -341,6 +345,18 @@ function clean2 ($value) {
   return $value;
 }
 
+function cleanEmail ($value) {
+  $value = trim($value);
+  $value = preg_replace("/\r/","",$value);
+  $value = preg_replace("/\n/","",$value);
+  $value = preg_replace('/"/',"&quot;",$value);
+  ## these are allowed in emails
+//  $value = preg_replace("/'/","&rsquo;",$value);
+  $value = preg_replace("/`/","&lsquo;",$value);
+  $value = stripslashes($value);
+  return $value;
+}
+
 if (TEST && REGISTER)
   $pixel = '<img src="http://phplist.tincan.co.uk/images/pixel.gif" width=1 height=1>';
 
@@ -532,7 +548,7 @@ function addAbsoluteResources($text,$url) {
       $match = $foundtags[2][$i];
       $tagmatch = $foundtags[1][$i];
 #      print "$match<br/>";
-      if (preg_match("#[http|javascript|https|ftp|mailto]:#i",$match)) {
+      if (preg_match("#^(http|javascript|https|ftp|mailto):#i",$match)) {
         # scheme exists, leave it alone
       } elseif (preg_match("#\[.*\]#U",$match)) {
         # placeholders used, leave alone as well

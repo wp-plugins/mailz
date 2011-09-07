@@ -169,6 +169,11 @@ if (isset($_POST["subscribe"]) && is_email($_POST["email"]) && $listsok && $allt
       # read the current values to compare changes
       $old_data = Sql_fetch_array($result);
 
+      /** mantis 15300
+       * when re-subscribing just update the details and don't require the password to 
+       * be the one on file
+       *
+
       if (ASKFORPASSWORD && $old_data["password"]) {
          if (ENCRYPTPASSWORD) {
             $canlogin = md5($_POST["password"]) == $old_data["password"];
@@ -187,6 +192,7 @@ if (isset($_POST["subscribe"]) && is_email($_POST["email"]) && $listsok && $allt
             return;
          }
       }
+      */
 
       $userid = $old_data["id"];
       $old_data = array_merge($old_data,getUserAttributeValues('',$userid));

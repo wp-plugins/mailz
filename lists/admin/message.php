@@ -55,7 +55,7 @@ if (!Sql_Affected_Rows()) {
   print $GLOBALS['I18N']->get('No such message');
   return;
 }
-echo "<table border=\"1>\"";
+echo "<table border=\"1\">";
 
 while ($msg = Sql_fetch_array($result)) {
   foreach($DBstruct["message"] as $field => $val) {

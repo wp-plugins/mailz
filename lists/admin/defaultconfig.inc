@@ -74,7 +74,7 @@ $defaultfooter = '
 
 <tr>
 <td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-<td bgcolor="#ff9900" class="bottom">&copy; <a href="http://tincan.co.uk" target="_tincan" class="urhere">tincan limited</a> | <a class="urhere" href="http://www.phplist.com" target="_blank">phplist</a> - version <?php echo VERSION?></td>
+<td bgcolor="#ff9900" class="bottom">&copy; <a href="http://tincan.co.uk" target="_tincan" class="urhere">tincan limited</a> | <a class="urhere" href="http://www.phplist.com" target="_blank">phplist</a></td>
 <td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
 </tr>
 
@@ -98,17 +98,11 @@ $defaultfooter = '
 </body></html>
 ';
 
-//zing added dirname(__FILE__)
 if (is_file(dirname(__FILE__)."/../config/header.inc")) {
-	$fd = fopen(dirname(__FILE__)."/../config/header.inc", "r");
-	$defaultheader = fread($fd, filesize(dirname(__FILE__)."/../config/header.inc"));
-	fclose($fd);
+	$defaultheader = file_get_contents(dirname(__FILE__)."/../config/header.inc");
 }
-//zing added dirname(__FILE__)
 if (is_file(dirname(__FILE__)."/../config/footer.inc")) {
-	$fd = fopen(dirname(__FILE__)."/../config/footer.inc", "r");
-	$defaultfooter = fread($fd, filesize(dirname(__FILE__)."/../config/footer.inc"));
-	fclose($fd);
+	$defaultfooter = file_get_contents(dirname(__FILE__)."/../config/footer.inc");
 }
 
 if (isset ($_SERVER['HTTP_HOST'])) {

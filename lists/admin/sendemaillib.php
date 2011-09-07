@@ -129,7 +129,7 @@ function sendEmail ($messageid,$email,$hash,$htmlpref = 0,$rssitems = array(),$f
   $html["blacklisturl"] = sprintf('%s%semail=%s',$url,$sep,$email);
   $text["blacklisturl"] = sprintf('%s%semail=%s',$url,$sep,$email);
 
-  #0013076: Problem found during testing: mesage part must be parsed correctly as well.  
+  #0013076: Problem found during testing: message part must be parsed correctly as well.  
   if ($forwardContent) {
     $html["unsubscribe"] = $html["blacklist"];
     $text["unsubscribe"] = $text["blacklist"];
@@ -149,7 +149,7 @@ function sendEmail ($messageid,$email,$hash,$htmlpref = 0,$rssitems = array(),$f
   $url = getConfig("forwardurl");
   # make sure there are no newlines, otherwise they get turned into <br/>s
   $html["forwardform"] = sprintf('<form method="get" action="%s" name="forwardform" class="forwardform"><input type=hidden name="uid" value="%s" /><input type=hidden name="mid" value="%d" /><input type=hidden name="p" value="forward" /><input type=text name="email" value="" class="forwardinput" /><input name="Send" type="submit" value="%s" class="forwardsubmit"/></form>',$url,$hash,$messageid,$GLOBALS['strForward']);
-  $text["signature"] = "\n\n--\nPowered by PHPlist, www.phplist.com --\n\n";
+  $text["signature"] = "\n\n--\npowered by phpList, www.phplist.com --\n\n";
   $url = getConfig("preferencesurl");$sep = ereg('\?',$url)?'&':'?';
   $html["preferences"] = sprintf('<a href="%s%suid=%s">%s</a>',$url,$sep,$hash,$strThisLink);
   $text["preferences"] = sprintf('%s%suid=%s',$url,$sep,$hash);
@@ -278,13 +278,13 @@ function sendEmail ($messageid,$email,$hash,$htmlpref = 0,$rssitems = array(),$f
   $text["footer"] = eregi_replace("\[FORWARD\]",$text["forward"],$text["footer"]);
   $html["footer"] = eregi_replace("\[FORWARD\]",$html["forward"],$html["footer"]);
   $html["footer"] = eregi_replace("\[FORWARDFORM\]",$html["forwardform"],$html["footer"]);
+  $text["footer"] = eregi_replace("\[BLACKLIST\]",$text["blacklist"],$text['footer']);
+  $html["footer"] = eregi_replace("\[BLACKLIST\]",$html["blacklist"],$html['footer']);
   if (sizeof($forwardedby) && isset($forwardedby['email'])) {
     $htmlmessage    = eregi_replace("\[FORWARDEDBY]",$forwardedby["email"],$htmlmessage);
     $textmessage    = eregi_replace("\[FORWARDEDBY]",$forwardedby["email"],$textmessage);
     $html["footer"] = eregi_replace("\[FORWARDEDBY]",$forwardedby["email"],$html["footer"]);
     $text["footer"] = eregi_replace("\[FORWARDEDBY]",$forwardedby["email"],$text["footer"]);
-    $text["footer"] = eregi_replace("\[BLACKLIST\]",$text["blacklist"],$text['footer']);
-    $html["footer"] = eregi_replace("\[BLACKLIST\]",$html["blacklist"],$html['footer']);
     $text["footer"] = eregi_replace("\[UNSUBSCRIBE\]",$text["blacklist"],$text['footer']);
     $html["footer"] = eregi_replace("\[UNSUBSCRIBE\]",$html["blacklist"],$html['footer']);
   } else {
@@ -653,6 +653,8 @@ if (0) {
         if (ENABLE_RSS && sizeof($rssitems))
           updateRSSStats($rssitems,"ashtml");
       #  dbg("Adding HTML ".$cached[$messageid]["templateid"]);
+      ## wrap it: http://mantis.phplist.com/view.php?id=15528
+        $htmlmessage = wordwrap($htmlmessage, 60, "\r\n");
         $mail->add_html($htmlmessage,$textmessage,$cached[$messageid]["templateid"]);
         addAttachments($messageid,$mail,"HTML");
       } else {

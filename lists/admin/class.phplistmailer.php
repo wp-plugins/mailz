@@ -28,22 +28,21 @@ class PHPlistMailer extends PHPMailer {
       $this->addCustomHeader("X-Mailer: phplist v".VERSION);
       $this->addCustomHeader("X-MessageID: $messageid");
       $this->addCustomHeader("X-ListMember: $email");
-      $this->addCustomHeader("Precedence: bulk");
+#      $this->addCustomHeader("Precedence: bulk"); #http://mantis.phplist.com/view.php?id=15562
       $this->CharSet = getConfig("html_charset");
 
-      if (defined('PHPMAILERHOST') && PHPMAILERHOST != '' && isset($GLOBALS['phpmailer_smtpuser']) && $GLOBALS['phpmailer_smtpuser'] != '') {
-         $this->SMTPAuth = true;
-         $this->Helo = getConfig("website");
-         $this->Host = PHPMAILERHOST;
-
-         $this->Username = $GLOBALS['phpmailer_smtpuser'];
-         $this->Password = $GLOBALS['phpmailer_smtppassword'];
-         #  logEvent('Sending authenticated email via '.PHPMAILERHOST);
-
-         #  logEvent('Sending via smtp');
-         $this->Mailer = "smtp";
-      }
-      else{
+      if (defined('PHPMAILERHOST') && PHPMAILERHOST != '') {
+        //logEvent('Sending email via '.PHPMAILERHOST);
+        $this->Helo = getConfig("website");
+        $this->Host = PHPMAILERHOST;
+        if ( isset($GLOBALS['phpmailer_smtpuser']) && $GLOBALS['phpmailer_smtpuser'] != ''
+             && isset($GLOBALS['phpmailer_smtppassword']) && $GLOBALS['phpmailer_smtppassword']) {
+          $this->SMTPAuth = true;
+          $this->Username = $GLOBALS['phpmailer_smtpuser'];
+          $this->Password = $GLOBALS['phpmailer_smtppassword'];
+        }
+        $this->Mailer = "smtp";
+      } else{
          #  logEvent('Sending via mail');
          $this->Mailer = "mail";
       }
@@ -82,22 +81,21 @@ class PHPlistMailer extends PHPMailer {
     	$this->addTimeStamp($sTimeStamp);      
     }
     
-    
-    function add_text($text) {
+   function add_text($text) {
       if (!$this->Body) {
         $this->IsHTML(false);
-        $this->Body = html_entity_decode($text ,ENT_QUOTES, 'UTF-8' ); #$text;
+        $this->Body = html_entity_decode($text ,ENT_QUOTES, getConfig("text_charset") ); #$text;
 #        $this->Body = $text;
        } else {
-        $this->AltBody = html_entity_decode($text ,ENT_QUOTES, 'UTF-8' );#$text;
+        $this->AltBody = html_entity_decode($text ,ENT_QUOTES, getConfig("text_charset") );#$text;
       }
     }
 
     function append_text($text) {
       if ($this->AltBody) {
-        $this->AltBody .= html_entity_decode($text ,ENT_QUOTES, 'UTF-8' );#$text;
+        $this->AltBody .= html_entity_decode($text ,ENT_QUOTES, getConfig("text_charset") );#$text;
       } else {
-        $this->Body .= html_entity_decode($text ,ENT_QUOTES, 'UTF-8' );#$text;
+        $this->Body .= html_entity_decode($text."\n" ,ENT_QUOTES, getConfig("text_charset") );#$text;
       }
     }
 
@@ -183,7 +181,7 @@ class PHPlistMailer extends PHPMailer {
         sort($filesystem_images);
         for($i=0; $i<count($filesystem_images); $i++){
           if($image = $this->get_filesystem_image($filesystem_images[$i])){
-            $content_type = $this->image_types[substr($filesystem_images[$i], strrpos($filesystem_images[$i], '.') + 1)];
+            $content_type = $this->image_types[strtolower(substr($filesystem_images[$i], strrpos($filesystem_images[$i], '.') + 1))];
             $cid = $this->add_html_image($image, basename($filesystem_images[$i]), $content_type);
             $this->Body = str_replace(basename($filesystem_images[$i]), "cid:$cid", $this->Body);#@@@
           }

@@ -25,8 +25,8 @@
 global $Config ;
 if (isset($_SERVER["ConfigFile"]) && is_file($_SERVER["ConfigFile"])) {
   include $_SERVER["ConfigFile"];
-} elseif (is_file('../../../../../../../../config/config.php')) {
-  include "../../../../../../../../config/config.php";
+} elseif (is_file('../../../../../../config/config.php')) {
+  include "../../../../../../config/config.php";
 } else {
   SendError( 1, 'unable to load phplist config file' );
   print "Error, cannot find config file\n";

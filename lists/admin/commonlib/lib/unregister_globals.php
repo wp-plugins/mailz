@@ -27,4 +27,3 @@ function unregister_GLOBALS() {
 
 unregister_GLOBALS();
 
-?> 

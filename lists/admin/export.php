@@ -75,6 +75,9 @@ if (isset($_POST['process'])) {
         if (!ereg("sys",$val[1])) {
           print $val[1].$col_delim;
         } elseif (ereg("sysexp:(.*)",$val[1],$regs)) {
+          if ($regs[1] == 'ID') { # avoid freak Excel bug: http://mantis.phplist.com/view.php?id=15526
+            $regs[1] = 'id';
+          }
           print $regs[1].$col_delim;
         }
       }

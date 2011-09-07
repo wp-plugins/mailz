@@ -11,7 +11,7 @@ if (is_file(dirname(__FILE__) . '/../../../VERSION')) {
 	$version = "dev";
 }
 
-define("VERSION","2.10.11");
+define("VERSION","2.10.15");
 
 include_once dirname(__FILE__) . "/commonlib/lib/userlib.php";
 include_once dirname(__FILE__) . "/pluginlib.php";
@@ -91,7 +91,7 @@ $tables = array (
 	'userstats' => $table_prefix . 'userstats',
 	'bounceregex' => $table_prefix . 'bounceregex',
 	'bounceregex_bounce' => $table_prefix . 'bounceregex_bounce',
-	
+  'admintoken' => $table_prefix .'admintoken',
 );
 $domain = getConfig("domain");
 $website = getConfig("website");
@@ -130,11 +130,11 @@ function SaveConfig($item, $value, $editable = 1, $ignore_errors = 0) {
   We request you retain the $PoweredBy variable including the links.
   This not only gives respect to the large amount of time given freely
   by the developers  but also helps build interest, traffic and use of
-  PHPlist, which is beneficial to it's future development.
+  phpList, which is beneficial to it's future development.
 
   You can configure your PoweredBy options in your config file
 
-  Michiel Dethmers, Tincan Ltd 2001,2004
+  Michiel Dethmers, Tincan Ltd 2001,2004,2011
 */
 if (ereg("dev", VERSION))
 	$v = "dev";
@@ -156,7 +156,6 @@ a:hover.poweredphplist {color : #7D7B7B;}
     <span class="poweredphplist">powered by <a href="http://www.phplist.com" class="poweredphplist" target="_blank">phplist</a> v ' . $v . ', &copy; <a href="http://tincan.co.uk/powered" target="_blank" class="poweredphplist">tincan ltd</a></span>';
 if (!TEST && REGISTER) {
 	if (!PAGETEXTCREDITS) {
-		;
 		$PoweredBy = $PoweredByImage;
 	} else {
 		$PoweredBy = $PoweredByText;
@@ -196,8 +195,29 @@ function formStart($additional = "") {
 	    isset($p)?'<input type=hidden name="p" value="'.$p.'">':"")
 	    );
 	*/
+  $key = md5(time().mt_rand(0,10000));
+  Sql_Query(sprintf('insert into %s (adminid,value,entered,expires) values(%d,"%s",%d,date_add(now(),interval 1 hour))',
+    $GLOBALS['tables']['admintoken'],$_SESSION['logindetails']['id'],$key,time()));
+  $html .= sprintf('<input type="hidden" name="formtoken" value="%s" />',$key);
+  
 	return $html;
 }
+
+function verifyToken() {
+  if (empty($_POST['formtoken'])) {
+    return false;
+  }
+  $req = Sql_Fetch_Row_Query(sprintf('select id from %s where adminid = %d and value = "%s" and expires > now()',
+    $GLOBALS['tables']['admintoken'],$_SESSION['logindetails']['id'],sql_escape($_POST['formtoken'])));
+  if (empty($req[0])) {
+    return false;
+  }
+  Sql_Query(sprintf('delete from %s where id = %d',
+    $GLOBALS['tables']['admintoken'],$req[0]));
+  Sql_Query(sprintf('delete from %s where expires < now()',
+    $GLOBALS['tables']['admintoken']));
+  return true;
+}  
 
 function checkAccess($page) {
 	global $tables;
@@ -231,7 +251,7 @@ function sendMessageStats($msgid) {
 		$stats_collection_address = 'phplist-stats@tincan.co.uk';
 	}
 	$data = Sql_Fetch_Array_Query(sprintf('select * from %s where id = %d', $tables["message"], $msgid));
-	$msg .= "PHPlist version " . VERSION . "\n";
+	$msg .= "phpList version " . VERSION . "\n";
 	$diff = timeDiff($data["sendstart"], $data["sent"]);
 
 	if ($data["id"] && $data["processed"] > 10 && $diff != "very little time") {
@@ -253,9 +273,9 @@ function sendMessageStats($msgid) {
 			$msg .= "\n" . $item . ' => ' . $data[$item];
 		}
 		if ($stats_collection_address == 'phplist-stats@tincan.co.uk' && $data["processed"] > 500) {
-			mail($stats_collection_address, "PHPlist stats", $msg);
+			mail($stats_collection_address, "phpList stats", $msg);
 		} else {
-			mail($stats_collection_address, "PHPlist stats", $msg);
+			mail($stats_collection_address, "phpList stats", $msg);
 		}
 	}
 }
@@ -267,7 +287,7 @@ function normalize($var) {
 }
 
 function ClineSignature() {
-	return "PHPlist version " . VERSION . " (c) 2000-" . date("Y") . " Tincan Ltd, http://www.phplist.com\n";
+	return "phpList version " . VERSION . " (c) 2000-" . date("Y") . " phpList Ltd, http://www.phplist.com\n";
 }
 
 function ClineError($msg) {
@@ -472,7 +492,8 @@ function newMenu() {
 	if (sizeof($GLOBALS["plugins"])) {
 		$html .= $spb . "<hr/>" . $spe;
 		foreach ($GLOBALS["plugins"] as $pluginName => $plugin) {
-			$html .= $spb . PageLink2("main&pi=$pluginName", $pluginName) . $spe;
+      $pluginDesc = $plugin->name;      
+			$html .= $spb . PageLink2("main&pi=$pluginName", $pluginDesc) . $spe;
 		}
 	}
 
@@ -939,7 +960,7 @@ $newpoweredimage = 'iVBORw0KGgoAAAANSUhEUgAAAEYAAAAeCAMAAACmLZgsAAADAFBMVEXYx6fm
 
 function FileNotFound() {
 	ob_end_clean();
-	header("404, File Not Found");
+	header("HTTP/1.0 404 File Not Found");
 	printf('<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1>The requested document was not found on this server<br/>Please contact the <a href="mailto:%s?subject=File not Found: %s">Administrator</a><p><hr><address><a href="http://tincan.co.uk/phplist" target="_tincan">phplist</a> version %s</address></body></html>', getConfig("admin_address"), $_SERVER["REQUEST_URI"], VERSION);
 	exit;
 }
@@ -1128,17 +1149,19 @@ function cleanArray($array) {
   return $result;
 }
 
-#function cleanCommaList($list) {
-#  return join(',',cleanArray(split(',',$list)));
-#}
-
 function cleanCommaList($list) {
-   foreach ($list as $key=>$value) {
-      if(!$value) {
-         array_splice($list, $key, 1);  //Remove null value from array
-      }
-   }
-  return $list;
+  return join(',',cleanArray(split(',',$list)));
+}
+
+function cleanCommaList2($sList) {
+  if (!strpos($sList,',')) return $sList;
+  $aList = explode(',',$sList);
+  foreach ($aList as $key=>$value) {
+    if(!$value) {
+       array_splice($aList, $key, 1);  //Remove null value from array
+    }
+  }
+  return join(',',$aList);
 }
 
 
@@ -1156,7 +1179,7 @@ function phplist_shutdown() {
 	#  output( "Script status: ".connection_status(),0); # with PHP 4.2.1 buggy. http://bugs.php.net/bug.php?id=17774
 	$status = connection_status();
 	if ($GLOBALS["mail_error_count"]) {
-		$message = "Some errors occurred in the PHPlist Mailinglist System\n" .
+		$message = "Some errors occurred in the phpList Mailinglist System\n" .
 		"URL: {$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}\n" .
 		"Error message(s):\n\n" .
 

@@ -37,24 +37,6 @@ function zing_mailz_install() {
 	}
 }
 
-function zing_mailz_remove() {
-	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
-
-	if ($_GET['action']!='remove') {
-		$message='<p>Are you sure you want to uninstall this plugin? If so click, please confirm by clicking the button below.</p><br />';
-		$message.='<a href="admin.php?page=mailz-uninstall&action=remove" class="button">Uninstall</a><br />';
-		zing_mailz_cp($message);
-	} else {
-		zing_mailz_uninstall();
-		foreach ($zing_mailz_options as $value) {
-			delete_option( $value['id'] );
-			update_option( $value['id'], $value['std'] );
-		}
-		header("Location: admin.php?page=mailz_cp&uninstalled=true");
-		exit();
-	}
-}
-
 function zing_mailz_admin_menu() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
 	global $zing_mailz_content;
@@ -62,7 +44,6 @@ function zing_mailz_admin_menu() {
 
 	$zing_mailz_version=get_option("zing_mailz_version");
 
-	if ($_GET['action']=='remove' && $_GET['page']=='mailz_cp') zing_mailz_remove();
 	if ($_GET['action']=='install' && $_GET['page']=='mailz_cp') zing_mailz_install();
 	
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
@@ -85,9 +66,7 @@ function zing_mailz_admin_menu() {
 			}
 			$first=false;
 		}
-		add_submenu_page('mailz_cp', $zing_mailz_name.'- Import', 'Import', 'administrator', 'mailz-import', 'zing_mailz_import');
 		if ($zing_mailz_version != ZING_MAILZ_VERSION) add_submenu_page('mailz_cp', $zing_mailz_name.'- Upgrade', 'Upgrade', 'administrator', 'mailz-upgrade', 'zing_mailz_upgrade');
-		if ($zing_mailz_version) add_submenu_page('mailz_cp', $zing_mailz_name.'- Uninstall', 'Uninstall', 'administrator', 'mailz-uninstall', 'zing_mailz_remove');
 	} else {
 		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_install');
 		add_submenu_page('mailz_cp', $zing_mailz_name.'- Install', 'Install', 'administrator', 'mailz_cp', 'zing_mailz_install');
@@ -98,7 +77,6 @@ function zing_mailz_admin() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
 
 	if ( $_REQUEST['installed'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
-	if ( $_REQUEST['uninstalled'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' uninstalled.</strong></p></div>';
 
 	$zing_mailz_version=get_option("zing_mailz_version");
 
@@ -136,4 +114,4 @@ check out our <a href="http://zingiri.net/forums/">support forums</a>.</p>
 <?php
 }
 
-add_action('admin_menu', 'zing_mailz_admin_menu'); ?>
+add_action('admin_menu', 'zing_mailz_admin_menu', 10); ?>

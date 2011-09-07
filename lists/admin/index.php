@@ -1,5 +1,4 @@
 <?php
-
 @ob_start();
 $er = error_reporting(0);
 # check for commandline and cli version
@@ -102,6 +101,14 @@ if ($GLOBALS["commandline"]) {
     clineUsage(" [other parameters]");
     exit;
   }
+} else {
+  if (CHECK_REFERRER && isset($_SERVER['HTTP_REFERER'])) {
+    ## do a crude check on referrer. Won't solve everything, as it can be faked, but shouldn't hurt
+    $ref = parse_url($_SERVER['HTTP_REFERER']);
+    if ($ref['host'] != $_SERVER['HTTP_HOST'] && !in_array($ref['host'],$allowed_referrers)) {
+      print 'Access denied';exit;
+    }
+  }
 }
 
 # fix for old PHP versions, although not failsafe :-(
@@ -181,7 +188,10 @@ if (isset($GLOBALS["require_login"]) && $GLOBALS["require_login"]) {
       }
     }
   } elseif (isset($_REQUEST["forgotpassword"])) {
-    $pass = $GLOBALS["admin_auth"]->getPassword($_REQUEST["forgotpassword"]);
+    $pass = '';
+    if (is_email($_REQUEST["forgotpassword"])) {
+      $pass = $GLOBALS["admin_auth"]->getPassword($_REQUEST["forgotpassword"]);
+    } 
     if ($pass) {
       sendMail ($_REQUEST["forgotpassword"],$GLOBALS['I18N']->get('yourpassword'),"\n\n".$GLOBALS['I18N']->get('yourpasswordis')." $pass");
       $msg = $GLOBALS['I18N']->get('passwordsent');
@@ -223,7 +233,7 @@ if ($page != '') {
   $include = "home.php";
 }
 
-print '<h2 class="leaftitle">'.NAME.' - '.strtolower($page_title).'</h2>';
+print '<p class="leaftitle">'.NAME.' - '.strtolower($page_title).'</p>';
 
 if ($GLOBALS["require_login"] && $page != "login") {
   if ($page == 'logout') {
@@ -268,10 +278,14 @@ if ($page != "login") {
       print Info("Running CVS version, but developer email is not set");
     }
   }
+  if (TEST) {
+    print Info($GLOBALS['I18N']->get('Running in testmode, no emails will be sent. Check your config file.'));
+  }
+
   if (ini_get("register_globals") == "on" && WARN_ABOUT_PHP_SETTINGS) {
     Error($GLOBALS['I18N']->get('It is safer to set Register Globals in your php.ini to be <b>off</b> instead of ').ini_get("register_globals") );
   }
-  if (ini_get("safe_mode") && WARN_ABOUT_PHP_SETTINGS)
+  if (((bool)ini_get("safe_mode") === true ) && WARN_ABOUT_PHP_SETTINGS)
     Warn($GLOBALS['I18N']->get('safemodewarning'));
 
     /* this needs checking 
@@ -302,6 +316,7 @@ if (isset($_GET['page']) && $_GET['page'] == 'about') {
 if (is_file("info/".$_SESSION['adminlanguage']['info']."/$include")) {
   @include "info/".$_SESSION['adminlanguage']['info']."/$include";
 } else {
+  @include "info/en/$include";
 #  print "Not a file: "."info/".$adminlanguage["info"]."/$include";
 }
 
@@ -400,7 +415,7 @@ if (isset($GLOBALS["commandline"]) && $GLOBALS["commandline"]) {
   exit;
 } elseif (!isset($_GET["omitall"])) {
   if (!$GLOBALS['compression_used']) {
-    ob_end_flush();
+    @ob_end_flush();
   }
   include_once "footer.inc";
 }

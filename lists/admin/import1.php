@@ -175,6 +175,8 @@ if(isset($_REQUEST['import'])) {
     }
 
     while (list($email,$data) = each ($user_list)) {
+      ## a lot of spreadsheet include those annoying quotes
+      $email = str_replace('"', '', $email);      
       $done++;
       if ($done % 50 ==0) {
         print "$done/$todo<br/>";
@@ -219,9 +221,13 @@ if(isset($_REQUEST['import'])) {
 
           # add the attributes for this user
           reset($attributes);
-          while (list($attr,$value) = each($attributes))
+          while (list($attr,$value) = each($attributes)) {
+            if (is_array($value)) {
+                $value=join(',',$value);
+            }
             Sql_query(sprintf('replace into %s (attributeid,userid,value) values("%s","%s","%s")',
               $tables["user_attribute"],$attr,$userid,addslashes($value)));
+          }
         }
 
         #add this user to the lists identified
