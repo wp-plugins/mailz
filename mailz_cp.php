@@ -42,7 +42,7 @@ function zing_mailz_admin_menu() {
 	global $zing_mailz_content;
 	global $zing_mailz_menu;
 
-	require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
+	if (!class_exists('simple_html_dom_node')) require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 	
 	$zing_mailz_version=get_option("zing_mailz_version");
 

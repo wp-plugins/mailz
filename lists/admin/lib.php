@@ -13,7 +13,10 @@ if (!defined("ENABLE_RSS")) define("ENABLE_RSS",0);
 if (!defined("ALLOW_ATTACHMENTS")) define("ALLOW_ATTACHMENTS",0);
 if (!defined("EMAILTEXTCREDITS")) define("EMAILTEXTCREDITS",0);
 if (!defined("PAGETEXTCREDITS")) define("PAGETEXTCREDITS",0);
-if (!defined("USEFCK")) define("USEFCK",0);
+//if (!defined("USEFCK")) define("USEFCK",0);
+//zingiri
+if (!defined('USEFCK')) define('USEFCK',getConfig('fckeditor_active'));
+
 if (!defined("ASKFORPASSWORD")) define("ASKFORPASSWORD",0);
 if (!defined("UNSUBSCRIBE_REQUIRES_PASSWORD")) define("UNSUBSCRIBE_REQUIRES_PASSWORD",0);
 if (!defined("UNSUBSCRIBE_JUMPOFF")) define("UNSUBSCRIBE_JUMPOFF",0);

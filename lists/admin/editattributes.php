@@ -3,10 +3,7 @@ require_once dirname(__FILE__).'/accesscheck.php';
 
 # $Id: editattributes.php,v 1.3.4.3 2007-07-16 19:18:14 basovink Exp $
 
-//zingiri
-//$id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0;
-$id = !empty($_REQUEST['id']) ? sprintf('%d',$_REQUEST['id']) : 0;
-
+$id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0;
 ob_end_flush();
 function adminMenu() {
   global $adminlevel,$config;

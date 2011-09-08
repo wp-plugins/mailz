@@ -2,9 +2,8 @@
 
 require_once 'accesscheck.php';
 
-//zingiri
-if (!empty($_REQUEST['id'])) {
-  $id = sprintf('%d',$_REQUEST["id"]);
+if (!empty($_GET['id'])) {
+  $id = sprintf('%d',$_GET["id"]);
 } else {
   $id = 0;
 }

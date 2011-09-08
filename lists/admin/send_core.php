@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/accesscheck.php';
 
 #initialisation###############
 
+echo 'fck='.USEFCK;
 // Verify that FCKeditor is available
 if (USEFCK && file_exists("./FCKeditor/fckeditor.php")) {
   include("./FCKeditor/fckeditor.php") ;
@@ -52,9 +53,8 @@ if (isset($_POST['prepare'])) {
 } else {
   $prepare = '';
 }
-//zingiri
-if (isset($_REQUEST['id'])) {
-  $id = sprintf('%d',$_REQUEST["id"]);  // Only get this from the GET variable
+if (isset($_GET['id'])) {
+  $id = sprintf('%d',$_GET["id"]);  // Only get this from the GET variable
 } else {
   $id = 0;
 }
@@ -95,7 +95,7 @@ ob_end_flush();
 #if (((!$send) && (!$save) && (!$sendtest)) && ($id)) {
 if ($id) {
   // Load message attributes / values
-	
+
   require $GLOBALS["coderoot"] . "structure.php";  // This gets the database structures into DBStruct
 
   $result = Sql_query("SELECT * FROM {$tables["message"]} where id = $id $ownership");
@@ -1045,7 +1045,7 @@ if (!$done) {
 
   $maincontent .= '
   <tr><td>'.Help("subject").' '.$GLOBALS['I18N']->get("Subject").':</td>
-    <td><input type=text name="msgsubject"
+    <td><input type=text id="title" name="msgsubject"
     value="'.htmlentities($utf8_subject,ENT_QUOTES,'UTF-8').'" size=40></td></tr>
   <tr>
     <td colspan=2>
@@ -1228,7 +1228,12 @@ if (!$done) {
         ."<textarea name='message' id='message' cols='65' rows='20'>{$_POST['message']}</textarea>";
         
   } else {
-    $maincontent    .= '<textarea name=message cols=65 rows=20>'.htmlspecialchars($_POST["message"]).'</textarea>';
+    $maincontent    .= '<textarea class="theEditor" id="content" name=message cols=65 rows=20>'.htmlspecialchars($_POST["message"]).'</textarea>';
+    
+    $maincontent.='<script type="text/javascript">';
+	$maincontent.="edCanvas = document.getElementById('content');";
+	$maincontent.='</script>';
+    
   }
 
   #0013076: different content when forwarding 'to a friend'

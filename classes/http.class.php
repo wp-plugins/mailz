@@ -1,5 +1,5 @@
 <?php
-//v0.9
+//v0.10
 //removed cc_whmcs_log call
 //need wpabspath for mailz
 //mailz returns full URL in case of redirection!!
@@ -8,6 +8,7 @@
 //fixed issue with redirection location string 
 //added support for content-type
 //fixed issue with $this->$headers wrong, should be $this->headers
+//fixed issue with handling of $repost
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -317,7 +318,7 @@ if (!class_exists('zHttpRequest')) {
 				elseif (strstr($redir,'?')) $redir.='&';
 				else $redir.='?';
 				$redir.='wpabspath='.urlencode(ABSPATH);
-				if (!$this->repost) $this->post=array();
+				if ($this->repost) $this->post=array();
 				$this->countRedirects++;
 				if ($this->countRedirects < 10) {
 					if ($redir != $url) {

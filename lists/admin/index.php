@@ -1,4 +1,5 @@
 <?php
+
 @ob_start();
 $er = error_reporting(0);
 # check for commandline and cli version
@@ -77,6 +78,8 @@ include_once dirname(__FILE__)."/languages.php";
 include_once dirname(__FILE__)."/lib.php";
 require_once dirname(__FILE__)."/commonlib/lib/interfacelib.php";
 include_once dirname(__FILE__)."/pagetop.php";
+
+
 
 if ($GLOBALS["commandline"]) {
   if (!isset($_SERVER["USER"]) && sizeof($GLOBALS["commandline_users"])) {

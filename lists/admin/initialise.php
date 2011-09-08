@@ -30,6 +30,7 @@ while (list($table, $val) = each($DBstruct)) {
   # get rid of the last ,
   $query = substr($query,0,-1);
   $query .= "\n)";
+
   # submit it to the database
   echo $GLOBALS['I18N']->get("Initialising table")." <b>$table</b>";
   if ($force && Sql_Table_Exists($tables[$table])) {

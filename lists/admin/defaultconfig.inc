@@ -14,38 +14,12 @@ $defaultheader = '
 <body bgcolor="#ffffff">
 <a name="top"></a>
 <div align=center>
-<table cellspacing=0 cellpadding=0 width=710 border=0>
-
-<tr>
-<td bgcolor="#000000" rowspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=708 border=0></td>
-<td bgcolor="#000000" rowspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-</tr>
+<table cellspacing=0 cellpadding=0 width="100%" border=0>
 
 <tr valign="top">
 <td>
 <!--TOP TABLE starts-->
 <table cellspacing=0 cellpadding=0 width=708 border="0" bgcolor="#ffffff">
-
-<tr valign="top">
-<td height="41" background="images/top01.png" colspan="2">
-<span class="phphead"><a href="http://www.phplist.com" class="phphead"><b>PHP</b>list</a></span></td>
-<td background="images/top02.png" align="left">
-<font size="-2">&nbsp;<i>powered by:
-</i><br />&nbsp;<b>[<a class="powered" href="http://www.php.net/" target="_new"><i>PHP</i></a>]</b> + <b>[<a class="powered" href="http://www.mysql.com/" target="_new">mySQL</a>]</b></font></td>
-</tr>
-
-<tr valign="bottom">
-<td><img src="images/top03a.png" width=20 height=34 alt="" border="0"></td>
-<td background="images/top03b.png" height="34"><!--hello <b>ben</b>:&nbsp;<a class="urhere" href="">you are here &gt; main admin</a>-->
-<td width="132" valign="bottom" background="images/top04.png"><span class="webblermenu">phplist</span></td>
-</tr>
-
-<tr>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=20 border=0></td>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=576 border=0></td>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=132 border=0></td>
-</tr>
 
 <tr valign="top">
 <td>&nbsp;</td>
@@ -68,29 +42,6 @@ $defaultfooter = '
 <!-- main page content-->
 
 <!-- end of main page content--><!-- bottom black line-->
-<tr>
-<td bgcolor="#000000" colspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-</tr>
-
-<tr>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-<td bgcolor="#ff9900" class="bottom">&copy; <a href="http://tincan.co.uk" target="_tincan" class="urhere">tincan limited</a> | <a class="urhere" href="http://www.phplist.com" target="_blank">phplist</a></td>
-<td bgcolor="#000000"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-</tr>
-
-<tr>
-<td bgcolor="#000000" colspan=3><img height=1 alt="" src="images/transparent.png" width=1 border=0></td>
-</tr>
-
-<tr>
-<td colspan=3><img height=3 alt="" src="images/transparent.png" width=1 border=0></td>
-</tr>
-
-<tr>
-<td colspan=3>
-&nbsp;
-</td>
-</tr>
 </tbody>
 </table>
 
@@ -248,7 +199,7 @@ $default_config = array (
   #0013076: Blacklisting posibility for unknown users
   # the location of your blacklist script:
 "blacklisturl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=blacklist",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=blacklist$wpindex",
   "URL where unknown users can unsubscribe (blacklist)",
   "text"
 ),
@@ -269,7 +220,7 @@ $default_config = array (
 
   # url to change their preferences
 "forwardurl" => array (
-  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=forward",
+  $GLOBALS['scheme'] . "://[WEBSITE]$pageroot/?p=forward$wpindex",
   "URL where messages can be forwarded",
   "text"
 ),
@@ -579,6 +530,11 @@ if (defined("ENABLE_RSS") && ENABLE_RSS) {
 }
 
 #if (USEFCK) {
+$default_config["fckeditor_active"] = array (
+	0,
+	"FCKeditor Active",
+	"text"
+);
 $default_config["fckeditor_width"] = array (
 	600,
 	"Width in px of FCKeditor Area",

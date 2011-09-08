@@ -17,7 +17,6 @@ if (!function_exists('zing_support_us')) {
 <div style="width:20%;float:right;position:relative">
 	<div class="cc-support-us">
 		<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
-		<h3>Support Us</h3>
 		<p>If you like this plugin, please share it with your friends</p>
 		<div style="align:center;margin-bottom:15px;text-align:center">
 			<a style="margin-bottom:15px" href="http://www.twitter.com/zingiri"><img align="middle" src="http://twitter-badges.s3.amazonaws.com/follow_us-a.png" alt="Follow Zingiri on Twitter"/></a>
@@ -29,23 +28,25 @@ if (!function_exists('zing_support_us')) {
 		<a href="http://wordpress.org/extend/plugins/mailz" alt="Rate our plugin"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"><img height="35px" src="<?php echo ZING_MAILZ_URL;?>stars.png"></img></a>
 		<?php echo zing_support_us('mailz_cp');?>
 	</div>
-	<div class="cc-support-us">
-		<h3>Discover Mailing List Pro</h3>
-		<p>Mailing List Pro is an extension to the Mailings List plugin taking the integration with Wordpress to a new level.<br />
-		With Mailing List Pro you can
-			upload your WP users to Mailing List and attach them to your chosen Mailing List,
-			auto signup new blog users to a chosen Mailing List and
-			auto create a Mailing List message when creating a new post.
-		</p>   
-		<a href="http://www.clientcentral.info/cart.php?a=add&pid=113" target="_blank"><img src="<?php echo ZING_MAILZ_URL;?>images/buy_now.png" /></a>		
-		<p><strong style="color:green;font-size:large">$19.95</strong>/year.</p>
-	</div>
-	<div class="cc-support-us">
-		<h3>Unlimited Hosting</h3>
-		<p>Every month we offer a handful of unlimited hosting packages at an exceptional low price to our plugin users.<br />The packages are made available on a first come, first served basis, so don't wait too long beforing ordering yours!</p>   
-		<a href="http://www.clientcentral.info/cart.php?a=add&pid=114" target="_blank"><img src="<?php echo ZING_MAILZ_URL;?>images/home.png" /></a>		
-		<p><strong style="color:red;font-size:large">$2.95</strong>/month.</p>
-	</div>
+	<?php 	
+	global $current_user;
+	$url='http://www.zingiri.net/index.php?zlistpro=register&e='.urlencode($current_user->data->user_email).'&f='.urlencode($current_user->data->first_name).'&l='.urlencode($current_user->data->last_name).'&w='.urlencode(get_option('home')).'&p=mailz'.'&v='.urlencode(ZING_MAILZ_VERSION);
+	$news = new zHttpRequest($url);
+	if ($news->live() && !$_SESSION['zing_mailz_session']['news']) {
+		update_option('zing_mailz_news',$news->DownloadToString());
+		$_SESSION['zing_mailz_session']['news']=true;
+	}
+	?>
+	<?php
+	//echo get_option('zing_mailz_news');
+	$data=json_decode(get_option('zing_mailz_news'));
+	foreach ($data as $rec) { ?>
+		<div class="cc-support-us">
+		<h3><?php echo $rec->title;?></h3>
+		<?php echo $rec->content;?>
+		</div>
+	<?php }
+	?>
 
 	<div style="text-align:center;margin-top:40px">
 		<a href="http://www.zingiri.net" target="_blank"><img src="http://www.zingiri.net/logo.png" /></a>

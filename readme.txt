@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.net/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 
 Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
 
@@ -64,14 +64,30 @@ Don't forget to take a database backup before you upgrade!
 
 == Other ==
 Fixes applied in PHPlists:
-* admin/editlist.php: replaced $_GET['id'] with $_REQUEST['id'];
-* admin/editattributes.php: replaced $id = !empty($_GET['id']) ? sprintf('%d',$_GET['id']) : 0; with $id = sprintf('%d',$_REQUEST['id']);
-* admin/spagedit.php: replaced $_GET['id'] by $_REQUEST['id']
 * admin/connect.php: added a class to "Powered by" image
 * index.php: moved hardcoded styling for div.adminmessage to zing.css
-* config/config.php: defined NAME as "Mailing List"
+* config/config.php: various changes
+* admin/defaultconfig.inc: modified default links for mailing list messages (unsubscribe, etc)
+* admin/FCKEditor/editor/fckeditor.html: changed location of Loadscript
+* admin/FCKEditor: fixed bug in phplist where phpxml tags are used instead of xml tags
+* admin/header.inc: modified look and feel
+* admin/styles/phplist.css: adapted styles to fit with Wordpress
+* config/config.php: disabled Test mode
+* config/header.inc: modified look and feel
+* config/footer.inc: modified look and feel
+* styles/phplist.css: adapted styles to fit with Wordpress
 
 == Changelog ==
+
+= 1.3.2 =
+* Fixed issue with 'No access' message being displayed when updating configuration and users
+* Fixed issue in phplist with handling of GET and POST variables
+* Corrected default blacklist and forward URL's at first installation
+* Updated Support Us page
+* Minor styling improvements
+* Fixed issue with FCK Editor not loading in some cases
+* Defaulted to Wordpress Tiny MCE editor instead of FCK Editor
+* Added option to activate FCK Editor in phplist configuration page
 
 = 1.3.1 =
 * Fixed issue with Mailing List plugin deleting tables of the Zingiri Web Shop plugin upon uninstall

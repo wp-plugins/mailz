@@ -544,7 +544,8 @@ define("MANUALLY_PROCESS_RSS",1);
 # the FCKeditor is now included in PHPlist, but the use of it is experimental
 # if it's not working for you, set this to 0
 # NOTE: If you enable TinyMCE please disable FCKeditor and vice-versa.
-define("USEFCK",1);
+//zingiri: part of the configuration menu
+//define("USEFCK",0);
 
 # If you want to upload images to the FCKeditor, you need to specify the location
 # of the directory where the images go. This needs to be writable by the webserver,
@@ -762,6 +763,10 @@ if ( isset($_GET['wpabspath']) ) {
 	$pageroot = '';
 	$adminpages = '/wp-content/plugins/mailz/lists/admin';//$_GET['wpsiteurl'].'/wp-admin/options-general.php';
 	$wpindex='&zlist=index&page_id='.$_GET['wppageid'];
+
+	//fixes
+	if (isset($_POST['id']) && !isset($_GET['id'])) $_GET['id']=$_POST['id'];
+	
 }
 
 ?>
