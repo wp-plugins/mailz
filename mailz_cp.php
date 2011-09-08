@@ -42,6 +42,8 @@ function zing_mailz_admin_menu() {
 	global $zing_mailz_content;
 	global $zing_mailz_menu;
 
+	require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
+	
 	$zing_mailz_version=get_option("zing_mailz_version");
 
 	if ($_GET['action']=='install' && $_GET['page']=='mailz_cp') zing_mailz_install();

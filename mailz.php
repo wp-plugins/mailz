@@ -4,14 +4,14 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.0
+ Version: 1.3.1
  Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("ZING_MAILZ_VERSION","1.3.0");
+define("ZING_MAILZ_VERSION","1.3.1");
 define("ZING_MAILZ_PREFIX","zing_");
 
 $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -70,15 +70,14 @@ if ($zing_mailz_version) {
 	add_action('wp_head','zing_mailz_head');
 	add_action('admin_head','zing_mailz_admin_head');
 	add_action('wp_head','zing_mailz_header');
+	add_action('admin_notices','zing_mailz_notices');
 }
-add_action('admin_notices','zing_mailz_notices');
 
 register_activation_hook(__FILE__,'zing_mailz_activate');
 register_deactivation_hook(__FILE__,'zing_mailz_deactivate');
 require_once(dirname(__FILE__) . '/includes/index.php');
 require_once(dirname(__FILE__) . '/classes/index.php');
 require_once(dirname(__FILE__) . '/mailz_cp.php');
-require_once(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 
 function zing_mailz_notices() {
 	$zing_mailz_version=get_option("zing_mailz_version");
@@ -93,6 +92,8 @@ function zing_mailz_notices() {
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz-upgrade">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
 
+	if (get_option('activation-output')) $warnings[]='An error occured during activation:<br /><div style="background-color:white">'.get_option('activation-output').'</div>';
+
 	if (count($warnings)>0) {
 		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
 		foreach ($warnings as $message) {
@@ -101,6 +102,13 @@ function zing_mailz_notices() {
 		echo "</div>";
 	}
 }
+
+
+function zing_activation_output($buffer) {
+	update_option('activation-output',$buffer);
+	if ($buffer) die();
+}
+
 /**
  * Activation: creation of database tables & set up of pages
  * @return unknown_type
@@ -110,10 +118,19 @@ function zing_mailz_activate() {
 	global $current_user;
 	global $zing_mailz_options;
 
+
+	if ($_REQUEST['action']=='error_scrape') {
+		echo get_option('activation-output');
+		return;
+	}
+
+
+	update_option('activation-output','');
 	$wpdb->show_errors();
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 	$zing_mailz_version=get_option("zing_mailz_version");
-	update_option("zing_mailz_version",ZING_MAILZ_VERSION);
+
+	ob_start('zing_activation_output');
 
 	//create standard pages
 	if ($zing_mailz_version <= '0.1') {
@@ -146,13 +163,13 @@ function zing_mailz_activate() {
 
 	//create database tables
 	if (!$zing_mailz_version) {
-		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'initialise','firstintall'=>1));
+		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'initialise','firstintall'=>1));
 		$news = new zHttpRequest($http,'mailz');
 		if ($news->live()) {
 			$output=$news->DownloadToString();
 		}
 	} else {
-		$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'upgrade','doit'=>'yes'));
+		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'upgrade','doit'=>'yes'));
 		$news = new zHttpRequest($http,'mailz');
 		if ($news->live()) {
 			$output=$news->DownloadToString();
@@ -170,10 +187,15 @@ function zing_mailz_activate() {
 	$wpdb->query($query);
 
 	//default options
-	foreach ($zing_mailz_options as $value) {
-		delete_option( $value['id'] );
-		if ( !empty($value['id']) && !get_option($value['id']) ) update_option( $value['id'], $value['std'] );
+	if (count($zing_mailz_options) > 0) {
+		foreach ($zing_mailz_options as $value) {
+			delete_option( $value['id'] );
+			if ( !empty($value['id']) && !get_option($value['id']) ) update_option( $value['id'], $value['std'] );
+		}
 	}
+
+	update_option("zing_mailz_version",ZING_MAILZ_VERSION);
+
 }
 
 /**
@@ -193,13 +215,11 @@ function zing_mailz_uninstall() {
 	global $wpdb;
 
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
-	$rows=$wpdb->get_results("show tables like '".$prefix."%'",ARRAY_N);
+	$rows=$wpdb->get_results("show tables like '".$prefix."phplist_%'",ARRAY_N);
 	if (count($rows) > 0) {
 		foreach ($rows as $id => $row) {
-			if (strpos($row[0],'_mybb_')===false && strstr($row[0],'_ost_')===false) {
-				$query="drop table ".$row[0];
-				$wpdb->query($query);
-			}
+			$query="drop table ".$row[0];
+			$wpdb->query($query);
 		}
 	}
 	$ids=get_option("zing_mailz_pages");
@@ -362,11 +382,14 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$http=ZING_PHPLIST_URL.'/';
 	$http.= $to_include;
 	$and="";
-	
+
+	$unload=array("_wpnonce","zlist","zpage","page_id","zscp","zlistpage","page","action","plugin");
+
 	$get=array_merge($_GET,$get);
+
 	if (count($get) > 0) {
 		foreach ($get as $n => $v) {
-			if ($n!="zlist" && $n!="zpage" && $n!="page_id" && $n!="zscp" && $n!="zlistpage" && $n!="page") {
+			if (!in_array($n,$unload)) {
 				$vars.= $and.$n.'='.zing_urlencode($v);
 				$and="&";
 			} elseif ($n=="zlistpage" && $v !== null) {
@@ -375,14 +398,6 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 			}
 		}
 	}
-	/*
-	if (count($get) > 0) {
-		foreach ($get as $n => $v) {
-			$vars.= $and.$n.'='.zing_urlencode($v);
-			$and="&";
-		}
-	}
-	*/
 
 	$vars.=$and.'wpabspath='.urlencode(ABSPATH);
 	$vars.='&wppageid='.zing_mailz_mainpage();
@@ -527,7 +542,7 @@ function zing_mailz_cron() {
 	$post['login']='admin';
 	$post['password']=get_option('zing_mailz_password');
 
-	$http=zing_mailz_http("phplist",'admin/index.php',array('page'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
+	$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'processqueue','user'=>'admin','password'=>get_option('zing_mailz_password')));
 
 	$news = new zHttpRequest($http,'mailz');
 	$news->post=$post;
@@ -544,4 +559,4 @@ if (!wp_next_scheduled('zing_mailz_cron_hook')) {
 	wp_schedule_event( time(), 'hourly', 'zing_mailz_cron_hook' );
 }
 add_action('zing_mailz_cron_hook','zing_mailz_cron');
-?>
+

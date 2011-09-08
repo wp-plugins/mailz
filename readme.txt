@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.net/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 
 Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
 
@@ -72,6 +72,11 @@ Fixes applied in PHPlists:
 * config/config.php: defined NAME as "Mailing List"
 
 == Changelog ==
+
+= 1.3.1 =
+* Fixed issue with Mailing List plugin deleting tables of the Zingiri Web Shop plugin upon uninstall
+* Changed load of simplehtmldom script
+* Fixed issues with plugin activation 
 
 = 1.3.0 =
 * Upgraded phplists to version 2.10.15
