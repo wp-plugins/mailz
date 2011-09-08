@@ -47,21 +47,6 @@ if (!function_exists('zing_support_us')) {
 		<p><strong style="color:red;font-size:large">$2.95</strong>/month.</p>
 	</div>
 
-	<div class="cc-support-us">
-	<?php 	
-	$url='http://www.zingiri.com/news.php?e='.urlencode(get_option('admin_email')).'&w='.urlencode(get_option('home')).'&a='.get_option("zing_ws_install").'&v='.urlencode(ZING_MAILZ_VERSION);
-	//echo $url;
-	$news = new zHttpRequest($url);
-	//if ($news->live() && !$_SESSION['zing_mailz_session']['news']) {
-	if ($news->live()) {
-		update_option('zing_mailz_news',$news->DownloadToString());
-		$_SESSION['zing_mailz_session']['news']=true;
-	}
-	echo '<h3>Latest news</h3>';
-	echo get_option('zing_mailz_news');
-	echo '</div>';
-	?>
-	</div>
 	<div style="text-align:center;margin-top:40px">
 		<a href="http://www.zingiri.net" target="_blank"><img src="http://www.zingiri.net/logo.png" /></a>
 	</div>
