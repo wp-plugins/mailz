@@ -4,14 +4,14 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.2
+ Version: 1.3.3
  Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("ZING_MAILZ_VERSION","1.3.2");
+define("ZING_MAILZ_VERSION","1.3.3");
 define("ZING_MAILZ_PREFIX","zing_");
 
 $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -446,12 +446,13 @@ function zing_mailz_header()
 }
 
 function zing_mailz_admin_head() {
-	if (strstr($_REQUEST['page'],'mailz-')) {
+	if (strstr($_REQUEST['page'],'mailz_') || strstr($_REQUEST['page'],'mailz-')) {
 		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
 		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
 	}
-
-    wp_tiny_mce( false, array( 'editor_selector' => 'theEditor' ) );
+	if ($_REQUEST['zlistpage']=='templatee' || $_REQUEST['zlistpage']=='send' || $_REQUEST['page']=='mailz-send') {
+	    wp_tiny_mce( false, array( 'editor_selector' => 'theEditor' ) );
+	}
 }
 
 function zing_mailz_head() {
@@ -468,7 +469,7 @@ function zing_mailz_init()
 	ob_start();
 	session_start();
 	
-	if (is_admin()) {
+	if (is_admin() && ($_REQUEST['zlistpage']=='templatee' || $_REQUEST['zlistpage']=='send' || $_REQUEST['page']=='mailz-send')) {
 		wp_enqueue_script(array('jquery', 'editor', 'thickbox', 'media-upload'));
 	}
 	
