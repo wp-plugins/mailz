@@ -1,5 +1,5 @@
 <?php
-//v0.10
+//v0.10 1.09.13
 //removed cc_whmcs_log call
 //need wpabspath for mailz
 //mailz returns full URL in case of redirection!!
@@ -9,6 +9,7 @@
 //added support for content-type
 //fixed issue with $this->$headers wrong, should be $this->headers
 //fixed issue with handling of $repost
+//remove reload of wpabspath
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -252,9 +253,9 @@ if (!class_exists('zHttpRequest')) {
 						$apost[$k]=stripslashes($v);
 					}
 				}
-			}
+			} else $apost=array();
 
-			if (count($post) > 0) {
+			if (count($apost) > 0) {
 				//echo '<br /><br />apost='.print_r($apost,true).'=<br /><br />';
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $apost); // add POST fields
 			}
@@ -310,14 +311,14 @@ if (!class_exists('zHttpRequest')) {
 			if ($headers['content-type']) {
 				$this->type=$headers['content-type'];
 			}
-			if ($headers['location']) {
+			if (isset($headers['location']) && $headers['location']) {
 				//echo '<br />redirect to:'.print_r($headers,true);
 				$redir=$headers['location'];
 				if (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
 				if (strstr($redir,'&')) $redir.='&';
 				elseif (strstr($redir,'?')) $redir.='&';
 				else $redir.='?';
-				$redir.='wpabspath='.urlencode(ABSPATH);
+				$redir.='wpabspath=0';
 				if ($this->repost) $this->post=array();
 				$this->countRedirects++;
 				if ($this->countRedirects < 10) {

@@ -321,7 +321,7 @@ define("ALLOW_NON_LIST_SUBSCRIBE",0);
 # define("MAILQUEUE_BATCH_PERIOD",1);
 
 ## if you send the queue using commandline, you can set it to something that complies with the
-## limits of your ISP, eg 300 messages an hour would be 
+## limits of your ISP, eg 300 messages an hour would be
 # define("MAILQUEUE_BATCH_SIZE",300);
 # define("MAILQUEUE_BATCH_PERIOD",3600);
 # and then you need to set the cron to run every 5 minutes
@@ -495,14 +495,14 @@ define('LANGUAGE_SWITCH',1);
 # if you use this, you will need to teach your system regularly about patterns in new bounces
 define('USE_ADVANCED_BOUNCEHANDLING',0);
 
-/* 
-=========================================================================
+/*
+ =========================================================================
 
-Security
+ Security
 
-=========================================================================
+ =========================================================================
 
-*/ 
+ */
 
 # CHECK REFERRER. Set this to "true" to activate a check on each request to make sure that
 # the "referrer" in the request is from ourselves. This is not failsafe, as the referrer may
@@ -664,7 +664,7 @@ define("USE_PREPARE",0);
 
 #0011857: forward to friend, retain attributes
 # When forwarding ('to a friend') the message will be using the attributes of the destination email by default.
-# This often means the message gets stripped of al its attributes. 
+# This often means the message gets stripped of al its attributes.
 # When setting this constant to 1, the message will use the attributes of the forwarding user. It can be used
 # to connect the destinatory to the forwarder and/or reward the forwarder.
 define("KEEPFORWARDERATTRIBUTES",0);
@@ -678,16 +678,16 @@ define("FORWARD_EMAIL_COUNT",1);
 # Allow user to add a personal note when forwarding 'to a friend'
 # 0 will turn this option off. default is 0 to not change behaviour from previous version.
 # 500 is recommended as a sound value to write a little introductory note to a friend
-#The note is prepeded to both text and html messages and will be stripped of all html 
+#The note is prepeded to both text and html messages and will be stripped of all html
 define("FORWARD_PERSONAL_NOTE_SIZE",0);
 
 #0013076: different content when forwarding 'to a friend'
 # Allow admin to enter a different message that will be sent when forwarding 'to a friend'
-# This will show an extra tab in the message dialog. 
+# This will show an extra tab in the message dialog.
 define("FORWARD_ALTERNATIVE_CONTENT",0);
 
 #0013845 Lead Ref Scheme
-# When this setting has a value <> '' all succesfull handovers to the MTA will be counted 
+# When this setting has a value <> '' all succesfull handovers to the MTA will be counted
 # and saved in the attribute with the name of this setting.
 #define('FORWARD_FRIEND_COUNT_ATTRIBUTE', 'FriendCount');
 
@@ -747,26 +747,55 @@ Settings for Wordpress integration
 =========================================================================
 
 */
+//zingiri
 define("NAME",'Mailing List');
-if ( isset($_GET['wpabspath']) ) {
-	//zingiri
-	//error_reporting(E_ALL & ~E_NOTICE);
-	//ini_set('display_errors', '1');
-	define('ABSPATH', dirname(__FILE__) . '/');
-	require($_GET['wpabspath'].'wp-config.php');
-	$database_host = DB_HOST;
-	$database_name = DB_NAME;
-	$database_user = DB_USER;
-	$database_password = DB_PASSWORD;
-	$table_prefix = $table_prefix . 'zing_phplist_'; //$table_prefix gets returned from WP config
-	$usertable_prefix = $table_prefix;
-	$pageroot = '';
-	$adminpages = '/wp-content/plugins/mailz/lists/admin';//$_GET['wpsiteurl'].'/wp-admin/options-general.php';
-	$wpindex='&zlist=index&page_id='.$_GET['wppageid'];
+//error_reporting(E_ALL & ~E_NOTICE);
+//ini_set('display_errors', '1');
 
-	//fixes
-	if (isset($_POST['id']) && !isset($_GET['id'])) $_GET['id']=$_POST['id'];
-	
+if (!session_id()) @session_start();
+
+if (isset($_REQUEST['wph'])) {
+	$database_host = $_REQUEST['wph'];
+	$_SESSION['wordpress']['host']=$database_host;
+	echo 'case1';
 }
+elseif (isset($_SESSION['wordpress']['host'])) {
+	$database_host = $_SESSION['wordpress']['host'];
+}
+if (isset($_REQUEST['wpdb'])) {
+	$database_name = $_REQUEST['wpdb'];
+	$_SESSION['wordpress']['name']=$database_name;
+}
+elseif (isset($_SESSION['wordpress']['name'])) {
+	$database_name = $_SESSION['wordpress']['name'];
+}
+if (isset($_REQUEST['wpu'])) {
+	$database_user = $_REQUEST['wpu'];
+	$_SESSION['wordpress']['user']=$database_user;
+}
+elseif (isset($_SESSION['wordpress']['user'])) {
+	$database_user = $_SESSION['wordpress']['user'];
+}
+if (isset($_REQUEST['wpp'])) {
+	$database_password = $_REQUEST['wpp'];
+	$_SESSION['wordpress']['password']=$database_password;
+}
+elseif (isset($_SESSION['wordpress']['password'])) {
+	$database_password = $_SESSION['wordpress']['password'];
+}
+if (isset($_REQUEST['wpf'])) {
+	$table_prefix = $_REQUEST['wpf'] . 'zing_phplist_';
+	$usertable_prefix = $_REQUEST['wpf'];
+	$_SESSION['wordpress']['prefix']=$usertable_prefix;
+} elseif (isset($_SESSION['wordpress']['prefix'])) {
+	$table_prefix = $_SESSION['wordpress']['prefix'] . 'zing_phplist_';
+	$usertable_prefix = $_SESSION['wordpress']['prefix'];
+}
+$pageroot = '';
+$adminpages = '/wp-content/plugins/mailz/lists/admin';
+$wpindex='&zlist=index&page_id='.$_GET['wppageid'];
+
+//fixes
+if (isset($_POST['id']) && !isset($_GET['id'])) $_GET['id']=$_POST['id'];
 
 ?>

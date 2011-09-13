@@ -27,7 +27,6 @@ function zing_mailz_install() {
 			} else { delete_option( $value['id'] );
 			}
 		}
-		//die('here now');
 		header("Location: admin.php?page=mailz_cp&installed=true");
 		die();
 	} else {
@@ -43,10 +42,9 @@ function zing_mailz_admin_menu() {
 	global $zing_mailz_menu;
 
 	if (!class_exists('simple_html_dom_node')) require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
-	
 	$zing_mailz_version=get_option("zing_mailz_version");
 
-	if ($_GET['action']=='install' && $_GET['page']=='mailz_cp') zing_mailz_install();
+	if (isset($_GET['action']) && $_GET['action']=='install' && isset($_GET['page']) && $_GET['page']=='mailz_cp') zing_mailz_install();
 	
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	if (!empty($_REQUEST['page']) && $_REQUEST['page'] != 'mailz_cp') {
@@ -56,19 +54,20 @@ function zing_mailz_admin_menu() {
 
 	if (get_option("zing_mailz_version")) {
 		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
-		zing_mailz_header();
-		$html=str_get_html($zing_mailz_menu);
-		$first=true;
-		foreach($html->find('a') as $e) {
-			$link=str_replace("admin.php?page=mailz_cp&zlist=index&zlistpage=","",$e->href);
-			$label=ucfirst($e->innertext);
-			if ($first) add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz_cp', 'zing_mailz_admin');
-			elseif (substr($link,0,3)!='div') {
-				add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz-'.$link, 'zing_mailz_admin');
-			}
-			$first=false;
-		}
 		if ($zing_mailz_version != ZING_MAILZ_VERSION) add_submenu_page('mailz_cp', $zing_mailz_name.'- Upgrade', 'Upgrade', 'administrator', 'mailz-upgrade', 'zing_mailz_upgrade');
+		else {zing_mailz_header();
+			$html=str_get_html($zing_mailz_menu);
+			$first=true;
+			foreach($html->find('a') as $e) {
+				$link=str_replace("admin.php?page=mailz_cp&zlist=index&zlistpage=","",$e->href);
+				$label=ucfirst($e->innertext);
+				if ($first) add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz_cp', 'zing_mailz_admin');
+				elseif (substr($link,0,3)!='div') {
+					add_submenu_page('mailz_cp', $zing_mailz_name.'- '.$label, $label, 'administrator', 'mailz-'.$link, 'zing_mailz_admin');
+				}
+				$first=false;
+			}
+		}
 	} else {
 		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_install');
 		add_submenu_page('mailz_cp', $zing_mailz_name.'- Install', 'Install', 'administrator', 'mailz_cp', 'zing_mailz_install');
@@ -78,7 +77,7 @@ function zing_mailz_admin_menu() {
 function zing_mailz_admin() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
 
-	if ( $_REQUEST['installed'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
+	if ( isset($_REQUEST['installed']) && $_REQUEST['installed'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
 
 	$zing_mailz_version=get_option("zing_mailz_version");
 
@@ -98,7 +97,7 @@ function zing_mailz_cp($message='') {
 		echo '<h2><b>'.$zing_mailz_name.' - '.$_GET['zlistpage'].'</b></h2>';
 		echo $message;
 	} elseif ($zing_mailz_version) {
-		if ($_GET['zlistpage']=='admin') {
+		if (isset($_GET['zlistpage']) && $_GET['zlistpage']=='admin') {
 			echo 'Please use the <a href="users.php">Wordpress Users menu</a> to change <strong>admin</strong> user details';
 		} else {
 			echo '<div id="phplist">'.$zing_mailz_content.'</div>';
