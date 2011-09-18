@@ -1,4 +1,5 @@
 <?php 
+//v1.09.15
 if (!function_exists('zing_support_us')) {
 	function zing_support_us($shareName,$wpPluginName,$adminLink,$version) {
 ?>
@@ -27,14 +28,14 @@ if (!function_exists('zing_support_us')) {
 					update_option($option,time()+7776000);
 				} else {
 					if ((time() - get_option($option)) > 1209600) { //14 days 
-						return "<div id='zing-warning' style='background-color:red;color:white;font-size:large;margin:20px;padding:10px;'>Looks like you've been using this plugin for quite a while now. Have you thought about showing your appreciation through a small donation?<br /><br /><a href='http://www.zingiri.net/donations'><img src='https://www.paypal.com/en_GB/i/btn/btn_donate_LG.gif' /></a><br /><br />If you already made a donation, you can <a href='?page=".$plugin."&support-us=hide'>hide</a> this message.</div>";
+						echo "<div id='zing-warning' style='background-color:red;color:white;font-size:large;margin:20px;padding:10px;'>Looks like you've been using this plugin for quite a while now. Have you thought about showing your appreciation through a small donation?<br /><br /><a href='http://www.zingiri.net/donations'><img src='https://www.paypal.com/en_GB/i/btn/btn_donate_LG.gif' /></a><br /><br />If you already made a donation, you can <a href='?page=".$adminLink."&support-us=hide'>hide</a> this message.</div>";
 					}
 				}
 				?>
 			</div>
 			<?php 	
 			global $current_user;
-			$url='http://www.zingiri.net/index.php?zlistpro=register&e='.urlencode($current_user->data->user_email).'&f='.urlencode($current_user->data->first_name).'&l='.urlencode($current_user->data->last_name).'&w='.urlencode(get_option('home')).'&p='.$wpPluginName.'&v='.urlencode($version);
+			$url='http://www.zingiri.net/index.php?zlistpro=register&e='.urlencode($current_user->data->user_email).'&f='.urlencode(isset($current_user->data->first_name) ? $current_user->data->first_name : '').'&l='.urlencode(isset($current_user->data->last_name) ? $current_user->data->last_name : '').'&w='.urlencode(get_option('home')).'&p='.$wpPluginName.'&v='.urlencode($version);			
 			$news = new zHttpRequest($url);
 			if ($news->live() && !$_SESSION[$wpPluginName]['news']) {
 				update_option($wpPluginName.'_news',$news->DownloadToString());
@@ -43,12 +44,15 @@ if (!function_exists('zing_support_us')) {
 			?>
 			<?php
 			$data=json_decode(get_option($wpPluginName.'_news'));
-			foreach ($data as $rec) { ?>
-				<div class="cc-support-us">
-				<h3><?php echo $rec->title;?></h3>
-				<?php echo $rec->content;?>
-				</div>
-			<?php }?>
+			if (count($data) > 0) {
+				foreach ($data as $rec) { ?>
+					<div class="cc-support-us">
+					<h3><?php echo $rec->title;?></h3>
+					<?php echo $rec->content;?>
+					</div>
+				<?php 
+				}
+			}?>
 
 			<div style="text-align:center;margin-top:40px">
 				<a href="http://www.zingiri.net" target="_blank"><img src="http://www.zingiri.net/logo.png" /></a>
@@ -57,5 +61,4 @@ if (!function_exists('zing_support_us')) {
 <?php 
 	}
 }
-zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
 ?>

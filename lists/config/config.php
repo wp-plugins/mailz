@@ -757,7 +757,6 @@ if (!session_id()) @session_start();
 if (isset($_REQUEST['wph'])) {
 	$database_host = $_REQUEST['wph'];
 	$_SESSION['wordpress']['host']=$database_host;
-	echo 'case1';
 }
 elseif (isset($_SESSION['wordpress']['host'])) {
 	$database_host = $_SESSION['wordpress']['host'];
@@ -784,13 +783,12 @@ elseif (isset($_SESSION['wordpress']['password'])) {
 	$database_password = $_SESSION['wordpress']['password'];
 }
 if (isset($_REQUEST['wpf'])) {
-	$table_prefix = $_REQUEST['wpf'] . 'zing_phplist_';
-	$usertable_prefix = $_REQUEST['wpf'];
+	$usertable_prefix = $table_prefix = $_REQUEST['wpf'] . 'zing_phplist_';
 	$_SESSION['wordpress']['prefix']=$usertable_prefix;
 } elseif (isset($_SESSION['wordpress']['prefix'])) {
-	$table_prefix = $_SESSION['wordpress']['prefix'] . 'zing_phplist_';
-	$usertable_prefix = $_SESSION['wordpress']['prefix'];
+	$usertable_prefix = $table_prefix = $_SESSION['wordpress']['prefix'];
 }
+
 $pageroot = '';
 $adminpages = '/wp-content/plugins/mailz/lists/admin';
 $wpindex='&zlist=index&page_id='.$_GET['wppageid'];

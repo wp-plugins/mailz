@@ -4,14 +4,14 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.4
+ Version: 1.3.5
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.3.4");
+define("ZING_MAILZ_VERSION","1.3.5");
 define("ZING_MAILZ_PREFIX","zing_");
 
-$dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
+if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -80,7 +80,7 @@ function zing_mailz_notices() {
 
 	if (!is_writable(session_save_path())) $warnings[]='PHP sessions are not properly configured on your server, the sessions save path '.session_save_path().' is not writable.';
 
-	if (phpversion() < '5')	$warnings[]="You are running PHP version ".phpversion().". You require PHP version 5 or higher to install the Web Shop.";
+	if (phpversion() < '5.3')	$warnings[]="You are running PHP version ".phpversion().". You require PHP version 5.3 or higher for this plugin.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
 
 	$upload=wp_upload_dir();
@@ -91,9 +91,7 @@ function zing_mailz_notices() {
 
 	if (get_option('activation-output')) {
 		$warnings[]='An error occured during activation:<br /><div style="background-color:white">'.get_option('activation-output').'</div>';
-		delete_option('activation-output');
 	}
-
 	if (count($warnings)>0) {
 		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
 		foreach ($warnings as $message) {
@@ -122,12 +120,48 @@ function zing_mailz_activate() {
 		echo get_option('activation-output');
 		return;
 	}
-	update_option('activation-output','');
+	delete_option('activation-output');
 	$wpdb->show_errors();
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 	$zing_mailz_version=get_option("zing_mailz_version");
 
 	ob_start('zing_activation_output');
+
+	//create database tables
+	if (!$zing_mailz_version) {
+		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'initialise','firstintall'=>1));
+		$news = new zHttpRequest($http,'mailz');
+		if ($news->live()) {
+			$output=$news->DownloadToString();
+		}
+	} else {
+		foreach (array('user','user_history','attribute','user_attribute') as $t) { //renaming tables to use new prefix
+			$wpdb->query("RENAME TABLE ".$wpdb->prefix.$t." TO ".$prefix.$t);
+		}
+		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'upgrade','doit'=>'yes'));
+		$news = new zHttpRequest($http,'mailz');
+		if ($news->live()) {
+			$output=$news->DownloadToString();
+		}
+	}
+
+	//verify installation
+	$query="show tables like '".$prefix."phplist_%'";
+	$rows = $wpdb->get_results($query,ARRAY_N);
+	if (count($rows) == 0) {
+		print('Could not create phpList database tables');
+		ob_flush();
+	}
+	
+	//set admin password
+	$password=md5(time().get_option('home'));
+	$query="update ".$prefix."phplist_admin set password='".$password."' where loginname='admin'";
+	$wpdb->query($query);
+	update_option("zing_mailz_password",$password);
+
+	//set configuration options
+	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('siteurl'))."' where item='website'";
+	$wpdb->query($query);
 
 	//create standard pages
 	if ($zing_mailz_version <= '0.1') {
@@ -149,40 +183,8 @@ function zing_mailz_activate() {
 			if (empty($ids)) { $ids.=$id; } else { $ids.=",".$id; }
 			if (!empty($p[1])) add_post_meta($id,'zing_mailz_page',$p[1]);
 		}
-		if (get_option("zing_mailz_pages"))
-		{
-			update_option("zing_mailz_pages",$ids);
-		}
-		else {
-			add_option("zing_mailz_pages",$ids);
-		}
+		update_option("zing_mailz_pages",$ids);
 	}
-
-	//create database tables
-	if (!$zing_mailz_version) {
-		echo 'this case1';
-		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'initialise','firstintall'=>1));
-		$news = new zHttpRequest($http,'mailz');
-		if ($news->live()) {
-			$output=$news->DownloadToString();
-		}
-	} else {
-		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'upgrade','doit'=>'yes'));
-		$news = new zHttpRequest($http,'mailz');
-		if ($news->live()) {
-			$output=$news->DownloadToString();
-		}
-	}
-
-	//set admin password
-	$password=md5(time().get_option('home'));
-	$query="update ".$prefix."phplist_admin set password='".$password."' where loginname='admin'";
-	$wpdb->query($query);
-	update_option("zing_mailz_password",$password);
-
-	//set configuration options
-	$query="update ".$prefix."phplist_config set value='".str_replace('http://','',get_option('siteurl'))."' where item='website'";
-	$wpdb->query($query);
 
 	//default options
 	if (count($zing_mailz_options) > 0) {
@@ -264,9 +266,8 @@ function zing_mailz_output($process) {
 				unset($_POST['zname']);
 			}
 			if (isset($post)) $cf=get_post_custom($post->ID);
-			if (isset($_GET['zlist']))
-			{
-				if ($_GET['page']=='mailz_cp') $to_include='admin/index';
+			if (isset($_GET['zlist'])) {
+				if (isset($_GET['page']) && ($_GET['page']=='mailz_cp')) $to_include='admin/index';
 				elseif (isset($_GET['page'])) $to_include='admin/index';
 				else $to_include=$_GET['zlist'];
 				$zing_mailz_mode="client";
@@ -333,8 +334,6 @@ function zing_mailz_ob($buffer) {
 	global $current_user,$zing_mailz_mode,$wpdb;
 
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
-	$query="select uniqid from ".$prefix."phplist_user where email='".$current_user->data->user_email."'";
-	$uid=$wpdb->get_var($query);
 	$home=get_option('home');
 	$admin=get_option('siteurl').'/wp-admin/';
 	$pid=zing_mailz_mainpage();
@@ -358,15 +357,17 @@ function zing_mailz_ob($buffer) {
 		$buffer=str_replace('/lists/admin',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer); //go to admin page
 		$buffer=str_replace('./?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
 		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$home.'/?page_id='.$pid.'&zlist=index&',$buffer);
-		if ($_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
+		if (isset($_GET['p']) && $_GET['p']=='subscribe' && isset($current_user->data->user_email)) {
 			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
 			$buffer=str_replace('name=emailconfirm value=""','name=emailconfirm value="'.$current_user->data->user_email.'"',$buffer);
 		}
-		if ($_GET['p']=='unsubscribe' && isset($current_user->data->user_email)) {
+		if (isset($_GET['p']) && $_GET['p']=='unsubscribe' && isset($current_user) && isset($current_user->data->user_email)) {
+			$query="select uniqid from ".$prefix."phplist_user where email='".$current_user->data->user_email."'";
+			$uid=$wpdb->get_var($query);
 			$buffer=str_replace('name="unsubscribeemail" value=""','name="unsubscribeemail" value="'.$current_user->data->user_email.'"',$buffer);
 			$buffer=str_replace('uid="','uid='.$uid.'"',$buffer);
 		}
-		if ($_GET['p']=='preferences' && isset($current_user->data->user_email)) {
+		if (isset($_GET['p']) && $_GET['p']=='preferences' && isset($current_user->data->user_email)) {
 			$buffer=str_replace('name=email value=""','name=email value="'.$current_user->data->user_email.'"',$buffer);
 			$buffer=str_replace('name=emailconfirm value=""','name=emailconfirm value="'.$current_user->data->user_email.'"',$buffer);
 		}
@@ -452,7 +453,7 @@ function zing_mailz_header()
 }
 
 function zing_mailz_admin_head() {
-	if (strstr($_REQUEST['page'],'mailz_') || strstr($_REQUEST['page'],'mailz-')) {
+	if (isset($_REQUEST['page']) && (strstr($_REQUEST['page'],'mailz_') || strstr($_REQUEST['page'],'mailz-'))) {
 		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'lists/admin/styles/phplist.css" media="screen" />';
 		echo '<link rel="stylesheet" type="text/css" href="' . ZING_MAILZ_URL . 'zing.css" media="screen" />';
 	}

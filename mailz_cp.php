@@ -105,7 +105,9 @@ function zing_mailz_cp($message='') {
 	}
 	echo '</div>';
 	
-	require(dirname(__FILE__).'/support-us.inc.php');
+	require(dirname(__FILE__).'/includes/support-us.inc.php');
+	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
+	
 	echo '</div>';
 ?><div style="clear: both"></div>
 <hr />
