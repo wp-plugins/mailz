@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.5
+ Version: 1.3.6
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.3.5");
+define("ZING_MAILZ_VERSION","1.3.6");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -80,7 +80,7 @@ function zing_mailz_notices() {
 
 	if (!is_writable(session_save_path())) $warnings[]='PHP sessions are not properly configured on your server, the sessions save path '.session_save_path().' is not writable.';
 
-	if (phpversion() < '5.3')	$warnings[]="You are running PHP version ".phpversion().". You require PHP version 5.3 or higher for this plugin.";
+	if (phpversion() < '5')	$warnings[]="You are running PHP version ".phpversion().". You require PHP version 5.2 or higher for this plugin, with version 5.3 recommended.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
 
 	$upload=wp_upload_dir();
@@ -121,7 +121,7 @@ function zing_mailz_activate() {
 		return;
 	}
 	delete_option('activation-output');
-	$wpdb->show_errors();
+	//$wpdb->show_errors();
 	$prefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
 	$zing_mailz_version=get_option("zing_mailz_version");
 
@@ -136,7 +136,8 @@ function zing_mailz_activate() {
 		}
 	} else {
 		foreach (array('user','user_history','attribute','user_attribute') as $t) { //renaming tables to use new prefix
-			$wpdb->query("RENAME TABLE ".$wpdb->prefix.$t." TO ".$prefix.$t);
+			$wpdb->query("RENAME TABLE ".$wpdb->prefix.$t." TO ".$prefix.'phplist_'.$t);
+			$wpdb->query("RENAME TABLE ".$prefix.$t." TO ".$prefix.'phplist_'.$t);
 		}
 		$http=zing_mailz_http("phplist",'admin/index.php',array('zlistpage'=>'upgrade','doit'=>'yes'));
 		$news = new zHttpRequest($http,'mailz');
