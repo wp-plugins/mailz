@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.6
+ Version: 1.3.7
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.3.6");
+define("ZING_MAILZ_VERSION","1.3.7");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -78,7 +78,7 @@ function zing_mailz_notices() {
 	$zing_mailz_version=get_option("zing_mailz_version");
 	$warnings=array();
 
-	if (!is_writable(session_save_path())) $warnings[]='PHP sessions are not properly configured on your server, the sessions save path '.session_save_path().' is not writable.';
+	if (($ssp=session_save_path()) && !is_writable($ssp)) $warnings[]='PHP sessions are not properly configured on your server, the sessions save path '.$ssp.' is not writable.';
 
 	if (phpversion() < '5')	$warnings[]="You are running PHP version ".phpversion().". You require PHP version 5.2 or higher for this plugin, with version 5.3 recommended.";
 	if (!function_exists('curl_init')) $warnings[]="You need to have cURL installed. Contact your hosting provider to do so.";
@@ -475,7 +475,7 @@ function zing_mailz_head() {
 function zing_mailz_init()
 {
 	ob_start();
-	session_start();
+	if (!session_id()) @session_start();
 
 	if (is_admin() && ((isset($_REQUEST['zlistpage']) && ($_REQUEST['zlistpage']=='templatee' || $_REQUEST['zlistpage']=='send')) || (isset($_REQUEST['page']) && $_REQUEST['page']=='mailz-send'))) {
 		wp_enqueue_script(array('jquery', 'editor', 'thickbox', 'media-upload'));
