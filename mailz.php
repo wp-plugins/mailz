@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.8
+ Version: 1.4.0
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.3.8");
+define("ZING_MAILZ_VERSION","1.4.0");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -307,7 +307,7 @@ function zing_mailz_output($process) {
 	}
 	if (zing_mailz_login()) {
 		$http=zing_mailz_http("phplist",$to_include.'.php');
-		$news = new zHttpRequest($http,'mailz',true);
+		$news = new zHttpRequest($http,'mailz');
 		if ($news->live()) {
 			$output=$news->DownloadToString();
 			if ($news->type=='application/csv') {
@@ -402,6 +402,8 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 		}
 	}
 
+	//$wpconnect=base64_encode(serialize(array('wpdb'=>DB_NAME,'wpf'=>$wpdb->prefix,'wph'=>DB_HOST,'wpu'=>DB_USER,'wpp'=>DB_PASSWORD)));
+	//$vars.=$and.'wpconnect='.$wpconnect;
 	$vars.=$and.'wpdb='.zing_urlencode(DB_NAME);
 	$vars.='&wpf='.zing_urlencode($wpdb->prefix);
 	$vars.='&wph='.zing_urlencode(DB_HOST);
@@ -517,8 +519,8 @@ function zing_mailz_login() {
 
 function zing_mailz_logout() {
 	$_GET['zlistpage']='logout';
-	$http=zing_mailz_http('osticket','admin/index.php');
-	$news = new zHttpRequest($http,'mailz',array('zlistpage' => null));
+	$http=zing_mailz_http('osticket','admin/index.php',array('zlistpage' => null));
+	$news = new zHttpRequest($http,'mailz');
 	if ($news->live()) {
 		$output=$news->DownloadToString(true);
 		unset($_SESSION['zing']['mailz']['loggedin']);

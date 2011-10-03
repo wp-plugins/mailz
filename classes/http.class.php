@@ -1,5 +1,5 @@
 <?php
-//v1.09.15
+//v1.10.02
 //removed cc_whmcs_log call
 //need wpabspath for mailz
 //mailz returns full URL in case of redirection!!
@@ -20,6 +20,8 @@
 //added option to disable following redirect links
 //fixed issue with HTTP 417 errors on some web servers
 //fixed redirect link parsing issue
+//fixed issue with redirect urls duplicating url path
+//added http return code
 if (!class_exists('zHttpRequest')) {
 	class zHttpRequest
 	{
@@ -38,6 +40,7 @@ if (!class_exists('zHttpRequest')) {
 		var $errors=array();
 		var $countRedirects=0;
 		var $sid;
+		var $httpCode;
 		var $repost=false;
 		var $type; //content-type
 		var $follow=true; //whether to follow redirect links or not
@@ -295,8 +298,15 @@ if (!class_exists('zHttpRequest')) {
 			if (curl_errno($ch)) {
 				$this->errno=curl_errno($ch);
 				$this->error=curl_error($ch);
-				$this->error('HTTP Error:'.$this->errno.'/'.$this->error.' at '.$this->_url);
-				return false;
+				$this->httpCode=curl_getinfo($ch,CURLINFO_HTTP_CODE);
+				if (($this->errno==22) && ($this->httpCode=='404')) {
+					$this->notify('HTTP Error:'.$this->errno.'/'.$this->error.' at '.$this->_url);
+					return false;					
+				}
+				else {
+					$this->error('HTTP Error:'.$this->errno.'/'.$this->error.' at '.$this->_url);
+					return false;
+				}
 			}
 			$info=curl_getinfo($ch);
 			if ( !empty($data) ) {
@@ -348,7 +358,9 @@ if (!class_exists('zHttpRequest')) {
 				//echo '<br />redirect to:'.print_r($headers,true);
 				//echo '<br />path='.$this->_path;
 				$redir=$headers['location'];
-				if (strstr($this->_protocol.'://'.$this->_host.$redir,$this->_protocol.'://'.$this->_host.$this->_path)) $redir=$this->_protocol.'://'.$this->_host.$redir;
+				if (strstr($redir,$this->_protocol.'://'.$this->_host.$this->_path)) { //do nothing 
+				}
+				elseif (strstr($this->_protocol.'://'.$this->_host.$redir,$this->_protocol.'://'.$this->_host.$this->_path)) $redir=$this->_protocol.'://'.$this->_host.$redir;
 				elseif (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
 				//echo '<br />redir='.$redir;
 				if (strstr($redir,'&')) $redir.='&';
