@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.3.7
+ Version: 1.3.8
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.3.7");
+define("ZING_MAILZ_VERSION","1.3.8");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -90,7 +90,7 @@ function zing_mailz_notices() {
 	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz-upgrade">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
 
 	if (get_option('activation-output')) {
-		$warnings[]='An error occured during activation:<br /><div style="background-color:white">'.get_option('activation-output').'</div>';
+	//	$warnings[]='An error occured during activation:<br /><div style="background-color:white">'.get_option('activation-output').'</div>';
 	}
 	if (count($warnings)>0) {
 		echo "<div id='zing-warning' style='clear:both;background-color:greenyellow' class='updated fade'>";
@@ -241,7 +241,7 @@ function zing_mailz_uninstall() {
 function zing_mailz_main($process,$content="") {
 	global $zing_mailz_content;
 
-	if ($zing_mailz_content) {
+	if ((!is_admin() || (is_admin() && strstr($_REQUEST['page'],'mailz'))) && $zing_mailz_content) {
 		$content='<div id="phplist">'.$zing_mailz_content.'</div>';
 		$content.=zing_mailz_footer();
 	}
