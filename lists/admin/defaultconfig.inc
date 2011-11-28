@@ -529,7 +529,7 @@ if (defined("ENABLE_RSS") && ENABLE_RSS) {
 
 }
 
-#if (USEFCK) {
+//zingiri: fck editor
 $default_config["fckeditor_active"] = array (
 	0,
 	"FCKeditor Active",
@@ -545,7 +545,23 @@ $default_config["fckeditor_height"] = array (
 	"Height in px of FCKeditor Area",
 	"text"
 );
-#}
+
+//zingiri: smtp settings
+$default_config["phpmailerhost"] = array (
+	'',
+	"SMTP host",
+	"text"
+);
+$default_config["phpmailer_smtpuser"] = array (
+	'',
+	"SMTP user",
+	"text"
+);
+$default_config["phpmailer_smtppassword"] = array (
+	'',
+	"SMTP password",
+	"text"
+);
 
 ########## certainly do not edit after this #########
 

@@ -13,9 +13,15 @@ if (!defined("ENABLE_RSS")) define("ENABLE_RSS",0);
 if (!defined("ALLOW_ATTACHMENTS")) define("ALLOW_ATTACHMENTS",0);
 if (!defined("EMAILTEXTCREDITS")) define("EMAILTEXTCREDITS",0);
 if (!defined("PAGETEXTCREDITS")) define("PAGETEXTCREDITS",0);
-//if (!defined("USEFCK")) define("USEFCK",0);
-//zingiri
+
+//zingiri: fck editor
 if (!defined('USEFCK')) define('USEFCK',getConfig('fckeditor_active'));
+
+//zingiri: smtp settings
+global $phpmailer_smtpuser,$phpmailer_smtppassword;
+if (!defined("PHPMAILERHOST")) define("PHPMAILERHOST",getConfig('phpmailerhost'));
+$phpmailer_smtpuser=getConfig('phpmailer_smtpuser');
+$phpmailer_smtppassword=getConfig('phpmailer_smtppassword');
 
 if (!defined("ASKFORPASSWORD")) define("ASKFORPASSWORD",0);
 if (!defined("UNSUBSCRIBE_REQUIRES_PASSWORD")) define("UNSUBSCRIBE_REQUIRES_PASSWORD",0);

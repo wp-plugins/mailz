@@ -4,7 +4,6 @@ require_once dirname(__FILE__).'/accesscheck.php';
 
 #initialisation###############
 
-echo 'fck='.USEFCK;
 // Verify that FCKeditor is available
 if (USEFCK && file_exists("./FCKeditor/fckeditor.php")) {
   include("./FCKeditor/fckeditor.php") ;

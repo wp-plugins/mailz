@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.4.0
+ Version: 1.4.1
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.4.0");
+define("ZING_MAILZ_VERSION","1.4.1");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;

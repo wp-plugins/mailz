@@ -328,7 +328,7 @@ define("ALLOW_NON_LIST_SUBSCRIBE",0);
 
 # define the amount of emails you want to send per period. If 0, batch processing
 # is disabled and messages are sent out as fast as possible
-define("MAILQUEUE_BATCH_SIZE",0);
+define("MAILQUEUE_BATCH_SIZE",80);
 
 # define the length of one batch processing period, in seconds (3600 is an hour)
 # Please note: this setting has two consequences:
@@ -340,7 +340,7 @@ define("MAILQUEUE_BATCH_SIZE",0);
 # number 2 is when using browser queue processing. The browser will reload to send the next
 # batch after the amount of seconds set here
 
-define("MAILQUEUE_BATCH_PERIOD",100);
+define("MAILQUEUE_BATCH_PERIOD",3600);
 
 # to avoid overloading the server that sends your email, you can add a little delay
 # between messages that will spread the load of sending
@@ -697,7 +697,7 @@ define("PHPMAILER",1);
 
 # To use a SMTP please give your server hostname here, leave it blank to use the standard
 # PHP mail() command.
-define("PHPMAILERHOST",'');
+#define("PHPMAILERHOST",'');
 
 # if you want to use smtp authentication when sending the email uncomment the following
 # two lines and set the username and password to be the correct ones
