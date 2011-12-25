@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 1.4.1
+ Version: 1.4.2
  Author URI: http://www.zingiri.net/
  */
 
-define("ZING_MAILZ_VERSION","1.4.1");
+define("ZING_MAILZ_VERSION","1.4.2");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -404,11 +404,12 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 
 	//$wpconnect=base64_encode(serialize(array('wpdb'=>DB_NAME,'wpf'=>$wpdb->prefix,'wph'=>DB_HOST,'wpu'=>DB_USER,'wpp'=>DB_PASSWORD)));
 	//$vars.=$and.'wpconnect='.$wpconnect;
-	$vars.=$and.'wpdb='.zing_urlencode(DB_NAME);
-	$vars.='&wpf='.zing_urlencode($wpdb->prefix);
-	$vars.='&wph='.zing_urlencode(DB_HOST);
-	$vars.='&wpu='.zing_urlencode(DB_USER);
-	$vars.='&wpp='.zing_urlencode(DB_PASSWORD);
+	//$vars.=$and.'wpdb='.zing_urlencode(DB_NAME);
+	$vars.=$and.'&wpf='.zing_urlencode($wpdb->prefix);
+	//$vars.='&wph='.zing_urlencode(DB_HOST);
+	//$vars.='&wpu='.zing_urlencode(DB_USER);
+	//$vars.='&wpp='.zing_urlencode(DB_PASSWORD);
+	$vars.='&wpn='.md5(DB_HOST.DB_NAME.DB_USER.DB_PASSWORD);
 	$vars.='&wppageid='.zing_mailz_mainpage();
 	$vars.='&wpsiteurl='.urlencode(get_option('siteurl'));
 	if ($vars) $http.='?'.$vars;
@@ -462,6 +463,7 @@ function zing_mailz_admin_head() {
 	}
 	if ((isset($_REQUEST['zlistpage']) && ($_REQUEST['zlistpage']=='templatee' || $_REQUEST['zlistpage']=='send')) || (isset($_REQUEST['page']) && ($_REQUEST['page']=='mailz-send'))) {
 		wp_tiny_mce( false, array( 'editor_selector' => 'theEditor' ) );
+		//wp_editor(null,null,array('tinymce' => true));
 	}
 }
 

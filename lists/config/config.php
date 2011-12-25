@@ -754,6 +754,7 @@ define("NAME",'Mailing List');
 
 if (!session_id()) @session_start();
 
+/*
 if (isset($_REQUEST['wph'])) {
 	$database_host = $_REQUEST['wph'];
 	$_SESSION['wordpress']['host']=$database_host;
@@ -782,12 +783,26 @@ if (isset($_REQUEST['wpp'])) {
 elseif (isset($_SESSION['wordpress']['password'])) {
 	$database_password = $_SESSION['wordpress']['password'];
 }
+*/
 if (isset($_REQUEST['wpf'])) {
 	$usertable_prefix = $table_prefix = $_REQUEST['wpf'] . 'zing_phplist_';
 	$_SESSION['wordpress']['prefix']=$usertable_prefix;
 } elseif (isset($_SESSION['wordpress']['prefix'])) {
 	$usertable_prefix = $table_prefix = $_SESSION['wordpress']['prefix'];
 }
+if (isset($_REQUEST['wpn'])) {
+	$_SESSION['wordpress']['nonce']=$_REQUEST['wpn'];
+}
+
+define('ABSPATH',dirname(__FILE__).'/');
+require(dirname(__FILE__).'/../../../../../wp-config.php');
+$database_host = DB_HOST;
+$database_name = DB_NAME;
+$database_user = DB_USER;
+$database_password = DB_PASSWORD;
+$table_prefix=$usertable_prefix;
+
+if ($_SESSION['wordpress']['nonce'] != md5(DB_HOST.DB_NAME.DB_USER.DB_PASSWORD)) die('Access denied');
 
 $pageroot = '';
 $adminpages = '/wp-content/plugins/mailz/lists/admin';
