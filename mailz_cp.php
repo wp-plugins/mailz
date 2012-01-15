@@ -1,7 +1,6 @@
 <?php
 $zing_mailz_name = "Mailing List";
 $zing_mailz_shortname = "zing_mailz";
-$zing_mailz_options=array();
 
 function zing_mailz_upgrade() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
@@ -19,8 +18,8 @@ function zing_mailz_upgrade() {
 function zing_mailz_install() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
 
-	if ($_GET['action']=='install') {
-		zing_mailz_activate();
+	if ($_REQUEST['action']=='install') {
+		zing_mailz_install_db();
 		foreach ($zing_mailz_options as $value) {
 			if( isset( $_REQUEST[ $value['id'] ] ) ) {
 				update_option( $value['id'], $_REQUEST[ $value['id'] ]  );
@@ -44,7 +43,12 @@ function zing_mailz_admin_menu() {
 	if (!class_exists('simple_html_dom_node')) require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 	$zing_mailz_version=get_option("zing_mailz_version");
 
-	if (isset($_GET['action']) && $_GET['action']=='install' && isset($_GET['page']) && $_GET['page']=='mailz_cp') zing_mailz_install();
+	if (isset($_REQUEST['action']) && $_REQUEST['action']=='install' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
+		zing_mailz_install();
+	}
+	if (isset($_REQUEST['action']) && $_REQUEST['action']=='uninstall' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
+		zing_mailz_uninstall();
+	}
 	
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	if (!empty($_REQUEST['page']) && $_REQUEST['page'] != 'mailz_cp') {
@@ -52,11 +56,11 @@ function zing_mailz_admin_menu() {
 		$_GET['zlist']='index';
 	}
 
+	add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
 	if (get_option("zing_mailz_version")) {
-		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
-		if ($zing_mailz_version != ZING_MAILZ_VERSION) add_submenu_page('mailz_cp', $zing_mailz_name.'- Upgrade', 'Upgrade', 'administrator', 'mailz-upgrade', 'zing_mailz_upgrade');
-		else {zing_mailz_header();
-			$html=str_get_html($zing_mailz_menu);
+		if ($zing_mailz_version) {
+			zing_mailz_header();
+			$html=str_get_html($_SESSION['mailz_menu']);
 			$first=true;
 			foreach($html->find('a') as $e) {
 				$link=str_replace("admin.php?page=mailz_cp&zlist=index&zlistpage=","",$e->href);
@@ -68,11 +72,66 @@ function zing_mailz_admin_menu() {
 				$first=false;
 			}
 		}
-	} else {
-		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_install');
-		add_submenu_page('mailz_cp', $zing_mailz_name.'- Install', 'Install', 'administrator', 'mailz_cp', 'zing_mailz_install');
 	}
+	add_submenu_page('mailz_cp', $zing_mailz_name.'- Integration', 'Integration', 'administrator', 'mailz_setup', 'zing_mailz_setup');
 }
+
+function zing_mailz_setup() {
+	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
+
+	$controlpanelOptions=isset($zing_mailz_options) ? $zing_mailz_options : array();
+
+	if ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Install' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
+	elseif ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Upgrade' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' upgraded.</strong></p></div>';
+	elseif ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Update' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' updated.</strong></p></div>';
+	elseif ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Sync' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' synced.</strong></p></div>';
+	elseif ( isset($_REQUEST['uninstalled']) && $_REQUEST['uninstalled'] ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' uninstalled.</strong></p></div>';
+
+	?>
+<div class="wrap">
+<div
+	style="width: 75%; float: left; position: relative; min-height: 500px;">
+<h2><b>Mailing List</b></h2>
+<div style="float: left; width: 50%"><?php
+$zing_mailz_version=get_option("zing_mailz_version");
+
+?>
+<form method="post"><?php require(dirname(__FILE__).'/includes/cpedit.inc.php')?>
+
+<?php if (!$zing_mailz_version) { ?>
+<p class="submit"><input class="button-primary" name="install"
+	type="submit" value="Install" /> <input type="hidden" name="action"
+	value="install" /></p>
+
+<?php } elseif ($zing_mailz_version != ZING_MAILZ_VERSION) { ?>
+<p class="submit"><input class="button-primary" name="install"
+	type="submit" value="Upgrade" /> <input type="hidden" name="action"
+	value="install" /></p>
+
+
+<?php } elseif ($controlpanelOptions) { ?>
+
+<p class="submit"><input class="button-primary" name="install"
+	type="submit" value="Update" /> <input type="hidden" name="action"
+	value="update" /></p>
+
+<?php } ?></form>
+
+<?php if ($zing_mailz_version) { ?>
+<form method="post">
+<p class="submit"><input name="uninstall" type="submit"
+	value="Uninstall" /> <input type="hidden" name="action"
+	value="uninstall" /></p>
+</form>
+<?php }?></div>
+</div>
+<?php 	require(dirname(__FILE__).'/includes/support-us.inc.php');
+	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
+
+?></div>
+<?php
+}
+
 
 function zing_mailz_admin() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;

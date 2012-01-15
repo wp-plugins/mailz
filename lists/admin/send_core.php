@@ -1227,7 +1227,7 @@ if (!$done) {
         ."<textarea name='message' id='message' cols='65' rows='20'>{$_POST['message']}</textarea>";
         
   } else {
-    $maincontent    .= '<textarea class="theEditor" id="content" name=message cols=65 rows=20>'.htmlspecialchars($_POST["message"]).'</textarea>';
+    $maincontent    .= '<textarea id="message" class="theEditor" name=message cols=65 rows=20>'.htmlspecialchars($_POST["message"]).'</textarea>';
     
     $maincontent.='<script type="text/javascript">';
 	$maincontent.="edCanvas = document.getElementById('content');";
