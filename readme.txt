@@ -81,6 +81,7 @@ Fixes applied in PHPlists:
 
 = 2.0.2 =
 * Fixed issue when upgrading from version 1.4.x where previous data is not shown
+* Fixed issue with 'Manage users' and 'User history' links showing a restricted access page
 
 = 2.0.1 =
 * Fixed issue with no permissions upgrade link
