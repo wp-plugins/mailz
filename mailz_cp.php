@@ -5,7 +5,7 @@ $zing_mailz_shortname = "zing_mailz";
 function zing_mailz_upgrade() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
 
-	zing_mailz_activate();
+	zing_mailz_install_db();
 	foreach ($zing_mailz_options as $value) {
 		if( isset( $_REQUEST[ $value['id'] ] ) ) {
 			update_option( $value['id'], $_REQUEST[ $value['id'] ]  );
@@ -49,7 +49,7 @@ function zing_mailz_admin_menu() {
 	if (isset($_REQUEST['action']) && $_REQUEST['action']=='uninstall' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
 		zing_mailz_uninstall();
 	}
-	
+
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	if (!empty($_REQUEST['page']) && $_REQUEST['page'] != 'mailz_cp') {
 		$_GET['zlistpage']=str_replace('mailz-','',$_REQUEST['page']);
@@ -126,7 +126,7 @@ $zing_mailz_version=get_option("zing_mailz_version");
 <?php }?></div>
 </div>
 <?php 	require(dirname(__FILE__).'/includes/support-us.inc.php');
-	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
+zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
 
 ?></div>
 <?php
@@ -147,9 +147,9 @@ function zing_mailz_cp($message='') {
 	global $zing_mailz_content,$zing_mailz_name,$zing_mailz_menu;
 
 	$zing_mailz_version=get_option("zing_mailz_version");
-	
+
 	zing_mailz_head();
-	
+
 	echo '<div class="wrap">';
 	echo '<div id="zing-mailz-cp-content">';
 	if ($message) {
@@ -163,17 +163,19 @@ function zing_mailz_cp($message='') {
 		}
 	}
 	echo '</div>';
-	
+
 	require(dirname(__FILE__).'/includes/support-us.inc.php');
 	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
-	
+
 	echo '</div>';
-?><div style="clear: both"></div>
+	?>
+<div style="clear: both"></div>
 <hr />
-<p>For more info and support, contact us at <a href="http://www.zingiri.net/">Zingiri</a> or
-check out our <a href="http://zingiri.net/forums/">support forums</a>.</p>
+<p>For more info and support, contact us at <a
+	href="http://www.zingiri.net/">Zingiri</a> or check out our <a
+	href="http://zingiri.net/forums/">support forums</a>.</p>
 <hr />
-<?php
+	<?php
 }
 
 add_action('admin_menu', 'zing_mailz_admin_menu', 10); ?>
