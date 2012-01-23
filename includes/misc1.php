@@ -65,7 +65,9 @@ function zing_mailz_install_db() {
 	ob_start('zing_activation_output');
 
 	//install
-	if (!file_exists(ZING_MAILZ_DIR.'lists')) {
+	if (!file_exists(ZING_MAILZ_LOC.'lists')) {
+		if (!class_exists('ZipArchive')) die('Class ZipArchive doesn\'t exist, try installing it or manually unzip the file lists.zip in the plugin folder. Then try the upgrade again.');
+
 		$file=ZING_MAILZ_LOC.'lists.zip';
 		$to=ZING_MAILZ_LOC.'lists';
 
@@ -80,7 +82,7 @@ function zing_mailz_install_db() {
 			die();
 		}
 	}
-	
+
 	//create database tables
 	if (!$zing_mailz_version) {
 		$http=zing_mailz_http('mailz','admin/index.php',array('zlistpage'=>'initialise','firstintall'=>1));
@@ -107,7 +109,7 @@ function zing_mailz_install_db() {
 		print('Could not create phpList database tables');
 		ob_flush();
 	}
-	
+
 	//set admin password
 	$password=md5(time().get_option('home'));
 	$query="update ".$prefix."phplist_admin set password='".$password."' where loginname='admin'";
@@ -263,7 +265,7 @@ function zing_mailz_footer() {
 	$f.='<center style="margin-top:0px;font-size:x-small">';
 	$f.='Wordpress and <a href ="http://www.phplist.com/" target="_blank">phpList</a> integration by <a href="http://www.zingiri.net" target="_blank">Zingiri</a>';
 	$f.='</center>';
-	
+
 	return $f;
 }
 
