@@ -177,6 +177,8 @@ function zing_mailz_uninstall() {
 	}
 	
 	delete_option("zing_mailz_key");
+	delete_option("zing_mailz_cron");
+	delete_option("zing_mailz_password");
 	delete_option("zing_mailz_remote");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");

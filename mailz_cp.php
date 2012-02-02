@@ -79,6 +79,8 @@ function zing_mailz_admin_menu() {
 function zing_mailz_setup() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
 
+	if (!get_option('zing_mailz_key')) update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
+	
 	$controlpanelOptions=isset($zing_mailz_options) ? $zing_mailz_options : array();
 
 	if ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Install' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
