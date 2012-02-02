@@ -1,14 +1,14 @@
 <?php
 /*
  Plugin Name: Mailing List
- Plugin URI: http://www.zingiri.net
+ Plugin URI: http://www.zingiri.com/plugins-and-addons/mailing-list
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 2.0.3
- Author URI: http://www.zingiri.net/
+ Version: 2.0.4
+ Author URI: http://www.zingiri.com/
  */
 
-define("ZING_MAILZ_VERSION","2.0.3");
+define("ZING_MAILZ_VERSION","2.0.4");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -60,7 +60,7 @@ add_action('admin_head','zing_mailz_admin_head');
 
 register_activation_hook(__FILE__,'zing_mailz_activate');
 register_deactivation_hook(__FILE__,'zing_mailz_deactivate');
-if (get_option('zing_mailz_remote')) require_once(dirname(__FILE__) . '/includes/misc2.php');
+if (zing_mailz_remote()) require_once(dirname(__FILE__) . '/includes/misc2.php');
 else require_once(dirname(__FILE__) . '/includes/misc1.php');
 require_once(dirname(__FILE__) . '/includes/index.php');
 require_once(dirname(__FILE__) . '/classes/index.php');
@@ -100,8 +100,7 @@ function zing_activation_output($buffer) {
 }
 
 function zing_mailz_activate() {
-	update_option('zing_mailz_remote',1);
-	update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
+	if (!get_option('zing_mailz_key')) update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
 }
 
 /**
@@ -109,7 +108,7 @@ function zing_mailz_activate() {
  * @return void
  */
 function zing_mailz_deactivate() {
-	delete_option('zing_mailz_remote');
+	delete_option('zing_mailz_remote'); //legacy
 	wp_clear_scheduled_hook('zing_mailz_cron_hook');
 }
 
@@ -355,4 +354,12 @@ function mailz_log($type=0,$msg='',$filename="",$linenum=0) {
 		array_unshift($v,array(time(),$type,$msg));
 		update_option('mailz_debug_log',$v);
 	}
+}
+
+function zing_mailz_remote() {
+	global $wpdb;
+	$query="show tables like '".$wpdb->prefix.ZING_MAILZ_PREFIX."phplist_config'";
+	$rows=$wpdb->get_results($query);
+	if (count($rows) > 0) return false;
+	else return true;
 }

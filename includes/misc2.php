@@ -168,6 +168,8 @@ function zing_mailz_uninstall() {
 	foreach ($ida as $id) {
 		wp_delete_post($id);
 	}
+	delete_option("zing_mailz_key");
+	delete_option("zing_mailz_remote");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");
 }

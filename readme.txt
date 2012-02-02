@@ -1,16 +1,17 @@
 === Mailing List ===
 Contributors: zingiri
-Donate link: http://www.zingiri.net/donations
+Donate link: http://www.zingiri.com/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing, phplist
 Requires at least: 2.1.7
 Tested up to: 3.3.1
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 
-Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
+Mailing List adds powerful mailing list features to your Wordpress site. 
 
 == Description ==
 
-Mailing List is a powerful mailing list plugin based on phplist, the world's most popular open source email campaign manager. 
+Mailing List adds powerful mailing list features to your Wordpress site. 
+
 It is easy to install and use, and is seamlessly integrated with Wordpress. 
 
 It is great for newsletters, publicity lists, notifications, and many other uses. 
@@ -46,12 +47,12 @@ The main features are:
 3. Go to the Wordpress Settings page and find the Mailing List menu, click on install
 4. You're now ready to start configuring your mailing lists
 
-Please visit the [Zingiri](http://zingiri.net/forums/ "Zingiri Support Forum") for more information and support.
+Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=65 "Zingiri Support Forum") for more information and support.
 
 == Frequently Asked Questions ==
 
 = I have more questions! =
-Please visit the [Zingiri](http://zingiri.net/forums/ "Zingiri Support Forum") for more information and support.
+Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=65 "Zingiri Support Forum") for more information and support.
 
 == Screenshots ==
 
@@ -62,22 +63,11 @@ Screenshots are not yet available, anyway, just install the plugin and try it ou
 Simply upload the new version and go to the control panel to ugprade your version.
 Don't forget to take a database backup before you upgrade!
 
-== Other ==
-Fixes applied in PHPlists:
-* admin/connect.php: added a class to "Powered by" image
-* index.php: moved hardcoded styling for div.adminmessage to zing.css
-* config/config.php: various changes
-* admin/defaultconfig.inc: modified default links for mailing list messages (unsubscribe, etc)
-* admin/FCKEditor/editor/fckeditor.html: changed location of Loadscript
-* admin/FCKEditor: fixed bug in phplist where phpxml tags are used instead of xml tags
-* admin/header.inc: modified look and feel
-* admin/styles/phplist.css: adapted styles to fit with Wordpress
-* config/config.php: disabled Test mode
-* config/header.inc: modified look and feel
-* config/footer.inc: modified look and feel
-* styles/phplist.css: adapted styles to fit with Wordpress
-
 == Changelog ==
+
+= 2.0.4 =
+* Fixed issue with upgrading from version prior to version 2.0.0.
+* Removed uninstallation when deactivating
 
 = 2.0.3 =
 * Fixed issue with upgrade not saving latest version number

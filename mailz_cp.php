@@ -172,8 +172,8 @@ function zing_mailz_cp($message='') {
 <div style="clear: both"></div>
 <hr />
 <p>For more info and support, contact us at <a
-	href="http://www.zingiri.net/">Zingiri</a> or check out our <a
-	href="http://zingiri.net/forums/">support forums</a>.</p>
+	href="http://www.zingiri.com/">Zingiri</a> or check out our <a
+	href="http://forums.zingiri.com/">support forums</a>.</p>
 <hr />
 	<?php
 }

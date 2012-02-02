@@ -175,8 +175,11 @@ function zing_mailz_uninstall() {
 	foreach ($ida as $id) {
 		wp_delete_post($id);
 	}
-	delete_option("zing_mailz_version",ZING_VERSION);
-	delete_option("zing_mailz_pages",ZING_VERSION);
+	
+	delete_option("zing_mailz_key");
+	delete_option("zing_mailz_remote");
+	delete_option("zing_mailz_version");
+	delete_option("zing_mailz_pages");
 }
 
 function zing_mailz_login() {
@@ -263,7 +266,7 @@ function zing_mailz_footer() {
 	//Please contact us if you wish to remove the Zingiri logo in the footer
 	$f='<div style="clear:both"></div>';
 	$f.='<center style="margin-top:0px;font-size:x-small">';
-	$f.='Wordpress and <a href ="http://www.phplist.com/" target="_blank">phpList</a> integration by <a href="http://www.zingiri.net" target="_blank">Zingiri</a>';
+	$f.='Wordpress and <a href ="http://www.phplist.com/" target="_blank">phpList</a> integration by <a href="http://www.zingiri.com" target="_blank">Zingiri</a>';
 	$f.='</center>';
 
 	return $f;
