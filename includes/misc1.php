@@ -1,5 +1,12 @@
 <?php
 define("ZING_PHPLIST_URL",ZING_MAILZ_URL.'lists');
+$zing_mailz_options[]=array(  "name" => "General settings",
+            "type" => "heading",
+			"desc" => "This section manages the Mailing List settings.");
+$zing_mailz_options[]=array(	"name" => "Show footer",
+			"desc" => "Show your support by enabling our page footer.",
+			"id" => "zing_mailz_footer",
+			"type" => "checkbox");
 
 if ($zing_mailz_version) {
 	add_filter('upgrader_pre_install', 'zing_mailz_pre_upgrade', 9, 2);
@@ -182,6 +189,8 @@ function zing_mailz_uninstall() {
 	delete_option("zing_mailz_remote");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");
+	delete_option("zing_mailz_news");
+	delete_option("zing_mailz_news_time");
 }
 
 function zing_mailz_login() {

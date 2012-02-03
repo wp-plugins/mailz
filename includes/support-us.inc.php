@@ -1,7 +1,7 @@
 <?php 
 //v2.01.09
 if (!function_exists('zing_support_us')) {
-	function zing_support_us($shareName,$wpPluginName,$adminLink,$version,$donations=true) {
+	function zing_support_us($shareName,$wpPluginName,$adminLink,$version,$donations=true,$pluginUrl) {
 ?>
 		<div style="width:20%;float:right;position:relative">
 				<div style="margin:5px 15px;">
@@ -18,7 +18,7 @@ if (!function_exists('zing_support_us')) {
 			<div class="cc-support-us">
 				<p>Rate our plugin on Wordpress</p>
 				<a href="http://wordpress.org/extend/plugins/<?php echo $wpPluginName;?>" alt="Rate our plugin">
-				<img src="http://www.zingiri.com/wordpress/wp-content/uploads/5-stars-125pxw.png" />
+				<img src="<?php echo $pluginUrl?>images/5-stars-125pxw.png" />
 				</a>
 				<?php 
 				$option=$wpPluginName.'-support-us';
@@ -33,32 +33,8 @@ if (!function_exists('zing_support_us')) {
 				}
 				?>
 			</div>
-			<?php 	
-			if ((time()-get_option($wpPluginName.'_news_time')) > 7200) {
-				global $current_user;
-			
-				$url='http://www.zingiri.com/index.php?zlistpro=register&e='.urlencode($current_user->data->user_email).'&f='.urlencode(isset($current_user->data->first_name) ? $current_user->data->first_name : '').'&l='.urlencode(isset($current_user->data->last_name) ? $current_user->data->last_name : '').'&w='.urlencode(get_option('home')).'&p='.$wpPluginName.'&v='.urlencode($version);			
-				$news = new zHttpRequest($url);
-				if ($news->live()) {
-					update_option($wpPluginName.'_news',$news->DownloadToString());
-				}
-				update_option($wpPluginName.'_news_time',time());
-			}
-			?>
-			<?php
-			$data=json_decode(get_option($wpPluginName.'_news'));
-			if (count($data) > 0) {
-				foreach ($data as $rec) { ?>
-					<div class="cc-support-us">
-					<h3><?php echo $rec->title;?></h3>
-					<?php echo $rec->content;?>
-					</div>
-				<?php 
-				}
-			}?>
-
 			<div style="text-align:center;margin-top:15px">
-				<a href="http://www.zingiri.com" target="_blank"><img width="150px" src="http://www.zingiri.com/logo.png" /></a>
+				<a href="http://www.zingiri.com" target="_blank"><img width="150px" src="<?php echo $pluginUrl?>images/logo.png" /></a>
 			</div>
 		</div>
 <?php 

@@ -4,9 +4,13 @@ $zing_mailz_options[]=array(  "name" => "General settings",
             "type" => "heading",
 			"desc" => "This section manages the Mailing List settings.");
 $zing_mailz_options[]=array(	"name" => "API key",
-			"desc" => "This is your API key, it is uniquely linked to your web site, make sure to keep it in a safe place.",
+			"desc" => "This plugin uses remote web services to provide mailing list functionality. This API key has been automatically generated for you. Once you click on Install, the API key, in combination with your web site address <strong>".home_url()."</strong> will create an account on our servers allowing the plugin to access the remote web services.<br />The combination of API key and your web site address uniquely identifes you so please make sure to keep it in a safe place. ",
 			"id" => "zing_mailz_key",
 			"type" => "text");
+$zing_mailz_options[]=array(	"name" => "Show footer",
+			"desc" => "Show your support by enabling our page footer.",
+			"id" => "zing_mailz_footer",
+			"type" => "checkbox");
 
 function zing_mailz_http($module,$to_include="index",$get=array()) {
 	global $wpdb,$current_user;
@@ -138,7 +142,7 @@ function zing_mailz_install_db() {
 			//echo $output;die();
 		}
 	}
-	
+
 	//default options
 	if (count($zing_mailz_options) > 0) {
 		foreach ($zing_mailz_options as $value) {
@@ -172,6 +176,8 @@ function zing_mailz_uninstall() {
 	delete_option("zing_mailz_remote");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");
+	delete_option("zing_mailz_news");
+	delete_option("zing_mailz_news_time");
 }
 
 function zing_mailz_login() {
@@ -278,4 +284,17 @@ function zing_mailz_home() {
 }
 
 function zing_mailz_footer() {
+	$bail_out = ( ( defined( 'WP_ADMIN' ) && WP_ADMIN == true ) || ( strpos( $_SERVER[ 'PHP_SELF' ], 'wp-admin' ) !== false ) );
+	if ( $bail_out ) return $footer;
+
+	$f='';
+	if (get_option('zing_mailz_footer')) {
+		$f='<div style="clear:both"></div>';
+		$f.='<center style="margin-top:0px;font-size:x-small">';
+		$f.='Wordpress and <a href ="http://www.phplist.com/" target="_blank">phpList</a> integration by <a href="http://www.zingiri.com" target="_blank">Zingiri</a>';
+		$f.='</center>';
+	}
+
+	return $f;
 }
+

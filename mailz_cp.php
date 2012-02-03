@@ -43,7 +43,21 @@ function zing_mailz_admin_menu() {
 	if (!class_exists('simple_html_dom_node')) require(dirname(__FILE__) . '/addons/simplehtmldom/simple_html_dom.php');
 	$zing_mailz_version=get_option("zing_mailz_version");
 
+	if (isset($_REQUEST['action']) && $_REQUEST['action']=='update' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
+		foreach ($zing_mailz_options as $value) {
+			if (isset($value['id'])) {
+				if( isset( $_REQUEST[ $value['id'] ] ) ) update_option( $value['id'], $_REQUEST[ $value['id'] ]  );
+				else delete_option( $value['id'] );
+			}
+		}
+	}
 	if (isset($_REQUEST['action']) && $_REQUEST['action']=='install' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
+		foreach ($zing_mailz_options as $value) {
+			if (isset($value['id'])) {
+				if( isset( $_REQUEST[ $value['id'] ] ) ) update_option( $value['id'], $_REQUEST[ $value['id'] ]  );
+				else delete_option( $value['id'] );
+			}
+		}
 		zing_mailz_install();
 	}
 	if (isset($_REQUEST['action']) && $_REQUEST['action']=='uninstall' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
@@ -80,7 +94,7 @@ function zing_mailz_setup() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
 
 	if (!get_option('zing_mailz_key')) update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
-	
+
 	$controlpanelOptions=isset($zing_mailz_options) ? $zing_mailz_options : array();
 
 	if ( isset($_REQUEST['installed']) && $_REQUEST['installed']=='Install' ) echo '<div id="message" class="updated fade"><p><strong>'.$zing_mailz_name.' installed.</strong></p></div>';
@@ -128,7 +142,7 @@ $zing_mailz_version=get_option("zing_mailz_version");
 <?php }?></div>
 </div>
 <?php 	require(dirname(__FILE__).'/includes/support-us.inc.php');
-zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
+zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION,true,ZING_MAILZ_URL);
 
 ?></div>
 <?php
@@ -167,7 +181,7 @@ function zing_mailz_cp($message='') {
 	echo '</div>';
 
 	require(dirname(__FILE__).'/includes/support-us.inc.php');
-	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION);
+	zing_support_us('mailing-list','mailz','mailz_cp',ZING_MAILZ_VERSION,true,ZING_MAILZ_URL);
 
 	echo '</div>';
 	?>
