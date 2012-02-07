@@ -1,5 +1,5 @@
 <?php 
-//v2.01.09
+//v2.02.01
 if (!function_exists('zing_support_us')) {
 	function zing_support_us($shareName,$wpPluginName,$adminLink,$version,$donations=true,$pluginUrl) {
 ?>
