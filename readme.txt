@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.com/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing, phplist
 Requires at least: 2.1.7
 Tested up to: 3.3.1
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 
 Mailing List adds powerful mailing list features to your Wordpress site. 
 
@@ -64,6 +64,9 @@ Simply upload the new version and go to the control panel to ugprade your versio
 Don't forget to take a database backup before you upgrade!
 
 == Changelog ==
+
+= 2.0.8 =
+* Fixed follow redirect issue
 
 = 2.0.7 =
 * Updated http class to version 2.02.06
