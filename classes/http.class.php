@@ -253,7 +253,7 @@ if (!class_exists('zHttpRequest')) {
 				
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
 			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 60); // times out after 10s
+			curl_setopt($ch, CURLOPT_TIMEOUT, 30); // times out after 10s
 			if ($this->_protocol == "https") {
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
@@ -405,8 +405,13 @@ if (!class_exists('zHttpRequest')) {
 					if (strstr($this->_protocol.'://'.$this->_host.$redir,$this->_protocol.'://'.$this->_host.$this->_path)) $redir=$this->_protocol.'://'.$this->_host.$this->_path;
 					elseif (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
 				} else {
-					if (strstr($this->_protocol.'://'.$this->_host.$redir,$this->_protocol.'://'.$this->_host.$this->_path)) $redir=$this->_protocol.'://'.$this->_host.$redir;
-					elseif (!strstr($redir,$this->_host)) $redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
+					if (strstr($redir,$this->_protocol.'://'.$this->_host.$this->_path)) {
+						//do nothing
+					} elseif (strstr($this->_protocol.'://'.$this->_host.$redir,$this->_protocol.'://'.$this->_host.$this->_path)) {
+						$redir=$this->_protocol.'://'.$this->_host.$redir;
+					} elseif (!strstr($redir,$this->_host)) {
+						$redir=$this->_protocol.'://'.$this->_host.$this->_path.$redir;
+					}
 				}
 				//echo '<br />redir='.$redir;
 				if (strstr($redir,'&')) $redir.='&';

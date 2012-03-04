@@ -1,7 +1,8 @@
 <?php 
-//v2.02.01
+//v2.02.06
 if (!function_exists('zing_support_us')) {
-	function zing_support_us($shareName,$wpPluginName,$adminLink,$version,$donations=true,$pluginUrl) {
+	function zing_support_us($shareName,$wpPluginName,$adminLink,$version,$donations=true,$pluginUrl=false) {
+		if (!$pluginUrl) $pluginUrl=plugins_url().'/'.$wpPluginName.'/';
 ?>
 		<div style="width:20%;float:right;position:relative">
 				<div style="margin:5px 15px;">
