@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.com/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing, phplist
 Requires at least: 2.1.7
 Tested up to: 3.3.1
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 
 Mailing List adds powerful mailing list features to your Wordpress site. 
 
@@ -40,6 +40,8 @@ The main features are:
 * Scheduled sending let you decide when the message is to be sent
 * Send a message repeatedly for updated dynamic content and attachments
 
+Note: Mailing List uses web services stored on Zingiri's servers, read more in the plugin's FAQ about what that means.
+
 == Installation ==
 
 1. Upload the `mailz` folder to the `/wp-content/plugins/` directory
@@ -50,6 +52,15 @@ The main features are:
 Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=65 "Zingiri Support Forum") for more information and support.
 
 == Frequently Asked Questions ==
+
+= This plugin uses web services, what exactly does that mean? =
+Web services are simple way of delivering software solutions. Basically it means that the software & data is hosted on our secure servers and that you can access it from anywhere in the world. 
+No need to worry about backing up your data, managing systems, we do it for you.
+
+= What about data privacy? =
+This plugin uses web services stored on Zingiri's servers. In doing so, personal data is collected and stored on our servers. 
+This data includes amongst others your admin email address as this is used, together with the API key as a unique identifier for your account on Zingiri's servers. 
+We have a very strict [privacy policy](http://www.zingiri.com/privacy-policy/ "privacy policy") as well as [terms & conditions](http://www.zingiri.com/terms/ "terms & conditions") governing data stored on our servers.
 
 = I have more questions! =
 Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=65 "Zingiri Support Forum") for more information and support.
@@ -64,6 +75,9 @@ Simply upload the new version and go to the control panel to ugprade your versio
 Don't forget to take a database backup before you upgrade!
 
 == Changelog ==
+
+= 2.0.9 =
+* Updated readme.txt and settings page regarding the use of web services and data privacy policy
 
 = 2.0.8 =
 * Fixed follow redirect issue

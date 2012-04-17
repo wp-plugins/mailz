@@ -1,5 +1,6 @@
 <?php
-define("ZING_PHPLIST_URL",'http://eu1.ml.clientcentral.info');
+define("ZING_PHPLIST_URL",'http://eu1.ml.clientcentral.info'); //URL end point for web services stored on Zingiri servers
+
 $zing_mailz_options[]=array(  "name" => "General settings",
             "type" => "heading",
 			"desc" => "This section manages the Mailing List settings.");
@@ -11,6 +12,12 @@ $zing_mailz_options[]=array(	"name" => "Show footer",
 			"desc" => "Show your support by enabling our page footer.",
 			"id" => "zing_mailz_footer",
 			"type" => "checkbox");
+$zing_mailz_options[]=array(  "name" => "Before you install",
+		"type" => "heading",
+		"desc" => '<div style="text-decoration:underline;display:inline;font-weight:bold">IMPORTANT:</div> Mailing List uses web services stored on Zingiri\'s servers. In doing so, personal data is collected and stored on our servers. 
+				This data includes amongst others your admin email address as this is used, together with the API key as a unique identifier for your account on Zingiri\'s servers.
+				We have a very strict <a href="http://www.zingiri.com/privacy-policy/" target="_blank">privacy policy</a> as well as <a href="http://www.zingiri.com/terms/" target="_blank">terms & conditions</a> governing data stored on our servers.
+				<div style="font-weight:bold;display:inline">By installing this plugin you accept these terms & conditions.</div>');
 
 function zing_mailz_http($module,$to_include="index",$get=array()) {
 	global $wpdb,$current_user;

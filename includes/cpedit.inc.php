@@ -1,5 +1,5 @@
 <?php
-//v1.09.15
+//v2.04.17
 ?>
 <table class="optiontable">
 
@@ -105,9 +105,8 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan=2><small>
-		<p style="color: red; margin: 0 0;"><?php echo $value['desc']; ?></P>
-		</small>
+		<td colspan=2>
+		<div style="color: red; margin: 0 0; font-size: smaller"><?php echo $value['desc']; ?></div>
 		<hr />
 		</td>
 	</tr>
