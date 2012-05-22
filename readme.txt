@@ -3,8 +3,8 @@ Contributors: zingiri
 Donate link: http://www.zingiri.com/donations
 Tags: mailing, mailing list, mail, email, contact, newsletter, subscription, marketing, phplist
 Requires at least: 2.1.7
-Tested up to: 3.3.1
-Stable tag: 2.0.9
+Tested up to: 3.3.2
+Stable tag: 2.1.0
 
 Mailing List adds powerful mailing list features to your Wordpress site. 
 
@@ -75,6 +75,9 @@ Simply upload the new version and go to the control panel to ugprade your versio
 Don't forget to take a database backup before you upgrade!
 
 == Changelog ==
+
+= 2.1.0 =
+* Added language selector allowing changing the admin language
 
 = 2.0.9 =
 * Updated readme.txt and settings page regarding the use of web services and data privacy policy
