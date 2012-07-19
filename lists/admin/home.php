@@ -27,6 +27,7 @@ if (Sql_Table_exists($tables["config"],1)) {
 //   Warn($GLOBALS['I18N']->get('globalvulnwarning'));
 
 # check for latest version
+
 $checkinterval = sprintf('%d',getConfig("check_new_version"));
 if (!isset($checkinterval)) {
   $checkinterval = 7;
@@ -57,6 +58,7 @@ if ($checkinterval) {
       $tables["config"]));
   }
 }
+
 
 if (!stristr($_SERVER['HTTP_USER_AGENT'],'firefox')) {
   print '<div align="right"><a href="http://www.spreadfirefox.com/?q=affiliates&amp;id=131358&amp;t=81"><img border="0" alt="Get Firefox!" title="Get Firefox!" src="images/getff.gif"/></a></div>';
