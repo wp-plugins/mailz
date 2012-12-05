@@ -1,7 +1,10 @@
 <?php
 define("ZING_PHPLIST_URL",'http://eu1.ml.clientcentral.info'); //URL end point for web services stored on Zingiri servers
 
-$zing_mailz_options[]=array(  "name" => "General settings",
+if (!get_option('zing_mailz_key')) update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
+
+
+$zing_mailz_options[]=array(  "name" => "Remote settings",
             "type" => "heading",
 			"desc" => "This section manages the Mailing List settings.");
 $zing_mailz_options[]=array(	"name" => "API key",
@@ -180,7 +183,7 @@ function zing_mailz_uninstall() {
 		wp_delete_post($id);
 	}
 	delete_option("zing_mailz_key");
-	delete_option("zing_mailz_remote");
+	delete_option("zing_mailz_mode");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");
 	delete_option("zing_mailz_news");

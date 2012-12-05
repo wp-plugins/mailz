@@ -19,14 +19,14 @@ function zing_mailz_install() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options;
 
 	if ($_REQUEST['action']=='install') {
-		zing_mailz_install_db();
+		if (function_exists('zing_mailz_install_db')) zing_mailz_install_db();
 		foreach ($zing_mailz_options as $value) {
 			if( isset( $_REQUEST[ $value['id'] ] ) ) {
 				update_option( $value['id'], $_REQUEST[ $value['id'] ]  );
 			} else { delete_option( $value['id'] );
 			}
 		}
-		header("Location: admin.php?page=mailz_cp&installed=true");
+		header("Location: admin.php?page=mailz_setup&installed=true");
 		die();
 	} else {
 		$message='<p>Ready to install this plugin? Simply click on the button below and wait a few seconds.</p><br />';
@@ -62,6 +62,7 @@ function zing_mailz_admin_menu() {
 	}
 	if (isset($_REQUEST['action']) && $_REQUEST['action']=='uninstall' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
 		zing_mailz_uninstall();
+		header("Location: admin.php?page=mailz_setup&uninstalled=true");
 	}
 
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
@@ -70,8 +71,8 @@ function zing_mailz_admin_menu() {
 		$_GET['zlist']='index';
 	}
 
-	add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
 	if (get_option("zing_mailz_version")) {
+		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_cp','zing_mailz_admin');
 		if ($zing_mailz_version) {
 			zing_mailz_header();
 			$html=str_get_html($_SESSION['mailz_menu']);
@@ -86,14 +87,15 @@ function zing_mailz_admin_menu() {
 				$first=false;
 			}
 		}
+		add_submenu_page('mailz_cp', $zing_mailz_name.'- Setup', 'Setup', 'administrator', 'mailz_setup', 'zing_mailz_setup');
+	} else {
+		add_menu_page($zing_mailz_name, $zing_mailz_name, 'administrator', 'mailz_setup','zing_mailz_setup');
+		add_submenu_page('mailz_cp', $zing_mailz_name.'- Setup', 'Setup', 'administrator', 'mailz_setup', 'zing_mailz_setup');
 	}
-	add_submenu_page('mailz_cp', $zing_mailz_name.'- Integration', 'Integration', 'administrator', 'mailz_setup', 'zing_mailz_setup');
 }
 
 function zing_mailz_setup() {
 	global $zing_mailz_name, $zing_mailz_shortname, $zing_mailz_options, $wpdb;
-
-	if (!get_option('zing_mailz_key')) update_option('zing_mailz_key',md5(time().sprintf(mt_rand(),'%10d')));
 
 	$controlpanelOptions=isset($zing_mailz_options) ? $zing_mailz_options : array();
 
@@ -116,7 +118,7 @@ $zing_mailz_version=get_option("zing_mailz_version");
 
 <?php if (!$zing_mailz_version) { ?>
 <p class="submit"><input class="button-primary" name="install"
-	type="submit" value="Install" /> <input type="hidden" name="action"
+	type="submit" value="<?php echo get_option('zing_mailz_mode') ? 'Install' : 'Select Local or Remote mode';?>" /> <input type="hidden" name="action"
 	value="install" /></p>
 
 <?php } elseif ($zing_mailz_version != ZING_MAILZ_VERSION) { ?>

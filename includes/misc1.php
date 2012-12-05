@@ -1,6 +1,6 @@
 <?php
 define("ZING_PHPLIST_URL",ZING_MAILZ_URL.'lists');
-$zing_mailz_options[]=array(  "name" => "General settings",
+$zing_mailz_options[]=array(  "name" => "Local settings",
             "type" => "heading",
 			"desc" => "This section manages the Mailing List settings.");
 $zing_mailz_options[]=array(	"name" => "Show footer",
@@ -186,7 +186,7 @@ function zing_mailz_uninstall() {
 	delete_option("zing_mailz_key");
 	delete_option("zing_mailz_cron");
 	delete_option("zing_mailz_password");
-	delete_option("zing_mailz_remote");
+	delete_option("zing_mailz_mode");
 	delete_option("zing_mailz_version");
 	delete_option("zing_mailz_pages");
 	delete_option("zing_mailz_news");

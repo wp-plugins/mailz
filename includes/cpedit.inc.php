@@ -100,13 +100,13 @@
 	<?php } elseif ($value['type'] == "heading") { ?>
 
 	<tr valign="top">
-		<td colspan="2" style="text-align: left;">
+		<td colspan="2" style="text-align: left;color:#21759B;">
 		<h3><?php echo $value['name']; ?></h2>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-		<div style="color: red; margin: 0 0; font-size: smaller"><?php echo $value['desc']; ?></div>
+		<div style="color: #999999; margin: 0 0; font-size: smaller"><?php echo $value['desc']; ?></div>
 		<hr />
 		</td>
 	</tr>
