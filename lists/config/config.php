@@ -545,7 +545,7 @@ define("MANUALLY_PROCESS_RSS",1);
 # if it's not working for you, set this to 0
 # NOTE: If you enable TinyMCE please disable FCKeditor and vice-versa.
 //zingiri: part of the configuration menu
-//define("USEFCK",0);
+define("USEFCK",0);
 
 # If you want to upload images to the FCKeditor, you need to specify the location
 # of the directory where the images go. This needs to be writable by the webserver,

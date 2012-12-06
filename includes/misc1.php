@@ -38,13 +38,7 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 		}
 	}
 
-	//$wpconnect=base64_encode(serialize(array('wpdb'=>DB_NAME,'wpf'=>$wpdb->prefix,'wph'=>DB_HOST,'wpu'=>DB_USER,'wpp'=>DB_PASSWORD)));
-	//$vars.=$and.'wpconnect='.$wpconnect;
-	//$vars.=$and.'wpdb='.zing_urlencode(DB_NAME);
 	$vars.=$and.'&wpf='.zing_urlencode($wpdb->prefix);
-	//$vars.='&wph='.zing_urlencode(DB_HOST);
-	//$vars.='&wpu='.zing_urlencode(DB_USER);
-	//$vars.='&wpp='.zing_urlencode(DB_PASSWORD);
 	$vars.='&wpn='.md5(DB_HOST.DB_NAME.DB_USER.DB_PASSWORD);
 	$vars.='&wppageid='.zing_mailz_mainpage();
 	$vars.='&wpsiteurl='.urlencode(get_option('siteurl'));

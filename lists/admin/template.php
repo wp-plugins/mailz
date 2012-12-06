@@ -11,7 +11,7 @@ if (!empty($_FILES['file_template']) && is_uploaded_file($_FILES['file_template'
   $content = '';
 }
 
-if (file_exists("./FCKeditor/fckeditor.php") && USEFCK) {
+if (USEFCK && file_exists("./FCKeditor/fckeditor.php")) {
   include("./FCKeditor/fckeditor.php") ;
 
   // Create the editor object here so we can check to see if *it* wants us to use it (this

@@ -382,9 +382,9 @@ function Info($msg) {
 
 $main_menu = array (
 	"configure" => "Configure",
-	"community" => "Help",
-	"about" => "About",
-	"div1" => "<hr />",
+	//"community" => "Help",
+	//"about" => "About",
+	//"div1" => "<hr />",
 	"list" => "Lists",
 	"send" => "Send a message",
 	"users" => "Users",
@@ -392,7 +392,7 @@ $main_menu = array (
 	"spage" => "Subscribe Pages",
 	"messages" => "Messages",
 	'statsmgt' => 'Statistics',
-	"div2" => "<hr />",
+	//"div2" => "<hr />",
 	"templates" => "Templates",
 	"preparesend" => "Prepare a message",
 	"sendprepared" => "Send a prepared message",

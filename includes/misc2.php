@@ -31,10 +31,8 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$t=explode('/',$to_include);
 	if (count($t)==2) {
 		$http=ZING_PHPLIST_URL.'/'.$t[0].'/api.php';
-		//$pg=$t[1];
 	} else {
 		$http=ZING_PHPLIST_URL.'/api.php';
-		//$pg=$t[0];
 	}
 
 	$and="&";
@@ -56,12 +54,6 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 		}
 	}
 
-	/*
-	 $vars.=$and.'&wpf='.zing_urlencode($wpdb->prefix);
-	 $vars.='&wpn='.md5(DB_HOST.DB_NAME.DB_USER.DB_PASSWORD);
-	 $vars.='&wppageid='.zing_mailz_mainpage();
-	 $vars.='&wpsiteurl='.urlencode(get_option('siteurl'));
-	 */
 	$wp=array();
 	if (is_user_logged_in()) {
 		$wp['login']=$current_user->data->user_login;
@@ -78,7 +70,6 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$wp['pluginurl']=ZING_MAILZ_URL;
 	if (is_admin()) {
 		$wp['mode']='b';
-		//$wp['pageurl']=zing_mailz_home();
 		$wp['pageurl']=get_admin_url().'admin.php?page=bookings&';
 	} else {
 		$wp['mode']='f';
@@ -90,11 +81,8 @@ function zing_mailz_http($module,$to_include="index",$get=array()) {
 	$wp['key']=get_option('zing_mailz_key');
 	$wp['lang']=get_option('zing_mailz_lang'); //get_bloginfo('language');
 	$wp['client_version']=ZING_MAILZ_VERSION;
-	//if (current_user_can(zing_mailz_ADMIN_CAP)) $wp['cap']='admin';
-	//elseif (current_user_can(zing_mailz_USER_CAP)) $wp['cap']='operator';
 
 	$vars.='&wp='.urlencode(base64_encode(json_encode($wp)));
-
 
 	if ($vars) $http.='?'.$vars;
 
