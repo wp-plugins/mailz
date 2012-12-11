@@ -1,6 +1,7 @@
 
 <script language="Javascript" src="js/jslib.js" type="text/javascript"></script>
 
+
 <?php
 
 if (!isset($_SESSION["userlistfilter"]) || !$_SESSION["userlistfilter"]) {
@@ -289,12 +290,13 @@ $find_url .= "&amp;sortby=$sortby&amp;sortorder=$sortorder&amp;unconfirmed=$unco
 
 $listing = '';
 $dolist = 1;
+
 if ($total > MAX_USER_PP) {
   if (isset($start) && $start) {
     $listing = sprintf($GLOBALS['I18N']->get('Listing user %d to %d'),$start,$start + MAX_USER_PP);
     $limit = "limit $start,".MAX_USER_PP;
   } else {
-    if ($total < 1000 || $searchdone) {
+    if ($total < 100000 || $searchdone) {
       $listing =  sprintf($GLOBALS['I18N']->get('Listing user %d to %d'),1,50);
       $limit = "limit 0,50";
       $start = 0;

@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com/plugins-and-addons/mailing-list
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 2.2.1
+ Version: 2.2.2
  Author URI: http://www.zingiri.com/
  */
 
-define("ZING_MAILZ_VERSION","2.2.1");
+define("ZING_MAILZ_VERSION","2.2.2");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -228,6 +228,7 @@ function zing_mailz_ob($buffer) {
 		if (isset($_GET['zlistpage'])) $buffer=str_replace('<form method=post >','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace('name="page"','name="zlistpage"',$buffer);
 		$buffer=str_replace('<form method="get" name="listcontrol" action="">','<form method="get" name="listcontrol" action="admin.php"><input type="hidden" value="mailz-users" name="page"/>',$buffer);
+		$buffer=str_replace('<form method="get" name="listcontrol">','<form method="get" name="listcontrol" action="admin.php"><input type="hidden" value="mailz-users" name="page"/>',$buffer);
 		if (isset($_GET['zlistpage'])) $buffer=str_replace('<form method=get>','<form method=get><input type="hidden" name="page" value="mailz_cp" /><input type="hidden" name="zlist" value="index" /><input type="hidden" name="zlistpage" value="'.$_GET['zlistpage'].'" />',$buffer);
 		if (isset($_GET['zlistpage'])) $buffer=str_replace('<form method="post" action="">','<form method=post action="'.$admin.'admin.php?page=mailz_cp&zlist=index&zlistpage='.$_GET['zlistpage'].'">',$buffer);
 		$buffer=str_replace(ZING_PHPLIST_URL.'/?',$admin.'admin.php?page=mailz_cp&zlist=index&',$buffer);

@@ -1,6 +1,3 @@
-<script language="Javascript" src="js/jslib.js" type="text/javascript"></script>
-<hr>
-
 <?php
 ####################################################################
 # This file is a placeholder. Functionality is passed to commonlib #

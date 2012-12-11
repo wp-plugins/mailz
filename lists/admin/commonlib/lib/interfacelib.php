@@ -184,12 +184,14 @@ class WebblerListing {
           </td></tr>',$row["name"],$align,sizeof($this->columns),$align,$value);
       }
     }
+    /*
     $html .= sprintf('<!--greenline start-->
       <tr valign="middle">
       <td colspan="%d" bgcolor="#CCCC99"><img height=1 alt="" src="images/transparent.png" width=1 border=0></td></td>
       </tr>
       <!--greenline end-->
     ',sizeof($this->columns)+2);
+    */
 #    $this->duplicatebuttons[$name] = array(
 #      "button" => $name,
 #      "rows" => $rows,
