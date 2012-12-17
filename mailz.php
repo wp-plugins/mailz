@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com/plugins-and-addons/mailing-list
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 2.2.2
+ Version: 2.2.3
  Author URI: http://www.zingiri.com/
  */
 
-define("ZING_MAILZ_VERSION","2.2.2");
+define("ZING_MAILZ_VERSION","2.2.3");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -358,15 +358,17 @@ function mailz_log($type=0,$msg='',$filename="",$linenum=0) {
 }
 
 function zing_mailz_mode() {
-	global $wpdb;
 	if (!get_option('zing_mailz_mode')) {
-		if (get_option('zing_mailz_key')) {
-			update_option('zing_mailz_mode','remote');
-		} else {
-			$query="show tables like '".$wpdb->prefix.ZING_MAILZ_PREFIX."phplist_config'";
-			$rows=$wpdb->get_results($query);
-			if (count($rows) > 0) update_option('zing_mailz_mode','local');
-		}
+		if (zing_mailz_has_local_database()) update_option('zing_mailz_mode','local');
+		elseif (get_option('zing_mailz_key')) update_option('zing_mailz_mode','remote');
 	}
 	return get_option('zing_mailz_mode');
+}
+
+function zing_mailz_has_local_database() {
+	global $wpdb;
+	$query="show tables like '".$wpdb->prefix.ZING_MAILZ_PREFIX."phplist_config'";
+	$rows=$wpdb->get_results($query);
+	if (count($rows) > 0) return true;
+	else return false;
 }

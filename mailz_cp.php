@@ -26,11 +26,11 @@ function zing_mailz_install() {
 			} else { delete_option( $value['id'] );
 			}
 		}
-		if (function_exists('zing_mailz_install_db')) { 
+		if (function_exists('zing_mailz_install_db')) {
 			header("Location: admin.php?page=mailz_setup&installed=Install");
 			die();
 		} else header("Location: admin.php?page=mailz_setup");
-		
+
 	} else {
 		$message='<p>Ready to install this plugin? Simply click on the button below and wait a few seconds.</p><br />';
 		$message.='<a href="admin.php?page=mailz_setup&action=install" class="button">Install</a><br />';
@@ -67,8 +67,13 @@ function zing_mailz_admin_menu() {
 	if (isset($_REQUEST['action']) && $_REQUEST['action']=='uninstall' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
 		zing_mailz_uninstall();
 		header("Location: admin.php?page=mailz_setup&uninstalled=true");
+		die();
 	}
-
+	if (isset($_REQUEST['action']) && $_REQUEST['action']=='switchtolocal' && isset($_REQUEST['page']) && $_REQUEST['page']=='mailz_setup') {
+		update_option('zing_mailz_mode','local');
+		header("Location: admin.php?page=mailz_setup&installed=Update");
+		die();
+	}
 	if (empty($_GET['zlist'])) $_GET['zlist']='admin/index';
 	if (!empty($_REQUEST['page']) && $_REQUEST['page'] != 'mailz_cp') {
 		$_GET['zlistpage']=str_replace('mailz-','',$_REQUEST['page']);
@@ -149,10 +154,16 @@ function zing_mailz_setup() {
 
 				<?php } ?>
 			</form>
-
+			<?php
+			if ((get_option('zing_mailz_key')=='remote') && zing_mailz_has_local_database()) {
+				echo '<a href="admin.php?page=mailz_setup&action=switchtolocal" onclick="return confirm(\'If you switch to local mode you won\\\'t be able to switch back to remote mode.\nClick OK to proceed or Cancel to abort.\');" class="button">Switch to Local Mode</a>';
+			}
+			?>
 			<?php if ($zing_mailz_version) { ?>
-			<a href="admin.php?page=mailz_setup&action=uninstall" onclick="return confirm('Uninstalling will remove all your data, are you sure?\nClick OK to proceed or Cancel to abort.');" class="button">Uninstall</a>
-			<?php }?>
+			<a href="admin.php?page=mailz_setup&action=uninstall"
+				onclick="return confirm('Uninstalling will remove all your data, are you sure?\nClick OK to proceed or Cancel to abort.');"
+				class="button">Uninstall</a>
+				<?php }?>
 		</div>
 	</div>
 	<?php 	require(dirname(__FILE__).'/includes/support-us.inc.php');
@@ -208,7 +219,7 @@ function zing_mailz_cp($message='') {
 		href="http://forums.zingiri.com/">support forums</a>.
 </p>
 <hr />
-<?php
+	<?php
 }
 
 add_action('admin_menu', 'zing_mailz_admin_menu', 10); ?>
