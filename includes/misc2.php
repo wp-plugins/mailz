@@ -11,6 +11,10 @@ $zing_mailz_options[]=array(	"name" => "API key",
 			"desc" => "This plugin uses remote web services to provide mailing list functionality. This API key has been automatically generated for you. Once you click on Install, the API key, in combination with your web site address <strong>".home_url()."</strong> will create an account on our servers allowing the plugin to access the remote web services.<br />The combination of API key and your web site address uniquely identifes you so please make sure to keep it in a safe place. ",
 			"id" => "zing_mailz_key",
 			"type" => "text");
+$zing_mailz_options[]=array(	"name" => "License key",
+			"desc" => "If you wish to activate the Pro features of Mailing List, enter your license key here. You can purchase a license key <a href=\"http://www.zingiri.com/plugins-and-addons/mailing-list\" target=\"_blank\">here</a>.",
+			"id" => "zing_mailz_lic",
+			"type" => "text");
 $zing_mailz_options[]=array(	"name" => "Show footer",
 			"desc" => "Show your support by enabling our page footer.",
 			"id" => "zing_mailz_footer",
