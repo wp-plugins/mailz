@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com/plugins-and-addons/mailing-list
  Description: This plugin provides easy to use mailing list functionality to your Wordpress site
  Author: Zingiri
- Version: 2.3.0
+ Version: 2.3.1
  Author URI: http://www.zingiri.com/
  */
 
-define("ZING_MAILZ_VERSION","2.3.0");
+define("ZING_MAILZ_VERSION","2.3.1");
 define("ZING_MAILZ_PREFIX","zing_");
 
 if (isset($wpdb)) $dbtablesprefix=$wpdb->prefix.ZING_MAILZ_PREFIX;
@@ -80,7 +80,7 @@ function zing_mailz_notices() {
 	if ($upload['error']) $warnings[]=$upload['error'];
 
 	if (empty($zing_mailz_version)) $warnings[]='Please proceed with a clean install or deactivate your plugin';
-	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.' and need to <a href="admin.php?page=mailz_setup">upgrade</a> your database (currently at version '.$zing_mailz_version.').';
+	elseif ($zing_mailz_version != ZING_MAILZ_VERSION) $warnings[]='You downloaded version '.ZING_MAILZ_VERSION.'. Please verify and <a href="admin.php?page=mailz_setup">update</a> your settings (currently at version '.$zing_mailz_version.').';
 
 	if (get_option('activation-output')) {
 		//	$warnings[]='An error occured during activation:<br /><div style="background-color:white">'.get_option('activation-output').'</div>';

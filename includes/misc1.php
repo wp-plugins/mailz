@@ -322,3 +322,4 @@ function zing_mailz_rrmdir($dir) {
 		rmdir($dir);
 	}
 }
+
